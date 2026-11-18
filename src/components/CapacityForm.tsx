@@ -17,6 +17,7 @@ import {
 import { addDays, formatDay, parseDate, toInputDate } from "@/lib/dates";
 import { valuesForMode, type ListingValues } from "@/lib/listingValues";
 import { Field, toNumber } from "./Field";
+import { SpaceCalculator } from "./SpaceCalculator";
 
 const PRICE_LABEL: Record<PricingUnit, string> = {
   PER_KG: "Price per chargeable kg (USD)",
@@ -240,6 +241,14 @@ export function CapacityForm({
           <input id="transitDaysMax" inputMode="numeric" value={v.transitDaysMax} onChange={(e) => set("transitDaysMax", e.target.value)} aria-invalid={!!err("transitDaysMax")} />
         </Field>
       </div>
+
+      {!vehicles && v.mode !== "AIR" && (
+        <SpaceCalculator
+          onUse={({ floorM2, volumeM3 }) =>
+            setV((p) => ({ ...p, availableFloorM2: String(floorM2), availableVolumeM3: String(volumeM3) }))
+          }
+        />
+      )}
 
       <details className="mt-5 rounded border border-rule px-4 py-3">
         <summary className="cursor-pointer text-sm font-semibold">More details (cutoff, limits, restrictions)</summary>

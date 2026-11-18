@@ -114,6 +114,11 @@ model ShipmentRequest {
   cargoKind          CargoKind @default(GENERAL)
   pieces             Int      @default(1)
   floorAreaM2        Float?
+  pieceLengthCm      Int?
+  pieceWidthCm       Int?
+  pieceHeightCm      Int?
+  pieceWeightKg      Float?
+  stackable          Boolean  @default(false)
   vehicleCount       Int?
   heaviestPieceKg    Float?
   isDangerousGoods   Boolean  @default(false)

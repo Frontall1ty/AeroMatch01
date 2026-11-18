@@ -113,6 +113,11 @@ export type ShipmentInput = {
   weightKg: number;
   volumeM3: number;
   floorAreaM2?: number | null;
+  pieceLengthCm?: number | null;
+  pieceWidthCm?: number | null;
+  pieceHeightCm?: number | null;
+  pieceWeightKg?: number | null;
+  stackable?: boolean;
   vehicleCount?: number | null;
   heaviestPieceKg?: number | null;
   isDangerousGoods: boolean;

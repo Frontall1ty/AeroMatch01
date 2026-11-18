@@ -15,12 +15,18 @@ export default async function NewShipment({ searchParams }: { searchParams: Prom
   const blank: ShipmentDefaults = {
     destination: "IST",
     cargoKind: "GENERAL",
+    sizeMode: "PIECES",
+    pieces: "",
+    pieceWeightKg: "",
+    pieceLengthCm: "",
+    pieceWidthCm: "",
+    pieceHeightCm: "",
+    stackable: false,
     weightKg: "",
     volumeM3: "",
-    pieces: "",
     floorAreaM2: "",
-    vehicleCount: "",
     heaviestPieceKg: "",
+    vehicleCount: "",
     isDangerousGoods: false,
     cargoType: "Textiles and garments",
     commodity: "",
@@ -28,28 +34,39 @@ export default async function NewShipment({ searchParams }: { searchParams: Prom
     deliverBy: toInputDate(addDays(ready, 14)),
     notes: "",
   };
+  // 25 crates of 160 x 100 x 100 cm, 240 kg each: 6,000 kg and 40 m³.
   const demo: ShipmentDefaults = {
     ...blank,
-    weightKg: "6000",
-    volumeM3: "40",
-    pieces: "24",
-    heaviestPieceKg: "800",
-    commodity: "Cotton knit garments on pallets",
+    pieces: "25",
+    pieceWeightKg: "240",
+    pieceLengthCm: "160",
+    pieceWidthCm: "100",
+    pieceHeightCm: "100",
+    stackable: true,
+    commodity: "Cotton knit garments in crates",
   };
 
   let defaults = blank;
   if (edit) {
     const s = await prisma.shipmentRequest.findUnique({ where: { id: edit } });
     if (s && s.shipperCompanyId === session.companyId) {
+      const vehicles = s.cargoKind === "VEHICLES";
+      const hasPiece = s.pieceLengthCm != null && s.pieceWidthCm != null && s.pieceHeightCm != null && s.pieceWeightKg != null;
       defaults = {
         destination: s.destination,
         cargoKind: s.cargoKind,
-        weightKg: s.cargoKind === "VEHICLES" ? "" : String(s.weightKg),
-        volumeM3: s.cargoKind === "VEHICLES" ? "" : String(s.volumeM3),
-        pieces: s.cargoKind === "VEHICLES" ? "" : String(s.pieces),
-        floorAreaM2: s.floorAreaM2 == null ? "" : String(s.floorAreaM2),
+        sizeMode: hasPiece ? "PIECES" : "TOTALS",
+        pieces: vehicles ? "" : String(s.pieces),
+        pieceWeightKg: s.pieceWeightKg == null ? "" : String(s.pieceWeightKg),
+        pieceLengthCm: s.pieceLengthCm == null ? "" : String(s.pieceLengthCm),
+        pieceWidthCm: s.pieceWidthCm == null ? "" : String(s.pieceWidthCm),
+        pieceHeightCm: s.pieceHeightCm == null ? "" : String(s.pieceHeightCm),
+        stackable: s.stackable,
+        weightKg: vehicles ? "" : String(s.weightKg),
+        volumeM3: vehicles ? "" : String(s.volumeM3),
+        floorAreaM2: hasPiece || s.floorAreaM2 == null ? "" : String(s.floorAreaM2),
+        heaviestPieceKg: hasPiece || s.heaviestPieceKg == null ? "" : String(s.heaviestPieceKg),
         vehicleCount: s.vehicleCount == null ? "" : String(s.vehicleCount),
-        heaviestPieceKg: s.heaviestPieceKg == null ? "" : String(s.heaviestPieceKg),
         isDangerousGoods: s.isDangerousGoods,
         cargoType: s.cargoType,
         commodity: s.commodity,

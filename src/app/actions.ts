@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { MILESTONES } from "@/lib/constants";
 import { parseDate } from "@/lib/dates";
+import { totalsFromPieces } from "@/lib/fit";
 import {
   evaluateAvailability,
   floorAreaOf,
@@ -68,21 +69,45 @@ export async function createShipment(input: unknown): Promise<ActionResult> {
   const vehicles = v.cargoKind === "VEHICLES";
   const estimate = vehicles ? vehicleEstimate(v.vehicleCount ?? 0) : null;
 
+  // When the shipper describes one piece, the totals are always recomputed here, never taken from the client.
+  const byPieces =
+    !vehicles &&
+    v.pieces != null &&
+    v.pieceLengthCm != null &&
+    v.pieceWidthCm != null &&
+    v.pieceHeightCm != null &&
+    v.pieceWeightKg != null;
+  const piece = byPieces
+    ? {
+        lengthCm: v.pieceLengthCm!,
+        widthCm: v.pieceWidthCm!,
+        heightCm: v.pieceHeightCm!,
+        weightKg: v.pieceWeightKg!,
+        stackable: v.stackable,
+      }
+    : null;
+  const totals = piece ? totalsFromPieces(v.pieces!, piece) : null;
+
   const created = await prisma.shipmentRequest.create({
     data: {
       shipperCompanyId: session.companyId,
       origin: "TAS",
       destination: v.destination,
       cargoKind: v.cargoKind,
-      weightKg: estimate ? estimate.weightKg : (v.weightKg ?? 0),
-      volumeM3: estimate ? estimate.volumeM3 : (v.volumeM3 ?? 0),
+      weightKg: estimate ? estimate.weightKg : totals ? totals.weightKg : (v.weightKg ?? 0),
+      volumeM3: estimate ? estimate.volumeM3 : totals ? totals.volumeM3 : (v.volumeM3 ?? 0),
       pieces: vehicles ? (v.vehicleCount ?? 1) : (v.pieces ?? 1),
-      floorAreaM2: vehicles ? null : v.floorAreaM2,
+      floorAreaM2: vehicles ? null : totals ? totals.floorAreaM2 : v.floorAreaM2,
+      pieceLengthCm: piece ? Math.round(piece.lengthCm) : null,
+      pieceWidthCm: piece ? Math.round(piece.widthCm) : null,
+      pieceHeightCm: piece ? Math.round(piece.heightCm) : null,
+      pieceWeightKg: piece ? piece.weightKg : null,
+      stackable: piece ? piece.stackable : false,
       vehicleCount: vehicles ? v.vehicleCount : null,
-      heaviestPieceKg: vehicles ? null : v.heaviestPieceKg,
+      heaviestPieceKg: vehicles ? null : totals ? totals.heaviestPieceKg : v.heaviestPieceKg,
       isDangerousGoods: vehicles ? false : v.isDangerousGoods,
       cargoType: v.cargoType,
-      commodity: v.commodity,
+      commodity: v.commodity || (vehicles ? "Vehicles" : "General cargo"),
       readyDate: parseDate(v.readyDate),
       deliverBy: parseDate(v.deliverBy),
       notes: v.notes,

@@ -27,8 +27,8 @@ type Seed = {
 
 /**
  * Fictional carriers only. Every price, capacity and transit time is invented demo data.
- * Demo shipment: 6,000 kg, 40 m³, heaviest piece 800 kg, ready on day 0, deliver by day 14.
- * Floor space is estimated from volume: 40 m³ / 2 m = 20 m².
+ * Demo shipment: 25 crates of 160 x 100 x 100 cm, 240 kg each (6,000 kg, 40 m³, stackable 2 high,
+ * about 22.2 m² of floor space), ready on day 0, deliver by day 14.
  */
 export const COMPANIES = [
   { id: "demo-shipper", name: "Demo Textile Export LLC", type: "SHIPPER", verified: true, country: "Uzbekistan" },
@@ -46,7 +46,7 @@ const LISTINGS: Seed[] = [
   { id: "ist-air-belly-wide", carrier: "demo-air-b", mode: "AIR", destination: "IST", dep: 0, unit: "PER_KG", price: 2.05, weight: 9000, volume: 45, tMin: 1, tMax: 1, equipment: "Belly, wide-body", cutoff: 4, maxPiece: 150, dg: false, minCh: 45, restrictions: "Max piece 150 kg, 1.6 m high" },
   { id: "ist-air-belly-narrow", carrier: "demo-air-b", mode: "AIR", destination: "IST", dep: 2, unit: "PER_KG", price: 2.3, weight: 4000, volume: 14, tMin: 1, tMax: 1, equipment: "Belly, narrow-body", cutoff: 4, maxPiece: 120, dg: false, minCh: 45, restrictions: "Small consignments only" },
   // Tashkent to Istanbul: road, three ways to price
-  { id: "ist-road-full-truck", carrier: "demo-trucking", mode: "ROAD", destination: "IST", dep: 0, unit: "FLAT", price: 4800, weight: 22000, volume: 82, tMin: 5, tMax: 7, equipment: "Tent trailer, 82 m³", cutoff: 24, maxPiece: 2000, dg: true, minCh: 0, restrictions: "Whole truck, via Kazakhstan and Caspian ferry" },
+  { id: "ist-road-full-truck", carrier: "demo-trucking", mode: "ROAD", destination: "IST", dep: 0, unit: "FLAT", price: 4800, weight: 22000, volume: 82, floor: 33, tMin: 5, tMax: 7, equipment: "Tent trailer, 82 m³", cutoff: 24, maxPiece: 2000, dg: true, minCh: 0, restrictions: "Whole truck, via Kazakhstan and Caspian ferry" },
   { id: "ist-road-groupage", carrier: "demo-trucking", mode: "ROAD", destination: "IST", dep: 1, unit: "PER_M2", price: 200, weight: 22000, volume: 82, floor: 33, tMin: 6, tMax: 8, equipment: "Groupage trailer", cutoff: 24, maxPiece: 2000, dg: false, minCh: 0, restrictions: "Shared trailer, priced per m² of floor space" },
   { id: "ist-road-late", carrier: "demo-trucking", mode: "ROAD", destination: "IST", dep: 5, unit: "PER_KG", price: 0.27, weight: 22000, volume: 82, tMin: 10, tMax: 12, equipment: "Tent trailer, 82 m³", cutoff: 24, maxPiece: 2000, dg: false, minCh: 1000, restrictions: "Departs when the trailer is full" },
   { id: "ist-road-cars", carrier: "demo-trucking", mode: "ROAD", destination: "IST", dep: 1, cargo: "VEHICLES", unit: "PER_VEHICLE", price: 900, weight: 0, volume: 0, vehicles: 8, tMin: 6, tMax: 8, equipment: "Car carrier", cutoff: 24, maxPiece: 3000, dg: false, minCh: 0, restrictions: "Vehicles only, up to 8 per trailer" },
@@ -60,7 +60,7 @@ const LISTINGS: Seed[] = [
   { id: "dxb-air-belly", carrier: "demo-air-b", mode: "AIR", destination: "DXB", dep: 1, unit: "PER_KG", price: 2.0, weight: 7000, volume: 38, tMin: 1, tMax: 1, equipment: "Belly, wide-body", cutoff: 4, maxPiece: 200, dg: false, minCh: 45, restrictions: "Max piece 200 kg" },
   { id: "dxb-road", carrier: "demo-trucking", mode: "ROAD", destination: "DXB", dep: 1, unit: "PER_KG", price: 0.42, weight: 22000, volume: 82, tMin: 11, tMax: 15, equipment: "Tent trailer, 82 m³", cutoff: 24, maxPiece: 2000, dg: false, minCh: 1000, restrictions: "Via Turkmenistan and Iran" },
   // Tashkent to Almaty
-  { id: "ala-road-full-truck", carrier: "demo-trucking", mode: "ROAD", destination: "ALA", dep: 0, unit: "FLAT", price: 1900, weight: 22000, volume: 82, tMin: 2, tMax: 3, equipment: "Tent trailer, 82 m³", cutoff: 12, maxPiece: 2000, dg: true, minCh: 0, restrictions: "Whole truck, border queue time varies" },
+  { id: "ala-road-full-truck", carrier: "demo-trucking", mode: "ROAD", destination: "ALA", dep: 0, unit: "FLAT", price: 1900, weight: 22000, volume: 82, floor: 33, tMin: 2, tMax: 3, equipment: "Tent trailer, 82 m³", cutoff: 12, maxPiece: 2000, dg: true, minCh: 0, restrictions: "Whole truck, border queue time varies" },
   { id: "ala-road-groupage", carrier: "demo-trucking", mode: "ROAD", destination: "ALA", dep: 2, unit: "PER_M2", price: 70, weight: 22000, volume: 82, floor: 33, tMin: 3, tMax: 4, equipment: "Groupage trailer", cutoff: 12, maxPiece: 2000, dg: false, minCh: 0, restrictions: "Shared trailer, priced per m²" },
   { id: "ala-rail", carrier: "demo-rail", mode: "RAIL", destination: "ALA", dep: 2, unit: "PER_M2", price: 45, weight: 40000, volume: 120, floor: 40, tMin: 3, tMax: 5, equipment: "Container platform, 40 m² floor", cutoff: 24, maxPiece: 5000, dg: false, minCh: 0, restrictions: "Priced per m² of wagon floor space" },
   { id: "ala-air-belly", carrier: "demo-air-b", mode: "AIR", destination: "ALA", dep: 1, unit: "PER_KG", price: 1.4, weight: 3000, volume: 18, tMin: 1, tMax: 1, equipment: "Belly, narrow-body", cutoff: 3, maxPiece: 120, dg: false, minCh: 45, restrictions: "Small consignments only" },

@@ -1,4 +1,5 @@
 import { addDays, daysBetween } from "./dates";
+import { piecesThatFit } from "./fit";
 import { evaluateAvailability, priceFor, type Availability, type ShipmentInput } from "./rules";
 import type { CargoKind, Mode, PricingUnit } from "./constants";
 
@@ -46,6 +47,8 @@ export type OfferView = {
   transitDaysMax: number;
   chargedKg: number;
   totalPrice: number;
+  /** Pieces like the shipper's that fit in the free floor space. Null when unknown. */
+  piecesFit: number | null;
   /** Short description of what is left, for example "22,000 kg, 82 m³" or "8 vehicle slots". */
   availableWeightKg: number;
   availableVolumeM3: number;
@@ -61,6 +64,16 @@ export type OfferView = {
 };
 
 export function buildOffers(shipment: ShipmentInput, listings: ListingRow[]): OfferView[] {
+  const piece =
+    shipment.pieceLengthCm && shipment.pieceWidthCm && shipment.pieceHeightCm && shipment.pieceWeightKg
+      ? {
+          lengthCm: shipment.pieceLengthCm,
+          widthCm: shipment.pieceWidthCm,
+          heightCm: shipment.pieceHeightCm,
+          weightKg: shipment.pieceWeightKg,
+          stackable: shipment.stackable ?? false,
+        }
+      : null;
   return listings.map((l) => {
     const price = priceFor({
       mode: l.mode,
@@ -90,6 +103,7 @@ export function buildOffers(shipment: ShipmentInput, listings: ListingRow[]): Of
       transitDaysMax: l.transitDaysMax,
       chargedKg: price.chargedKg,
       totalPrice: price.total,
+      piecesFit: piece && l.availableFloorM2 != null ? piecesThatFit(l.availableFloorM2, piece) : null,
       availableWeightKg: l.availableWeightKg,
       availableVolumeM3: l.availableVolumeM3,
       availableFloorM2: l.availableFloorM2,

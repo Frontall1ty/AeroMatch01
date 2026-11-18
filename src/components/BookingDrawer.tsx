@@ -117,6 +117,15 @@ export function BookingDrawer({
                 ? `${shipment.commodity}, ${shipment.vehicleCount} ${shipment.vehicleCount === 1 ? "vehicle" : "vehicles"}`
                 : `${shipment.commodity}, ${shipment.pieces} ${shipment.pieces === 1 ? "piece" : "pieces"}, ${kg(shipment.weightKg)}, ${m3(shipment.volumeM3)}${shipment.isDangerousGoods ? ", dangerous goods" : ""}`}
             </dd>
+            {offer.availableFloorM2 != null && offer.piecesFit != null && shipment.floorAreaM2 != null && (
+              <>
+                <dt className="text-muted">Space</dt>
+                <dd>
+                  Your {shipment.pieces} pieces take about {shipment.floorAreaM2} m² of the {offer.availableFloorM2} m² free.{" "}
+                  <span className="font-semibold text-good">Room for {offer.piecesFit} pieces like yours.</span>
+                </dd>
+              </>
+            )}
             <dt className="text-muted">Price</dt>
             <dd>
               <span className="text-xl font-bold">{money(offer.totalPrice)}</span>{" "}

@@ -25,13 +25,25 @@ export const shipmentSchema = z
     heaviestPieceKg: optionalPositive("Heaviest piece must be more than 0 kg.", 500_000),
     isDangerousGoods: z.boolean(),
     cargoType: z.enum(CARGO_TYPES, { error: "Choose a cargo type." }),
-    commodity: z.string().trim().min(2, "Describe the goods, for example: cotton garments in cartons.").max(120, "Keep the description under 120 characters."),
+    pieceLengthCm: optionalPositive("Length must be more than 0 cm.", 2_000),
+    pieceWidthCm: optionalPositive("Width must be more than 0 cm.", 2_000),
+    pieceHeightCm: optionalPositive("Height must be more than 0 cm.", 2_000),
+    pieceWeightKg: optionalPositive("Weight per piece must be more than 0 kg.", 50_000),
+    stackable: z.boolean().default(false),
+    commodity: z.string().trim().max(120, "Keep the description under 120 characters.").default(""),
     readyDate: dateStr,
     deliverBy: dateStr,
     notes: z.string().trim().max(500, "Keep notes under 500 characters.").default(""),
   })
   .superRefine((v, ctx) => {
-    if (v.cargoKind === "GENERAL") {
+    const dims = [v.pieceLengthCm, v.pieceWidthCm, v.pieceHeightCm, v.pieceWeightKg];
+    const byPieces = dims.every((d) => d != null);
+    if (v.cargoKind === "GENERAL" && dims.some((d) => d != null) && !byPieces) {
+      ctx.addIssue({ code: "custom", path: ["pieceLengthCm"], message: "Enter length, width, height and weight of one piece, or switch to totals." });
+    }
+    if (v.cargoKind === "GENERAL" && byPieces) {
+      if (v.pieces == null) ctx.addIssue({ code: "custom", path: ["pieces"], message: "Enter the number of pieces." });
+    } else if (v.cargoKind === "GENERAL") {
       if (v.weightKg == null || !(v.weightKg > 0)) ctx.addIssue({ code: "custom", path: ["weightKg"], message: "Enter the total weight in kg." });
       if (v.volumeM3 == null || !(v.volumeM3 > 0)) ctx.addIssue({ code: "custom", path: ["volumeM3"], message: "Enter the total volume in m³." });
       if (v.pieces == null) ctx.addIssue({ code: "custom", path: ["pieces"], message: "Enter the number of pieces." });

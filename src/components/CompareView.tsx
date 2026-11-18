@@ -26,10 +26,11 @@ const arrivalText = (o: OfferView) =>
 
 const leftText = (o: OfferView) =>
   o.cargoKind === "VEHICLES"
-    ? { main: `${o.availableVehicles ?? 0} vehicle slots`, sub: "" }
+    ? { main: `${o.availableVehicles ?? 0} vehicle slots`, sub: "", fit: null as string | null }
     : {
         main: kg(o.availableWeightKg),
         sub: `${m3(o.availableVolumeM3)}${o.availableFloorM2 != null ? `, ${o.availableFloorM2} m² floor` : ""}`,
+        fit: o.piecesFit != null ? `Room for ${o.piecesFit} pieces like yours` : null,
       };
 
 export function CompareView({
@@ -214,7 +215,7 @@ export function CompareView({
                       <p className="text-base font-bold">{money(o.totalPrice)}</p>
                       <p className="text-xs text-muted">{o.priceBasis}</p>
                     </td>
-                    <td className="whitespace-nowrap p-3">{leftText(o).main}{leftText(o).sub && <span className="block text-xs text-muted">{leftText(o).sub}</span>}</td>
+                    <td className="whitespace-nowrap p-3">{leftText(o).main}{leftText(o).sub && <span className="block text-xs text-muted">{leftText(o).sub}</span>}{leftText(o).fit && <span className="mt-0.5 block text-xs font-semibold text-good">{leftText(o).fit}</span>}</td>
                     <td className="p-3">{o.cutoffHours} h</td>
                     <td className="p-3 text-muted">{o.restrictions || "None"}</td>
                     <td className="p-3">
@@ -250,7 +251,7 @@ export function CompareView({
                   <dt className="text-muted">Departs</dt><dd>{formatDay(new Date(o.departureDate))}</dd>
                   <dt className="text-muted">Arrives</dt><dd>{arrivalText(o)}</dd>
                   <dt className="text-muted">Price basis</dt><dd>{o.priceBasis}</dd>
-                  <dt className="text-muted">Left</dt><dd>{leftText(o).main}{leftText(o).sub ? `, ${leftText(o).sub}` : ""}</dd>
+                  <dt className="text-muted">Left</dt><dd>{leftText(o).main}{leftText(o).sub ? `, ${leftText(o).sub}` : ""}{leftText(o).fit && <span className="block font-semibold text-good">{leftText(o).fit}</span>}</dd>
                   <dt className="text-muted">Equipment</dt><dd>{o.equipment}</dd>
                   <dt className="text-muted">Cutoff</dt><dd>{o.cutoffHours} h before departure</dd>
                   <dt className="text-muted">Restrictions</dt><dd>{o.restrictions || "None"}</dd>

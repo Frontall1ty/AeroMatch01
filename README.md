@@ -51,12 +51,13 @@ DATABASE_URL="<production connection string>" npm run db:seed
 ## The 3 minute demo script
 
 1. Carrier: **Add capacity**. Click **Duplicate last listing**, pick **In 3 days**, click **Add capacity**.
-2. Shipper: **New shipment**, **Load demo shipment**, **Compare options**. Point out the lane chart, the Recommended line with its reason, and the reasons under **Not available**.
+2. Shipper: **New shipment**, **Load demo shipment** (25 crates; totals appear by themselves), **Compare options**. Point out the lane chart, the Recommended line with its reason, and the reasons under **Not available**.
 3. Switch priority to **Fastest** (air), **Cheapest** (rail, priced per m²), then **Balanced** (road, flat truck price). Point at the price column: every offer shows how it is calculated.
 4. **Request booking** on an air offer. Show the document checklist, then confirm.
 5. Carrier: **Requests**, **Approve**. Then **Active bookings**, **Mark as ...** until Delivered.
 6. Shipper: **My bookings**. Show the full milestone timeline and the air waybill data.
-7. Optional: **New shipment**, choose **Vehicles**, enter 4. Only the car carriers by road and rail are offered, priced per vehicle.
+7. Optional: carrier **Add capacity**, pick Road or Rail, open **Space calculator** and choose a common piece size to see how many fit.
+8. Optional: **New shipment**, choose **Vehicles**, enter 4. Only the car carriers by road and rail are offered, priced per vehicle.
 
 ## Honest limits
 

@@ -14,15 +14,18 @@ export default async function NewShipment({ searchParams }: { searchParams: Prom
   const ready = await getDemoReadyDate();
   const blank: ShipmentDefaults = {
     destination: "IST",
+    cargoKind: "GENERAL",
     weightKg: "",
     volumeM3: "",
     pieces: "",
+    floorAreaM2: "",
+    vehicleCount: "",
     heaviestPieceKg: "",
     isDangerousGoods: false,
     cargoType: "Textiles and garments",
     commodity: "",
     readyDate: toInputDate(ready),
-    deliverBy: toInputDate(addDays(ready, 9)),
+    deliverBy: toInputDate(addDays(ready, 14)),
     notes: "",
   };
   const demo: ShipmentDefaults = {
@@ -40,9 +43,12 @@ export default async function NewShipment({ searchParams }: { searchParams: Prom
     if (s && s.shipperCompanyId === session.companyId) {
       defaults = {
         destination: s.destination,
-        weightKg: String(s.weightKg),
-        volumeM3: String(s.volumeM3),
-        pieces: String(s.pieces),
+        cargoKind: s.cargoKind,
+        weightKg: s.cargoKind === "VEHICLES" ? "" : String(s.weightKg),
+        volumeM3: s.cargoKind === "VEHICLES" ? "" : String(s.volumeM3),
+        pieces: s.cargoKind === "VEHICLES" ? "" : String(s.pieces),
+        floorAreaM2: s.floorAreaM2 == null ? "" : String(s.floorAreaM2),
+        vehicleCount: s.vehicleCount == null ? "" : String(s.vehicleCount),
         heaviestPieceKg: s.heaviestPieceKg == null ? "" : String(s.heaviestPieceKg),
         isDangerousGoods: s.isDangerousGoods,
         cargoType: s.cargoType,

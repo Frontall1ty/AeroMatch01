@@ -6,6 +6,8 @@ import { CapacityForm } from "@/components/CapacityForm";
 import { valuesForMode, type ListingValues } from "@/lib/listingValues";
 import { ModeTag, PageTitle, DemoBadge } from "@/components/ui";
 
+const PRICE_SHORT = { PER_KG: "per kg", PER_M2: "per m²", FLAT: "flat", PER_VEHICLE: "per vehicle" } as const;
+
 export const dynamic = "force-dynamic";
 
 export default async function AddCapacity({ searchParams }: { searchParams: Promise<{ published?: string }> }) {
@@ -24,9 +26,13 @@ export default async function AddCapacity({ searchParams }: { searchParams: Prom
         mode: lastRow.mode,
         destination: lastRow.destination,
         departureDate: toInputDate(lastRow.departureDate),
+        cargoKind: lastRow.cargoKind,
+        pricingUnit: lastRow.pricingUnit,
+        unitPrice: String(lastRow.unitPrice),
         availableWeightKg: String(lastRow.availableWeightKg),
         availableVolumeM3: String(lastRow.availableVolumeM3),
-        pricePerChargeableKg: String(lastRow.pricePerChargeableKg),
+        availableFloorM2: lastRow.availableFloorM2 == null ? "" : String(lastRow.availableFloorM2),
+        availableVehicles: lastRow.availableVehicles == null ? "" : String(lastRow.availableVehicles),
         transitDaysMin: String(lastRow.transitDaysMin),
         transitDaysMax: String(lastRow.transitDaysMax),
         equipment: lastRow.equipment,
@@ -75,7 +81,7 @@ export default async function AddCapacity({ searchParams }: { searchParams: Prom
                   <th className="p-3 font-semibold">Route</th>
                   <th className="p-3 font-semibold">Departs</th>
                   <th className="p-3 font-semibold">Left</th>
-                  <th className="p-3 font-semibold">Price per kg</th>
+                  <th className="p-3 font-semibold">Price</th>
                   <th className="p-3 font-semibold">Status</th>
                 </tr>
               </thead>
@@ -85,8 +91,8 @@ export default async function AddCapacity({ searchParams }: { searchParams: Prom
                     <td className="p-3"><ModeTag mode={l.mode} /></td>
                     <td className="p-3">TAS to {l.destination}</td>
                     <td className="p-3">{formatDay(l.departureDate)}</td>
-                    <td className="p-3">{kg(l.availableWeightKg)}, {m3(l.availableVolumeM3)}</td>
-                    <td className="p-3">{moneyPrecise(l.pricePerChargeableKg)}</td>
+                    <td className="p-3">{l.cargoKind === "VEHICLES" ? `${l.availableVehicles ?? 0} vehicle slots` : `${kg(l.availableWeightKg)}, ${m3(l.availableVolumeM3)}${l.availableFloorM2 != null ? `, ${l.availableFloorM2} m² floor` : ""}`}</td>
+                    <td className="p-3">{moneyPrecise(l.unitPrice)} <span className="text-xs text-muted">{PRICE_SHORT[l.pricingUnit]}</span></td>
                     <td className="p-3">{l.status === "OPEN" ? "Open" : l.status === "FULL" ? "Full" : "Closed"}</td>
                   </tr>
                 ))}

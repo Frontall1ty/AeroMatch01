@@ -12,7 +12,7 @@ const config: Config = {
         rule: "#D3D9E2",
         air: "#1D4ED8",
         road: "#B45309",
-        sea: "#0F766E",
+        rail: "#0F766E",
         good: "#15803D",
         bad: "#B91C1C",
       },

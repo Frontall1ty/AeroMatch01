@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { formatDay } from "@/lib/dates";
-import { kg, m3, money, moneyPrecise } from "@/lib/format";
+import { kg, m3, money } from "@/lib/format";
+import { priceFor } from "@/lib/rules";
 import { requireRole } from "@/lib/session";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { AwbData } from "@/components/AwbData";
@@ -34,6 +35,8 @@ export default async function BookingDetail({
 
   const s = b.shipment;
   const l = b.listing;
+  const vehicles = s.cargoKind === "VEHICLES";
+  const price = priceFor({ mode: l.mode, pricingUnit: l.pricingUnit, unitPrice: l.unitPrice, minChargeableKg: l.minChargeableKg, shipment: s });
 
   const awb =
     l.mode === "AIR"
@@ -49,7 +52,7 @@ export default async function BookingDetail({
             grossWeightKg: s.weightKg,
             volumeM3: s.volumeM3,
             chargeableWeightKg: b.chargeableWeightKg,
-            ratePerChargeableKg: l.pricePerChargeableKg,
+            rate: { unit: l.pricingUnit, amount: l.unitPrice, basis: price.basis },
             totalCharge: { amount: b.totalPrice, currency: l.currency },
             natureOfGoods: s.commodity,
             dangerousGoods: s.isDangerousGoods,
@@ -94,12 +97,12 @@ export default async function BookingDetail({
             <dt className="text-muted">Equipment</dt><dd>{l.equipment}</dd>
             <dt className="text-muted">Departs</dt><dd>{formatDay(l.departureDate)}</dd>
             <dt className="text-muted">Transit</dt><dd>{l.transitDaysMin} to {l.transitDaysMax} days</dd>
-            <dt className="text-muted">Cargo</dt><dd>{s.commodity}, {s.pieces} pieces, {kg(s.weightKg)}, {m3(s.volumeM3)}</dd>
-            <dt className="text-muted">Charged weight</dt><dd>{kg(b.chargeableWeightKg)}</dd>
+            <dt className="text-muted">Cargo</dt><dd>{vehicles ? `${s.commodity}, ${s.vehicleCount} ${s.vehicleCount === 1 ? "vehicle" : "vehicles"}` : `${s.commodity}, ${s.pieces} pieces, ${kg(s.weightKg)}, ${m3(s.volumeM3)}`}</dd>
+            {l.pricingUnit === "PER_KG" && (<><dt className="text-muted">Charged weight</dt><dd>{kg(b.chargeableWeightKg)}</dd></>)}
             <dt className="text-muted">Price</dt>
             <dd>
               <span className="text-xl font-bold">{money(b.totalPrice)}</span> <DemoBadge />
-              <span className="block text-xs text-muted">{moneyPrecise(l.pricePerChargeableKg)} per kg</span>
+              <span className="block text-xs text-muted">{price.basis}</span>
             </dd>
           </dl>
         </section>

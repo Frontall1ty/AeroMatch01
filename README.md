@@ -1,6 +1,6 @@
 # AeroMatch demo
 
-A Tashkent-origin freight comparison and booking demo. One cargo entry, air, road and sea compared side by side with a decision layer, capacity entry in under a minute, and mode-specific document checklists and milestones.
+A Tashkent-origin freight comparison and booking demo. One cargo entry, air, rail and road compared side by side with a decision layer. Each carrier prices in its own way (per kg, per m² of floor space, flat, or per vehicle). Capacity entry takes under a minute, and document checklists and milestones are specific to each mode.
 
 > **All data is fictional.** Prices, carriers and capacities are invented. No carrier is connected. There is no real authentication.
 
@@ -52,19 +52,20 @@ DATABASE_URL="<production connection string>" npm run db:seed
 
 1. Carrier: **Add capacity**. Click **Duplicate last listing**, pick **In 3 days**, click **Add capacity**.
 2. Shipper: **New shipment**, **Load demo shipment**, **Compare options**. Point out the lane chart, the Recommended line with its reason, and the reasons under **Not available**.
-3. Switch priority to **Fastest**, then **Cheapest**, then **Balanced**.
+3. Switch priority to **Fastest** (air), **Cheapest** (rail, priced per m²), then **Balanced** (road, flat truck price). Point at the price column: every offer shows how it is calculated.
 4. **Request booking** on an air offer. Show the document checklist, then confirm.
 5. Carrier: **Requests**, **Approve**. Then **Active bookings**, **Mark as ...** until Delivered.
 6. Shipper: **My bookings**. Show the full milestone timeline and the air waybill data.
+7. Optional: **New shipment**, choose **Vehicles**, enter 4. Only the car carriers by road and rail are offered, priced per vehicle.
 
 ## Honest limits
 
 - All data is fictional and no carrier is connected.
 - Capacity is entered manually by design.
 - No real authentication. The role switcher is for the demo only.
-- Volumetric factors, milestone codes, availability rules and the document checklist are simplified and need review with industry practitioners. Sea freight is normally priced per container or per weight/measurement, not per kg.
+- Volumetric factors, milestone codes, availability rules and the document checklist are simplified and need review with industry practitioners. Rail volumetric factor and the floor-space estimate (volume ÷ 2 m) are placeholders. Road forwarders usually quote loading metres (LDM), not m².
 - Not built: admin screens, payments, notifications, carrier APIs, real tracking, document upload, other languages, recurring capacity agreements, consolidation, analytics.
 
 ## Where the rules live
 
-`src/lib/rules.ts` holds the chargeable weight, availability, visibility, decision layer and milestone rules. `src/lib/constants.ts` holds the factors, milestones and document checklists. Decisions that differ from the original spec are in `DECISIONS.md`.
+`src/lib/rules.ts` holds the chargeable weight, pricing units, availability, visibility, decision layer and milestone rules. `src/lib/constants.ts` holds the factors, milestones and document checklists. Decisions that differ from the original spec are in `DECISIONS.md`.

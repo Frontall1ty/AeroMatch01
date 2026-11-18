@@ -5,8 +5,8 @@ import { addDays, formatDay } from "@/lib/dates";
 import { money } from "@/lib/format";
 import type { OfferView } from "@/lib/offers";
 
-const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", ROAD: "#B45309", SEA: "#0F766E" };
-const LANES: Mode[] = ["AIR", "ROAD", "SEA"];
+const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", ROAD: "#B45309", RAIL: "#0F766E" };
+const LANES: Mode[] = ["AIR", "RAIL", "ROAD"];
 
 const W = 960;
 const LEFT = 64;
@@ -64,7 +64,7 @@ export function LaneChart({
           y += lane.height;
           return (
             <g key={lane.mode}>
-              <rect x={0} y={top} width={W} height={lane.height} fill={lane.mode === "ROAD" ? "#F4F6F9" : "#FFFFFF"} />
+              <rect x={0} y={top} width={W} height={lane.height} fill={lane.mode === "RAIL" ? "#F4F6F9" : "#FFFFFF"} />
               <line x1={0} x2={W} y1={top} y2={top} stroke="#D3D9E2" />
               <text x={8} y={top + lane.height / 2 + 5} fontSize={14} fontWeight={700} fill={COLOR[lane.mode]}>
                 {MODE_LABEL[lane.mode]}

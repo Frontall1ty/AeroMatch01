@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CARGO_TYPES, DESTINATIONS, MODES_BY_DESTINATION } from "./constants";
+import { CARGO_TYPES, DESTINATIONS, MODES_BY_DESTINATION, PRICING_UNITS_BY_MODE } from "./constants";
 import { parseDate, todayUtc } from "./dates";
 
 const dateStr = z
@@ -11,13 +11,18 @@ const destination = z.enum(DESTINATIONS.map((d) => d.code) as [string, ...string
   error: "Choose Istanbul, Dubai or Almaty.",
 });
 
+const optionalPositive = (message: string, max: number) => z.number().positive(message).max(max).nullable();
+
 export const shipmentSchema = z
   .object({
     destination,
-    weightKg: z.number({ error: "Enter the total weight in kg." }).positive("Weight must be more than 0 kg.").max(500_000, "Weight is too large for this demo."),
-    volumeM3: z.number({ error: "Enter the total volume in m³." }).positive("Volume must be more than 0 m³.").max(2_000, "Volume is too large for this demo."),
-    pieces: z.number({ error: "Enter the number of pieces." }).int("Pieces must be a whole number.").min(1, "At least 1 piece.").max(100_000),
-    heaviestPieceKg: z.number().positive("Heaviest piece must be more than 0 kg.").nullable(),
+    cargoKind: z.enum(["GENERAL", "VEHICLES"]),
+    weightKg: z.number().max(500_000, "Weight is too large for this demo.").nullable(),
+    volumeM3: z.number().max(2_000, "Volume is too large for this demo.").nullable(),
+    pieces: z.number().int("Pieces must be a whole number.").min(1, "At least 1 piece.").max(100_000).nullable(),
+    floorAreaM2: optionalPositive("Floor space must be more than 0 m².", 1_000),
+    vehicleCount: z.number().int("Vehicles must be a whole number.").min(1, "At least 1 vehicle.").max(200, "Up to 200 vehicles in this demo.").nullable(),
+    heaviestPieceKg: optionalPositive("Heaviest piece must be more than 0 kg.", 500_000),
     isDangerousGoods: z.boolean(),
     cargoType: z.enum(CARGO_TYPES, { error: "Choose a cargo type." }),
     commodity: z.string().trim().min(2, "Describe the goods, for example: cotton garments in cartons.").max(120, "Keep the description under 120 characters."),
@@ -26,8 +31,15 @@ export const shipmentSchema = z
     notes: z.string().trim().max(500, "Keep notes under 500 characters.").default(""),
   })
   .superRefine((v, ctx) => {
-    if (v.heaviestPieceKg != null && v.heaviestPieceKg > v.weightKg) {
-      ctx.addIssue({ code: "custom", path: ["heaviestPieceKg"], message: "Heaviest piece cannot be more than the total weight." });
+    if (v.cargoKind === "GENERAL") {
+      if (v.weightKg == null || !(v.weightKg > 0)) ctx.addIssue({ code: "custom", path: ["weightKg"], message: "Enter the total weight in kg." });
+      if (v.volumeM3 == null || !(v.volumeM3 > 0)) ctx.addIssue({ code: "custom", path: ["volumeM3"], message: "Enter the total volume in m³." });
+      if (v.pieces == null) ctx.addIssue({ code: "custom", path: ["pieces"], message: "Enter the number of pieces." });
+      if (v.heaviestPieceKg != null && v.weightKg != null && v.heaviestPieceKg > v.weightKg) {
+        ctx.addIssue({ code: "custom", path: ["heaviestPieceKg"], message: "Heaviest piece cannot be more than the total weight." });
+      }
+    } else if (v.vehicleCount == null) {
+      ctx.addIssue({ code: "custom", path: ["vehicleCount"], message: "Enter the number of vehicles." });
     }
     const ready = parseDate(v.readyDate);
     const by = parseDate(v.deliverBy);
@@ -39,17 +51,21 @@ export type ShipmentFormInput = z.infer<typeof shipmentSchema>;
 
 export const listingSchema = z
   .object({
-    mode: z.enum(["AIR", "ROAD", "SEA"]),
+    mode: z.enum(["AIR", "ROAD", "RAIL"]),
     destination,
+    cargoKind: z.enum(["GENERAL", "VEHICLES"]),
+    pricingUnit: z.enum(["PER_KG", "PER_M2", "PER_VEHICLE", "FLAT"]),
     departureDate: dateStr,
-    availableWeightKg: z.number({ error: "Enter the weight you can carry." }).positive("Weight must be more than 0 kg.").max(1_000_000),
-    availableVolumeM3: z.number({ error: "Enter the volume you can carry." }).positive("Volume must be more than 0 m³.").max(5_000),
-    pricePerChargeableKg: z.number({ error: "Enter the price per kg." }).min(0.01, "Price must be at least $0.01 per kg.").max(100, "Price per kg looks too high. Check the amount."),
+    unitPrice: z.number({ error: "Enter the price." }).min(0.01, "Price must be at least $0.01.").max(1_000_000, "That price looks too high. Check the amount."),
+    availableWeightKg: z.number().min(0).max(1_000_000).nullable(),
+    availableVolumeM3: z.number().min(0).max(5_000).nullable(),
+    availableFloorM2: z.number().positive("Floor space must be more than 0 m².").max(5_000).nullable(),
+    availableVehicles: z.number().int("Vehicle slots must be a whole number.").min(1, "At least 1 vehicle slot.").max(500).nullable(),
     transitDaysMin: z.number({ error: "Enter the fastest transit in days." }).int().min(0).max(90),
     transitDaysMax: z.number({ error: "Enter the slowest transit in days." }).int().min(0).max(90),
     equipment: z.string().trim().min(2, "Choose or enter the equipment.").max(60),
     cutoffHours: z.number({ error: "Enter the cutoff in hours." }).int().min(0).max(240),
-    maxPieceKg: z.number({ error: "Enter the max piece weight." }).positive("Max piece weight must be more than 0 kg.").max(100_000),
+    maxPieceKg: z.number().positive("Max piece weight must be more than 0 kg.").max(100_000).nullable(),
     acceptsDangerousGoods: z.boolean(),
     minChargeableKg: z.number().min(0).max(1_000_000),
     restrictions: z.string().trim().max(200, "Keep restrictions under 200 characters.").default(""),
@@ -60,6 +76,22 @@ export const listingSchema = z
     }
     if (!MODES_BY_DESTINATION[v.destination]?.includes(v.mode)) {
       ctx.addIssue({ code: "custom", path: ["destination"], message: "This mode is not available to that destination." });
+    }
+    if (!PRICING_UNITS_BY_MODE[v.mode].includes(v.pricingUnit)) {
+      ctx.addIssue({ code: "custom", path: ["pricingUnit"], message: "This mode cannot be priced that way." });
+    }
+    if (v.cargoKind === "VEHICLES") {
+      if (v.mode === "AIR") ctx.addIssue({ code: "custom", path: ["cargoKind"], message: "Vehicles are carried by road or rail in this demo." });
+      if (v.pricingUnit !== "PER_VEHICLE") ctx.addIssue({ code: "custom", path: ["pricingUnit"], message: "Vehicles are priced per vehicle." });
+      if (v.availableVehicles == null) ctx.addIssue({ code: "custom", path: ["availableVehicles"], message: "Enter how many vehicles you can carry." });
+    } else {
+      if (v.pricingUnit === "PER_VEHICLE") ctx.addIssue({ code: "custom", path: ["pricingUnit"], message: "Per-vehicle pricing is for vehicle carriers." });
+      if (v.availableWeightKg == null || !(v.availableWeightKg > 0)) ctx.addIssue({ code: "custom", path: ["availableWeightKg"], message: "Enter the weight you can carry." });
+      if (v.availableVolumeM3 == null || !(v.availableVolumeM3 > 0)) ctx.addIssue({ code: "custom", path: ["availableVolumeM3"], message: "Enter the volume you can carry." });
+      if (v.maxPieceKg == null) ctx.addIssue({ code: "custom", path: ["maxPieceKg"], message: "Enter the max piece weight." });
+      if (v.pricingUnit === "PER_M2" && v.availableFloorM2 == null) {
+        ctx.addIssue({ code: "custom", path: ["availableFloorM2"], message: "Enter the floor space you can sell, in m²." });
+      }
     }
     if (parseDate(v.departureDate) < todayUtc()) {
       ctx.addIssue({ code: "custom", path: ["departureDate"], message: "Departure is in the past. Pick today or later." });

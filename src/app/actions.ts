@@ -7,12 +7,13 @@ import { prisma } from "@/lib/db";
 import { MILESTONES } from "@/lib/constants";
 import { parseDate } from "@/lib/dates";
 import {
-  chargeableWeight,
   evaluateAvailability,
+  floorAreaOf,
   isVisibleToShipper,
   nextMilestone,
+  priceFor,
   statusAfterMilestones,
-  totalPrice,
+  vehicleEstimate,
 } from "@/lib/rules";
 import { seedDemoData } from "@/lib/seed";
 import {
@@ -64,16 +65,22 @@ export async function createShipment(input: unknown): Promise<ActionResult> {
   if (!parsed.success) return fieldErrorsFrom(parsed.error);
   const v = parsed.data;
 
+  const vehicles = v.cargoKind === "VEHICLES";
+  const estimate = vehicles ? vehicleEstimate(v.vehicleCount ?? 0) : null;
+
   const created = await prisma.shipmentRequest.create({
     data: {
       shipperCompanyId: session.companyId,
       origin: "TAS",
       destination: v.destination,
-      weightKg: v.weightKg,
-      volumeM3: v.volumeM3,
-      pieces: v.pieces,
-      heaviestPieceKg: v.heaviestPieceKg,
-      isDangerousGoods: v.isDangerousGoods,
+      cargoKind: v.cargoKind,
+      weightKg: estimate ? estimate.weightKg : (v.weightKg ?? 0),
+      volumeM3: estimate ? estimate.volumeM3 : (v.volumeM3 ?? 0),
+      pieces: vehicles ? (v.vehicleCount ?? 1) : (v.pieces ?? 1),
+      floorAreaM2: vehicles ? null : v.floorAreaM2,
+      vehicleCount: vehicles ? v.vehicleCount : null,
+      heaviestPieceKg: vehicles ? null : v.heaviestPieceKg,
+      isDangerousGoods: vehicles ? false : v.isDangerousGoods,
       cargoType: v.cargoType,
       commodity: v.commodity,
       readyDate: parseDate(v.readyDate),
@@ -117,18 +124,20 @@ export async function requestBooking(input: { shipmentId: string; listingId: str
     redirect(`/shipper/bookings/${duplicate.id}`);
   }
 
-  const charge = chargeableWeight({
+  // Price is always computed here, from the listing and the shipment. The client never sends it.
+  const price = priceFor({
     mode: listing.mode,
-    weightKg: shipment.weightKg,
-    volumeM3: shipment.volumeM3,
+    pricingUnit: listing.pricingUnit,
+    unitPrice: listing.unitPrice,
     minChargeableKg: listing.minChargeableKg,
+    shipment,
   });
   const booking = await prisma.booking.create({
     data: {
       shipmentRequestId: shipment.id,
       listingId: listing.id,
-      chargeableWeightKg: charge.chargedKg,
-      totalPrice: totalPrice(charge.chargedKg, listing.pricePerChargeableKg),
+      chargeableWeightKg: price.chargedKg,
+      totalPrice: price.total,
       status: "REQUESTED",
     },
   });
@@ -153,17 +162,21 @@ export async function createListing(input: unknown): Promise<ActionResult> {
       origin: "TAS",
       destination: v.destination,
       departureDate: parseDate(v.departureDate),
-      availableWeightKg: v.availableWeightKg,
-      availableVolumeM3: v.availableVolumeM3,
-      pricePerChargeableKg: v.pricePerChargeableKg,
+      cargoKind: v.cargoKind,
+      pricingUnit: v.pricingUnit,
+      unitPrice: v.unitPrice,
+      availableWeightKg: v.cargoKind === "VEHICLES" ? 0 : (v.availableWeightKg ?? 0),
+      availableVolumeM3: v.cargoKind === "VEHICLES" ? 0 : (v.availableVolumeM3 ?? 0),
+      availableFloorM2: v.cargoKind === "VEHICLES" ? null : v.availableFloorM2,
+      availableVehicles: v.cargoKind === "VEHICLES" ? v.availableVehicles : null,
       currency: "USD",
       transitDaysMin: v.transitDaysMin,
       transitDaysMax: v.transitDaysMax,
       equipment: v.equipment,
       cutoffHours: v.cutoffHours,
-      maxPieceKg: v.maxPieceKg,
-      acceptsDangerousGoods: v.acceptsDangerousGoods,
-      minChargeableKg: v.minChargeableKg,
+      maxPieceKg: v.maxPieceKg ?? 3000,
+      acceptsDangerousGoods: v.cargoKind === "VEHICLES" ? false : v.acceptsDangerousGoods,
+      minChargeableKg: v.pricingUnit === "PER_KG" ? v.minChargeableKg : 0,
       restrictions: v.restrictions,
       status: "OPEN",
       isDemo: true,
@@ -199,24 +212,44 @@ export async function approveBooking(input: unknown): Promise<ActionResult> {
       if (claimed.count === 0) throw new ActionError("This request was already handled. Reload the page.");
 
       // Capacity check and decrement in one statement, so two approvals cannot overbook.
+      // What counts as capacity depends on the listing: vehicle slots, or weight and volume
+      // (and floor space when the carrier sells it).
+      const s = booking.shipment;
+      const l = booking.listing;
+      const sellsFloor = l.cargoKind === "GENERAL" && l.availableFloorM2 != null;
+      const floorNeeded = floorAreaOf(s);
       const reserved = await tx.capacityListing.updateMany({
-        where: {
-          id: booking.listingId,
-          status: "OPEN",
-          availableWeightKg: { gte: booking.shipment.weightKg },
-          availableVolumeM3: { gte: booking.shipment.volumeM3 },
-        },
-        data: {
-          availableWeightKg: { decrement: booking.shipment.weightKg },
-          availableVolumeM3: { decrement: booking.shipment.volumeM3 },
-        },
+        where:
+          l.cargoKind === "VEHICLES"
+            ? { id: l.id, status: "OPEN", availableVehicles: { gte: s.vehicleCount ?? 0 } }
+            : {
+                id: l.id,
+                status: "OPEN",
+                availableWeightKg: { gte: s.weightKg },
+                availableVolumeM3: { gte: s.volumeM3 },
+                ...(sellsFloor ? { availableFloorM2: { gte: floorNeeded } } : {}),
+              },
+        data:
+          l.cargoKind === "VEHICLES"
+            ? { availableVehicles: { decrement: s.vehicleCount ?? 0 } }
+            : {
+                availableWeightKg: { decrement: s.weightKg },
+                availableVolumeM3: { decrement: s.volumeM3 },
+                ...(sellsFloor ? { availableFloorM2: { decrement: floorNeeded } } : {}),
+              },
       });
       if (reserved.count === 0) {
         throw new ActionError("Not enough capacity is left on this listing. Reject the request or add capacity.");
       }
 
-      const after = await tx.capacityListing.findUniqueOrThrow({ where: { id: booking.listingId } });
-      if (after.availableWeightKg <= 0 || after.availableVolumeM3 <= 0) {
+      const after = await tx.capacityListing.findUniqueOrThrow({ where: { id: l.id } });
+      const exhausted =
+        after.cargoKind === "VEHICLES"
+          ? (after.availableVehicles ?? 0) <= 0
+          : after.availableWeightKg <= 0 ||
+            after.availableVolumeM3 <= 0 ||
+            (after.availableFloorM2 != null && after.availableFloorM2 <= 0);
+      if (exhausted) {
         await tx.capacityListing.update({ where: { id: after.id }, data: { status: "FULL" } });
       }
 

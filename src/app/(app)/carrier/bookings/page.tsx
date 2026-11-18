@@ -42,7 +42,7 @@ export default async function ActiveBookings() {
                     <span>TAS to {b.listing.destination}, departs {formatDay(b.listing.departureDate)}</span>
                   </p>
                   <p className="mt-2 text-sm">
-                    {b.shipment.commodity}, {kg(b.shipment.weightKg)}, charged {kg(b.chargeableWeightKg)} · <span className="font-semibold">{money(b.totalPrice)}</span> <DemoBadge />
+                    {b.shipment.commodity}, {b.shipment.cargoKind === "VEHICLES" ? `${b.shipment.vehicleCount} vehicles` : `${kg(b.shipment.weightKg)}`} · <span className="font-semibold">{money(b.totalPrice)}</span> <DemoBadge />
                   </p>
                   <div className="mt-4">
                     {next ? (

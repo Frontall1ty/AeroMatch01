@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { AIRPORT_CITY, MODE_LABEL, type Mode } from "@/lib/constants";
+import { AIRPORT_CITY, MODE_LABEL, MODE_ORDER, VEHICLE_ESTIMATE, type Mode } from "@/lib/constants";
 import { addDays, formatDay } from "@/lib/dates";
-import { int, kg, m3, money, moneyPrecise } from "@/lib/format";
+import { int, kg, m3, money } from "@/lib/format";
 import type { OfferView } from "@/lib/offers";
 import { recommend, recommendationReason, type Priority } from "@/lib/rules";
 import { BookingDrawer, type ShipmentSummary } from "./BookingDrawer";
@@ -23,6 +23,14 @@ const arrivalText = (o: OfferView) =>
   o.arrivalMinDate === o.arrivalMaxDate
     ? formatDay(new Date(o.arrivalMinDate))
     : `${formatDay(new Date(o.arrivalMinDate))} to ${formatDay(new Date(o.arrivalMaxDate))}`;
+
+const leftText = (o: OfferView) =>
+  o.cargoKind === "VEHICLES"
+    ? { main: `${o.availableVehicles ?? 0} vehicle slots`, sub: "" }
+    : {
+        main: kg(o.availableWeightKg),
+        sub: `${m3(o.availableVolumeM3)}${o.availableFloorM2 != null ? `, ${o.availableFloorM2} m² floor` : ""}`,
+      };
 
 export function CompareView({
   shipment,
@@ -87,19 +95,35 @@ export function CompareView({
       {/* Charged weight per mode and priority */}
       <div className="mb-5 grid gap-4 lg:grid-cols-[1fr_auto]">
         <div className="panel p-3">
-          <p className="mb-2 text-sm font-semibold">Charged weight by mode</p>
-          <div className="grid gap-2 sm:grid-cols-3">
-            {(["AIR", "ROAD", "SEA"] as Mode[]).map((m) => (
-              <div key={m} className="text-sm">
-                <ModeTag mode={m} />
-                <p className="text-muted">
-                  Actual {int(breakdown[m].actualKg)} kg / Volumetric {int(breakdown[m].volumetricKg)} kg
-                </p>
-                <p className="font-semibold">Charged {int(breakdown[m].chargedKg)} kg</p>
+          {shipment.cargoKind === "VEHICLES" ? (
+            <>
+              <p className="mb-2 text-sm font-semibold">Vehicles</p>
+              <p className="text-sm">
+                {shipment.vehicleCount} {shipment.vehicleCount === 1 ? "vehicle" : "vehicles"}. Only carriers that take vehicles are offered. They price per vehicle.
+              </p>
+              <p className="mt-2 text-xs text-muted">
+                Weight and volume are estimated at {int(VEHICLE_ESTIMATE.weightKg)} kg and {VEHICLE_ESTIMATE.volumeM3} m³ per vehicle.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="mb-2 text-sm font-semibold">Charged weight by mode</p>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {MODE_ORDER.map((m) => (
+                  <div key={m} className="text-sm">
+                    <ModeTag mode={m} />
+                    <p className="text-muted">
+                      Actual {int(breakdown[m].actualKg)} kg / Volumetric {int(breakdown[m].volumetricKg)} kg
+                    </p>
+                    <p className="font-semibold">Charged {int(breakdown[m].chargedKg)} kg</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <p className="mt-2 text-xs text-muted">A carrier's minimum chargeable weight can raise this for a specific offer.</p>
+              <p className="mt-2 text-xs text-muted">
+                Each carrier sets its own pricing: per kg, per m² of floor space or a flat price. The price column shows how each offer is calculated.
+              </p>
+            </>
+          )}
         </div>
 
         <div className="panel p-3">
@@ -188,9 +212,9 @@ export function CompareView({
                     <td className="whitespace-nowrap p-3">{arrivalText(o)}<span className="block text-xs text-muted">{o.transitDaysMin === o.transitDaysMax ? `${o.transitDaysMin} d` : `${o.transitDaysMin} to ${o.transitDaysMax} d`} transit</span></td>
                     <td className="p-3">
                       <p className="text-base font-bold">{money(o.totalPrice)}</p>
-                      <p className="text-xs text-muted">{moneyPrecise(o.pricePerKg)}/kg × {int(o.chargedKg)} kg</p>
+                      <p className="text-xs text-muted">{o.priceBasis}</p>
                     </td>
-                    <td className="whitespace-nowrap p-3">{kg(o.availableWeightKg)}<span className="block text-xs text-muted">{m3(o.availableVolumeM3)}</span></td>
+                    <td className="whitespace-nowrap p-3">{leftText(o).main}{leftText(o).sub && <span className="block text-xs text-muted">{leftText(o).sub}</span>}</td>
                     <td className="p-3">{o.cutoffHours} h</td>
                     <td className="p-3 text-muted">{o.restrictions || "None"}</td>
                     <td className="p-3">
@@ -225,8 +249,8 @@ export function CompareView({
                 <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
                   <dt className="text-muted">Departs</dt><dd>{formatDay(new Date(o.departureDate))}</dd>
                   <dt className="text-muted">Arrives</dt><dd>{arrivalText(o)}</dd>
-                  <dt className="text-muted">Price per kg</dt><dd>{moneyPrecise(o.pricePerKg)} × {int(o.chargedKg)} kg</dd>
-                  <dt className="text-muted">Left</dt><dd>{kg(o.availableWeightKg)}, {m3(o.availableVolumeM3)}</dd>
+                  <dt className="text-muted">Price basis</dt><dd>{o.priceBasis}</dd>
+                  <dt className="text-muted">Left</dt><dd>{leftText(o).main}{leftText(o).sub ? `, ${leftText(o).sub}` : ""}</dd>
                   <dt className="text-muted">Equipment</dt><dd>{o.equipment}</dd>
                   <dt className="text-muted">Cutoff</dt><dd>{o.cutoffHours} h before departure</dd>
                   <dt className="text-muted">Restrictions</dt><dd>{o.restrictions || "None"}</dd>
@@ -281,16 +305,24 @@ export function ShipmentRail({ shipment }: { shipment: ShipmentSummary & { cargo
       <dd className="text-right font-semibold">{value}</dd>
     </div>
   );
+  const vehicles = shipment.cargoKind === "VEHICLES";
   return (
     <aside aria-label="Shipment summary" className="panel p-4 lg:sticky lg:top-4">
       <h2 className="mb-2 text-xl font-semibold">Shipment</h2>
       <dl className="text-sm">
-        {row("Weight", kg(shipment.weightKg))}
-        {row("Volume", m3(shipment.volumeM3))}
-        {row("Pieces", int(shipment.pieces))}
-        {row("Heaviest piece", shipment.heaviestPieceKg == null ? "Not given" : kg(shipment.heaviestPieceKg))}
-        {row("Dangerous goods", shipment.isDangerousGoods ? "Yes" : "No")}
-        {row("Cargo", shipment.cargoType)}
+        {vehicles ? (
+          row("Vehicles", int(shipment.vehicleCount ?? 0))
+        ) : (
+          <>
+            {row("Weight", kg(shipment.weightKg))}
+            {row("Volume", m3(shipment.volumeM3))}
+            {row("Pieces", int(shipment.pieces))}
+            {row("Floor space", shipment.floorAreaM2 == null ? "Estimated" : `${shipment.floorAreaM2} m²`)}
+            {row("Heaviest piece", shipment.heaviestPieceKg == null ? "Not given" : kg(shipment.heaviestPieceKg))}
+            {row("Dangerous goods", shipment.isDangerousGoods ? "Yes" : "No")}
+            {row("Cargo", shipment.cargoType)}
+          </>
+        )}
         {row("Ready", formatDay(new Date(shipment.readyDate)))}
         {row("Deliver by", formatDay(new Date(shipment.deliverBy)))}
       </dl>

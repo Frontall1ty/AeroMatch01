@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { formatDay } from "@/lib/dates";
 import { kg, m3, money } from "@/lib/format";
+import { floorAreaOf, priceFor } from "@/lib/rules";
 import { requireRole } from "@/lib/session";
 import { RequestActions } from "@/components/RequestActions";
 import { DemoBadge, EmptyState, ModeTag, PageTitle } from "@/components/ui";
@@ -35,7 +36,15 @@ export default async function Requests() {
       ) : (
         <ul className="panel divide-y divide-rule">
           {requests.map((r) => {
-            const fits = r.shipment.weightKg <= r.listing.availableWeightKg && r.shipment.volumeM3 <= r.listing.availableVolumeM3;
+            const sh = r.shipment;
+            const li = r.listing;
+            const vehicles = sh.cargoKind === "VEHICLES";
+            const fits = vehicles
+              ? (sh.vehicleCount ?? 0) <= (li.availableVehicles ?? 0)
+              : sh.weightKg <= li.availableWeightKg &&
+                sh.volumeM3 <= li.availableVolumeM3 &&
+                (li.availableFloorM2 == null || floorAreaOf(sh) <= li.availableFloorM2);
+            const basis = priceFor({ mode: li.mode, pricingUnit: li.pricingUnit, unitPrice: li.unitPrice, minChargeableKg: li.minChargeableKg, shipment: sh }).basis;
             return (
               <li key={r.id} className="grid gap-4 p-4 md:grid-cols-[1fr_auto]">
                 <div className="text-sm">
@@ -46,15 +55,17 @@ export default async function Requests() {
                   </p>
                   <dl className="mt-3 grid grid-cols-[120px_1fr] gap-x-3 gap-y-1">
                     <dt className="text-muted">Cargo</dt>
-                    <dd>{r.shipment.commodity}, {r.shipment.pieces} pieces{r.shipment.isDangerousGoods ? ", dangerous goods" : ""}</dd>
-                    <dt className="text-muted">Size</dt>
-                    <dd>{kg(r.shipment.weightKg)}, {m3(r.shipment.volumeM3)}{r.shipment.heaviestPieceKg ? `, heaviest piece ${kg(r.shipment.heaviestPieceKg)}` : ""}</dd>
-                    <dt className="text-muted">Charged weight</dt>
-                    <dd>{kg(r.chargeableWeightKg)}</dd>
+                    <dd>{vehicles ? `${sh.commodity}, ${sh.vehicleCount} ${sh.vehicleCount === 1 ? "vehicle" : "vehicles"}` : `${sh.commodity}, ${sh.pieces} pieces${sh.isDangerousGoods ? ", dangerous goods" : ""}`}</dd>
+                    {!vehicles && (
+                      <>
+                        <dt className="text-muted">Size</dt>
+                        <dd>{kg(sh.weightKg)}, {m3(sh.volumeM3)}, floor space {sh.floorAreaM2 ?? floorAreaOf(sh)} m²{sh.heaviestPieceKg ? `, heaviest piece ${kg(sh.heaviestPieceKg)}` : ""}</dd>
+                      </>
+                    )}
                     <dt className="text-muted">Price</dt>
-                    <dd><span className="font-bold">{money(r.totalPrice)}</span> <DemoBadge /></dd>
+                    <dd><span className="font-bold">{money(r.totalPrice)}</span> <DemoBadge /><span className="block text-xs text-muted">{basis}</span></dd>
                     <dt className="text-muted">Capacity left</dt>
-                    <dd>{kg(r.listing.availableWeightKg)}, {m3(r.listing.availableVolumeM3)}{!fits && <span className="ml-2 font-semibold text-bad">Not enough for this request</span>}</dd>
+                    <dd>{vehicles ? `${li.availableVehicles ?? 0} vehicle slots` : `${kg(li.availableWeightKg)}, ${m3(li.availableVolumeM3)}${li.availableFloorM2 != null ? `, ${li.availableFloorM2} m² floor` : ""}`}{!fits && <span className="ml-2 font-semibold text-bad">Not enough for this request</span>}</dd>
                   </dl>
                 </div>
                 <div className="md:w-64"><RequestActions bookingId={r.id} /></div>

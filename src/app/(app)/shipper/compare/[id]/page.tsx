@@ -24,7 +24,7 @@ export default async function Compare({ params }: { params: Promise<{ id: string
   const offers = buildOffers(shipment, listings);
 
   const breakdown = Object.fromEntries(
-    (["AIR", "ROAD", "SEA"] as Mode[]).map((m) => [
+    (["AIR", "RAIL", "ROAD"] as Mode[]).map((m) => [
       m,
       chargeableWeight({ mode: m, weightKg: shipment.weightKg, volumeM3: shipment.volumeM3 }),
     ]),
@@ -33,6 +33,9 @@ export default async function Compare({ params }: { params: Promise<{ id: string
   const summary = {
     id: shipment.id,
     destination: shipment.destination,
+    cargoKind: shipment.cargoKind,
+    vehicleCount: shipment.vehicleCount,
+    floorAreaM2: shipment.floorAreaM2,
     weightKg: shipment.weightKg,
     volumeM3: shipment.volumeM3,
     pieces: shipment.pieces,

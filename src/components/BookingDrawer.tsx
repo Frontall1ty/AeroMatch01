@@ -2,15 +2,18 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { requestBooking } from "@/app/actions";
-import { DOCUMENT_CHECKLIST, DOCUMENT_CHECKLIST_NOTE, MODE_LABEL } from "@/lib/constants";
+import { DOCUMENT_CHECKLIST, DOCUMENT_CHECKLIST_NOTE, MODE_LABEL, VEHICLE_DOCUMENTS, type CargoKind } from "@/lib/constants";
 import { formatDay } from "@/lib/dates";
-import { kg, m3, money, moneyPrecise } from "@/lib/format";
+import { kg, m3, money } from "@/lib/format";
 import type { OfferView } from "@/lib/offers";
 import { DemoBadge, ModeTag, VerifiedBadge } from "./ui";
 
 export type ShipmentSummary = {
   id: string;
   destination: string;
+  cargoKind: CargoKind;
+  vehicleCount: number | null;
+  floorAreaM2: number | null;
   weightKg: number;
   volumeM3: number;
   pieces: number;
@@ -110,25 +113,22 @@ export function BookingDrawer({
             <dd>{offer.cutoffHours} h before departure</dd>
             <dt className="text-muted">Cargo</dt>
             <dd>
-              {shipment.commodity}, {shipment.pieces} {shipment.pieces === 1 ? "piece" : "pieces"}, {kg(shipment.weightKg)}, {m3(shipment.volumeM3)}
-              {shipment.isDangerousGoods ? ", dangerous goods" : ""}
-            </dd>
-            <dt className="text-muted">Charged weight</dt>
-            <dd>
-              Actual {kg(offer.actualKg)} / Volumetric {kg(offer.volumetricKg)} / <strong>Charged {kg(offer.chargedKg)}</strong>
+              {shipment.cargoKind === "VEHICLES"
+                ? `${shipment.commodity}, ${shipment.vehicleCount} ${shipment.vehicleCount === 1 ? "vehicle" : "vehicles"}`
+                : `${shipment.commodity}, ${shipment.pieces} ${shipment.pieces === 1 ? "piece" : "pieces"}, ${kg(shipment.weightKg)}, ${m3(shipment.volumeM3)}${shipment.isDangerousGoods ? ", dangerous goods" : ""}`}
             </dd>
             <dt className="text-muted">Price</dt>
             <dd>
               <span className="text-xl font-bold">{money(offer.totalPrice)}</span>{" "}
               <DemoBadge />
-              <span className="mt-0.5 block text-xs text-muted">{kg(offer.chargedKg)} × {moneyPrecise(offer.pricePerKg)} per kg</span>
+              <span className="mt-0.5 block text-xs text-muted">{offer.priceBasis}</span>
             </dd>
           </dl>
 
           <section aria-labelledby="docs-title">
             <h3 id="docs-title" className="mb-1 font-semibold">Documents for {MODE_LABEL[offer.mode].toLowerCase()} freight</h3>
             <ul className="list-disc space-y-0.5 pl-5">
-              {DOCUMENT_CHECKLIST[offer.mode].map((d) => (
+              {[...DOCUMENT_CHECKLIST[offer.mode], ...(shipment.cargoKind === "VEHICLES" ? VEHICLE_DOCUMENTS : [])].map((d) => (
                 <li key={d}>{d}</li>
               ))}
             </ul>

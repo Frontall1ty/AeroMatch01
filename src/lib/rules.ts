@@ -1,7 +1,19 @@
-import { MILESTONES, VOLUMETRIC_FACTOR, type Mode } from "./constants";
+import {
+  MILESTONES,
+  STACK_HEIGHT_M,
+  VEHICLE_ESTIMATE,
+  VOLUMETRIC_FACTOR,
+  type CargoKind,
+  type Mode,
+  type PricingUnit,
+} from "./constants";
 import { addDays, daysBetween } from "./dates";
 
-/* ---------- 6.1 Chargeable weight and price ---------- */
+const n0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+const n1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+/* ---------- 6.1 Chargeable weight ---------- */
 
 export type ChargeableBreakdown = { actualKg: number; volumetricKg: number; chargedKg: number };
 
@@ -25,11 +37,83 @@ export function totalPrice(chargedKg: number, pricePerChargeableKg: number): num
   return Math.round(chargedKg * pricePerChargeableKg * 100) / 100;
 }
 
+/* ---------- Pricing: each carrier chooses its own unit ---------- */
+
+export type PricingShipment = {
+  cargoKind: CargoKind;
+  weightKg: number;
+  volumeM3: number;
+  floorAreaM2?: number | null;
+  vehicleCount?: number | null;
+};
+
+/** Floor space the shipment needs: entered by the shipper, otherwise estimated from volume. */
+export function floorAreaOf(shipment: { volumeM3: number; floorAreaM2?: number | null }): number {
+  if (shipment.floorAreaM2 != null && shipment.floorAreaM2 > 0) return shipment.floorAreaM2;
+  return Math.round((shipment.volumeM3 / STACK_HEIGHT_M) * 100) / 100;
+}
+
+/** Weight and volume are never empty: vehicles use an estimate per vehicle. */
+export function vehicleEstimate(count: number) {
+  return { weightKg: count * VEHICLE_ESTIMATE.weightKg, volumeM3: count * VEHICLE_ESTIMATE.volumeM3 };
+}
+
+export type PriceResult = {
+  total: number;
+  /** What the unit price is multiplied by. */
+  quantity: number;
+  /** Chargeable weight: the price basis for per-kg pricing, information otherwise. */
+  chargedKg: number;
+  basis: string;
+};
+
+function money(n: number): string {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: Number.isInteger(n) || n >= 100 ? 0 : 2,
+    maximumFractionDigits: n >= 100 ? 0 : 2,
+  }).format(n);
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+export function priceFor(args: {
+  mode: Mode;
+  pricingUnit: PricingUnit;
+  unitPrice: number;
+  minChargeableKg?: number;
+  shipment: PricingShipment;
+}): PriceResult {
+  const { mode, pricingUnit, unitPrice, shipment } = args;
+  const charge = chargeableWeight({
+    mode,
+    weightKg: shipment.weightKg,
+    volumeM3: shipment.volumeM3,
+    minChargeableKg: args.minChargeableKg,
+  });
+  const chargedKg = charge.chargedKg;
+
+  if (pricingUnit === "PER_KG") {
+    return { total: round2(chargedKg * unitPrice), quantity: chargedKg, chargedKg, basis: `$${money(unitPrice)}/kg × ${n0.format(chargedKg)} kg` };
+  }
+  if (pricingUnit === "PER_M2") {
+    const floor = floorAreaOf(shipment);
+    return { total: round2(floor * unitPrice), quantity: floor, chargedKg, basis: `$${money(unitPrice)}/m² × ${n1.format(floor)} m²` };
+  }
+  if (pricingUnit === "PER_VEHICLE") {
+    const count = shipment.vehicleCount ?? 0;
+    return { total: round2(count * unitPrice), quantity: count, chargedKg, basis: `$${money(unitPrice)}/vehicle × ${count}` };
+  }
+  return { total: round2(unitPrice), quantity: 1, chargedKg, basis: "Flat price, whole truck or wagon" };
+}
+
 /* ---------- 6.2 Availability ---------- */
 
 export type ShipmentInput = {
+  cargoKind: CargoKind;
   weightKg: number;
   volumeM3: number;
+  floorAreaM2?: number | null;
+  vehicleCount?: number | null;
   heaviestPieceKg?: number | null;
   isDangerousGoods: boolean;
   readyDate: Date;
@@ -39,10 +123,14 @@ export type ShipmentInput = {
 export type ListingInput = {
   id: string;
   mode: Mode;
+  cargoKind: CargoKind;
+  pricingUnit: PricingUnit;
+  unitPrice: number;
   departureDate: Date;
   availableWeightKg: number;
   availableVolumeM3: number;
-  pricePerChargeableKg: number;
+  availableFloorM2?: number | null;
+  availableVehicles?: number | null;
   transitDaysMin: number;
   transitDaysMax: number;
   maxPieceKg: number;
@@ -55,7 +143,8 @@ export type AvailabilityCode =
   | "INSUFFICIENT_CAPACITY"
   | "MISSES_DEADLINE"
   | "PIECE_TOO_HEAVY"
-  | "NO_DANGEROUS_GOODS";
+  | "NO_DANGEROUS_GOODS"
+  | "CARGO_NOT_ACCEPTED";
 
 export type Availability = {
   status: AvailabilityCode;
@@ -63,44 +152,55 @@ export type Availability = {
   reasons: { code: Exclude<AvailabilityCode, "OK">; text: string }[];
 };
 
-const n0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-const n1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+function joinParts(parts: string[]): string {
+  if (parts.length <= 1) return parts.join("");
+  return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+}
 
 /**
- * Capacity is checked against the actual weight and the volume of the shipment,
- * because a carrier's space is limited by both. Chargeable weight is used for price only.
+ * Capacity is checked against what the shipment physically takes: actual weight, volume and,
+ * where the carrier sells floor space, floor area. For vehicles it is the number of vehicle slots.
+ * Chargeable weight is used for price only.
  */
 export function evaluateAvailability(shipment: ShipmentInput, listing: ListingInput): Availability {
   const reasons: Availability["reasons"] = [];
 
-  if (shipment.isDangerousGoods && !listing.acceptsDangerousGoods) {
-    reasons.push({ code: "NO_DANGEROUS_GOODS", text: "Does not accept dangerous goods" });
-  }
-
-  if (shipment.heaviestPieceKg != null && shipment.heaviestPieceKg > listing.maxPieceKg) {
+  if (shipment.cargoKind !== listing.cargoKind) {
     reasons.push({
-      code: "PIECE_TOO_HEAVY",
-      text: `Max piece weight is ${n0.format(listing.maxPieceKg)} kg`,
+      code: "CARGO_NOT_ACCEPTED",
+      text: listing.cargoKind === "VEHICLES" ? "Carries vehicles only" : "Carries general cargo only",
     });
+    return { status: "CARGO_NOT_ACCEPTED", reasons };
   }
 
-  const tooHeavy = shipment.weightKg > listing.availableWeightKg;
-  const tooBulky = shipment.volumeM3 > listing.availableVolumeM3;
-  if (tooHeavy || tooBulky) {
+  if (shipment.cargoKind === "GENERAL") {
+    if (shipment.isDangerousGoods && !listing.acceptsDangerousGoods) {
+      reasons.push({ code: "NO_DANGEROUS_GOODS", text: "Does not accept dangerous goods" });
+    }
+
+    if (shipment.heaviestPieceKg != null && shipment.heaviestPieceKg > listing.maxPieceKg) {
+      reasons.push({ code: "PIECE_TOO_HEAVY", text: `Max piece weight is ${n0.format(listing.maxPieceKg)} kg` });
+    }
+
     const parts: string[] = [];
-    if (tooHeavy) parts.push(`${n0.format(Math.max(0, listing.availableWeightKg))} kg`);
-    if (tooBulky) parts.push(`${n1.format(Math.max(0, listing.availableVolumeM3))} m³`);
-    reasons.push({ code: "INSUFFICIENT_CAPACITY", text: `Only ${parts.join(" and ")} left` });
+    if (shipment.weightKg > listing.availableWeightKg) parts.push(`${n0.format(Math.max(0, listing.availableWeightKg))} kg`);
+    if (shipment.volumeM3 > listing.availableVolumeM3) parts.push(`${n1.format(Math.max(0, listing.availableVolumeM3))} m³`);
+    if (listing.availableFloorM2 != null && floorAreaOf(shipment) > listing.availableFloorM2) {
+      parts.push(`${n1.format(Math.max(0, listing.availableFloorM2))} m² of floor space`);
+    }
+    if (parts.length) reasons.push({ code: "INSUFFICIENT_CAPACITY", text: `Only ${joinParts(parts)} left` });
+  } else {
+    const need = shipment.vehicleCount ?? 0;
+    const have = listing.availableVehicles ?? 0;
+    if (need > have) {
+      reasons.push({ code: "INSUFFICIENT_CAPACITY", text: `Only ${plural(Math.max(0, have), "vehicle slot")} left` });
+    }
   }
 
   const arrivalLatest = addDays(listing.departureDate, listing.transitDaysMax);
   const daysLate = daysBetween(shipment.deliverBy, arrivalLatest);
   if (daysLate > 0) {
-    reasons.push({
-      code: "MISSES_DEADLINE",
-      text: `Arrives ${plural(daysLate, "day")} after your deadline`,
-    });
+    reasons.push({ code: "MISSES_DEADLINE", text: `Arrives ${plural(daysLate, "day")} after your deadline` });
   }
 
   return { status: reasons[0]?.code ?? "OK", reasons };
@@ -188,8 +288,6 @@ export function recommend<T extends ScorableOffer>(
   return { recommended: sorted[0], scores };
 }
 
-const usd0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-
 export function recommendationReason(recommended: ScorableOffer, offers: ScorableOffer[]): string {
   const cheapest = [...offers].sort((a, b) => a.totalPrice - b.totalPrice || transitMid(a) - transitMid(b))[0];
   if (!cheapest || cheapest.id === recommended.id || recommended.totalPrice <= cheapest.totalPrice) {
@@ -197,11 +295,11 @@ export function recommendationReason(recommended: ScorableOffer, offers: Scorabl
   }
   const extra = recommended.totalPrice - cheapest.totalPrice;
   const daysSaved = transitMid(cheapest) - transitMid(recommended);
-  const extraText = `Costs $${usd0.format(Math.round(extra))} more than the cheapest option`;
+  const extraText = `Costs $${n0.format(Math.round(extra))} more than the cheapest option`;
   if (daysSaved < 0.5) return `${extraText} with a similar transit time.`;
   const perDay = Math.round(extra / daysSaved);
   const days = Math.max(1, Math.round(daysSaved));
-  return `${extraText} and arrives about ${plural(days, "day")} earlier ($${usd0.format(perDay)} per day saved).`;
+  return `${extraText} and arrives about ${plural(days, "day")} earlier ($${n0.format(perDay)} per day saved).`;
 }
 
 /* ---------- 6.4 Milestones ---------- */

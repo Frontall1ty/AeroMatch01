@@ -4,7 +4,7 @@ import { MODE_LABEL, type Mode } from "@/lib/constants";
 const MODE_CLASS: Record<Mode, string> = {
   AIR: "bg-air",
   ROAD: "bg-road",
-  SEA: "bg-sea",
+  RAIL: "bg-rail",
 };
 
 /** Mode color identifies modes only. Never decoration. */

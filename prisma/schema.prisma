@@ -22,7 +22,19 @@ enum Role {
 enum Mode {
   AIR
   ROAD
-  SEA
+  RAIL
+}
+
+enum PricingUnit {
+  PER_KG
+  PER_M2
+  PER_VEHICLE
+  FLAT
+}
+
+enum CargoKind {
+  GENERAL
+  VEHICLES
 }
 
 enum ListingStatus {
@@ -68,7 +80,11 @@ model CapacityListing {
   departureDate         DateTime      @db.Date
   availableWeightKg     Float
   availableVolumeM3     Float
-  pricePerChargeableKg  Float
+  cargoKind             CargoKind     @default(GENERAL)
+  pricingUnit           PricingUnit   @default(PER_KG)
+  unitPrice             Float
+  availableFloorM2      Float?
+  availableVehicles     Int?
   currency              String        @default("USD")
   transitDaysMin        Int
   transitDaysMax        Int
@@ -95,7 +111,10 @@ model ShipmentRequest {
   destination        String
   weightKg           Float
   volumeM3           Float
+  cargoKind          CargoKind @default(GENERAL)
   pieces             Int      @default(1)
+  floorAreaM2        Float?
+  vehicleCount       Int?
   heaviestPieceKg    Float?
   isDangerousGoods   Boolean  @default(false)
   cargoType          String

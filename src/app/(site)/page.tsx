@@ -3,6 +3,8 @@ import { CargoDemo } from "@/components/site/CargoDemo";
 import { FitDemo } from "@/components/site/FitDemo";
 import { HeroLanes } from "@/components/site/HeroLanes";
 import { Integration } from "@/components/site/Integration";
+import { Story } from "@/components/site/Story";
+import { LoadViewDemo } from "@/components/site/LoadViewDemo";
 import { LocalDemo } from "@/components/site/LocalDemo";
 import { PricingDemo } from "@/components/site/PricingDemo";
 import { ModeTag } from "@/components/ui";
@@ -64,6 +66,8 @@ export default function Site() {
           <HeroLanes />
         </div>
       </section>
+
+      <Story />
 
       <Section
         id="who"
@@ -128,6 +132,14 @@ export default function Site() {
         lead="Airlines sell weight. A groupage trailer sells floor space. A full truck is one price. A car carrier charges per vehicle. Carriers choose their unit, and shippers see how each offer is worked out."
       >
         <PricingDemo />
+      </Section>
+
+      <Section
+        id="space"
+        title="See how full it is."
+        lead="Every option shows its vehicle with the space split into positions. Grey is booked by others, colored is your cargo, white is still free. Move the slider and your cargo takes its place."
+      >
+        <LoadViewDemo />
       </Section>
 
       <Section

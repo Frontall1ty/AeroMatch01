@@ -1,0 +1,193 @@
+/*
+ * The scroll story: sky, sea, road, rail, shown as four photographs.
+ * One number drives everything: --p, how far through the story you have scrolled (0 to 1).
+ * Every layer is calculated from it, so there is no animation library.
+ *
+ * The three transitions:
+ *   1. Sky to sea:  the photographs cross-fade, so the wing dissolves into the water below it.
+ *   2. Sea to road: a soft edge sweeps from left to right and the road photograph appears behind it.
+ *   3. Road to rail: a soft edge rises from the bottom and the rail yard appears under it.
+ * Photo credits are in PHOTOS.md.
+ */
+.story {
+  --p: 0;
+  --story-top: 61px; /* the height of the site header, which stays on screen */
+  position: relative;
+  height: 560vh;
+}
+
+.story-stage {
+  position: sticky;
+  top: var(--story-top);
+  height: calc(100vh - var(--story-top));
+  height: calc(100svh - var(--story-top));
+  overflow: hidden;
+  background: #0b2a44;
+  /* progress of each scene and each transition */
+  --a: clamp(0, calc(var(--p) / 0.32), 1);
+  --t1: clamp(0, calc((var(--p) - 0.2) / 0.12), 1);
+  --s: clamp(0, calc((var(--p) - 0.2) / 0.36), 1);
+  --t2: clamp(0, calc((var(--p) - 0.46) / 0.12), 1);
+  --r: clamp(0, calc((var(--p) - 0.46) / 0.36), 1);
+  --t3: clamp(0, calc((var(--p) - 0.72) / 0.12), 1);
+  --k: clamp(0, calc((var(--p) - 0.72) / 0.28), 1);
+}
+
+.story-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ---------- Photographs ---------- */
+.story-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+.story-sky .story-photo { transform: scale(calc(1.04 + var(--a) * 0.1)) translateX(calc(var(--a) * -2.5%)); }
+.story-sea .story-photo { transform: scale(calc(1.04 + var(--s) * 0.1)) translateX(calc(var(--s) * 2.5%)); }
+.story-road .story-photo { object-position: 30% 50%; transform: scale(calc(1.02 + var(--r) * 0.12)) translateX(calc(var(--r) * -3%)); }
+.story-rail .story-photo { transform: scale(calc(1.04 + var(--k) * 0.08)) translateY(calc(var(--k) * -2%)); }
+
+/* a gradient so that the white text stays readable on the sky */
+.story-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(4, 22, 40, 0.62) 0%, rgba(4, 22, 40, 0.18) 55%, rgba(4, 22, 40, 0) 100%);
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.12) / 0.1), 1));
+}
+
+/* ---------- The transitions ---------- */
+.story-sea {
+  opacity: var(--t1);
+}
+.story-road {
+  --edge: calc(var(--t2) * 135%);
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--edge) - 35%), transparent var(--edge));
+  mask-image: linear-gradient(90deg, #000 calc(var(--edge) - 35%), transparent var(--edge));
+}
+.story-rail {
+  --edge: calc(var(--t3) * 135%);
+  -webkit-mask-image: linear-gradient(0deg, #000 calc(var(--edge) - 35%), transparent var(--edge));
+  mask-image: linear-gradient(0deg, #000 calc(var(--edge) - 35%), transparent var(--edge));
+}
+
+/* ---------- Text ---------- */
+.story-text {
+  position: absolute;
+  left: 4vw;
+  bottom: 7vh;
+  width: min(440px, 92vw);
+  padding: 20px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #111827;
+}
+.story-text-air {
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.17) / 0.07), 1));
+}
+.story-text-sea {
+  opacity: min(clamp(0, calc((var(--p) - 0.27) / 0.06), 1), calc(1 - clamp(0, calc((var(--p) - 0.42) / 0.06), 1)));
+}
+.story-text-road {
+  opacity: min(clamp(0, calc((var(--p) - 0.53) / 0.06), 1), calc(1 - clamp(0, calc((var(--p) - 0.68) / 0.06), 1)));
+}
+.story-text-rail {
+  opacity: clamp(0, calc((var(--p) - 0.79) / 0.06), 1);
+}
+.story-intro {
+  position: absolute;
+  left: 4vw;
+  top: 5vh;
+  max-width: min(560px, 92vw);
+  color: #ffffff;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.12) / 0.06), 1));
+}
+
+/* ---------- Progress ---------- */
+.story-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 4px;
+  width: calc(var(--p) * 100%);
+  background: #ffffff;
+  z-index: 6;
+}
+.story-steps {
+  position: absolute;
+  right: 4vw;
+  top: 16px;
+  z-index: 6;
+  display: flex;
+  gap: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+}
+.story-step-air { border-bottom: calc(3px * (1 - clamp(0, calc((var(--p) - 0.22) / 0.04), 1))) solid #111827; }
+.story-step-sea { border-bottom: calc(3px * min(clamp(0, calc((var(--p) - 0.22) / 0.04), 1), calc(1 - clamp(0, calc((var(--p) - 0.47) / 0.04), 1)))) solid #111827; }
+.story-step-road { border-bottom: calc(3px * min(clamp(0, calc((var(--p) - 0.47) / 0.04), 1), calc(1 - clamp(0, calc((var(--p) - 0.72) / 0.04), 1)))) solid #111827; }
+.story-step-rail { border-bottom: calc(3px * clamp(0, calc((var(--p) - 0.72) / 0.04), 1)) solid #111827; }
+
+.story-steps span {
+  color: #374151;
+  padding-bottom: 2px;
+}
+
+.story-skip {
+  position: absolute;
+  right: 4vw;
+  bottom: 7vh;
+  z-index: 6;
+}
+
+.story-note {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  z-index: 6;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #4b5563;
+}
+.story-note a { text-decoration: underline; }
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  .story-road .story-photo { object-position: 24% 50%; }
+  .story-text { bottom: 64px; padding: 16px; }
+  .story-intro { top: 60px; }
+  .story-skip { display: none; }
+  .story-steps { gap: 10px; font-size: 13px; }
+  .story-note { left: 12px; right: 12px; text-align: center; }
+}
+
+/* ---------- Less motion: the four scenes are shown one under the other, still ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .story { height: auto; }
+  .story-stage { position: static; height: auto; overflow: visible; }
+  .story-scene {
+    position: relative;
+    inset: auto;
+    min-height: 78vh;
+    opacity: 1 !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+  .story-photo { transform: none !important; }
+  .story-text { opacity: 1 !important; }
+  .story-intro { opacity: 1 !important; }
+  .story-progress, .story-steps, .story-skip, .story-note { display: none; }
+}

@@ -1,10 +1,13 @@
 import Link from "next/link";
+import "@/app/story.css";
 import { DemoBadge } from "@/components/ui";
 import { getSession, homeFor } from "@/lib/session";
 
 const NAV = [
+  { href: "/#ways", label: "Four ways" },
   { href: "/#cargo", label: "One entry" },
   { href: "/#pricing", label: "Pricing" },
+  { href: "/#space", label: "Free space" },
   { href: "/#capacity", label: "Capacity" },
   { href: "/#local", label: "Documents" },
   { href: "/#systems", label: "Integration" },

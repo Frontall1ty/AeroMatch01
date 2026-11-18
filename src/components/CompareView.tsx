@@ -9,6 +9,7 @@ import type { OfferView } from "@/lib/offers";
 import { labelOffers, recommend, recommendationReason, type OfferLabel, type Priority } from "@/lib/rules";
 import { BookingDrawer, type ShipmentSummary } from "./BookingDrawer";
 import { LaneChart } from "./LaneChart";
+import { LoadView } from "./LoadView";
 import { SpaceBar } from "./SpaceBar";
 import { DemoBadge, EmptyState, ModeTag, VerifiedBadge } from "./ui";
 import { VehicleArt } from "./VehicleArt";
@@ -278,10 +279,10 @@ export function CompareView({
                   id={`row-${o.id}`}
                   onMouseEnter={() => setActiveId(o.id)}
                   onMouseLeave={() => setActiveId(null)}
-                  className={`grid gap-x-4 gap-y-3 p-4 md:grid-cols-[7.5rem_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)] ${activeId === o.id ? "bg-[#EEF2F7]" : ""}`}
+                  className={`grid gap-x-4 gap-y-3 p-4 md:grid-cols-[10.5rem_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1fr)] ${activeId === o.id ? "bg-[#EEF2F7]" : ""}`}
                 >
                   <div className="flex items-start gap-3 md:block">
-                    <VehicleArt mode={o.mode} equipment={o.equipment} vehicles={o.cargoKind === "VEHICLES"} className="h-14 w-28" />
+                    <LoadView mode={o.mode} equipment={o.equipment} seed={o.id} total={space.total} free={space.free} yours={space.yours} unit={space.unit} className="w-40 md:w-full" />
                     <div className="md:mt-1"><ModeTag mode={o.mode} /></div>
                   </div>
 

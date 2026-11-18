@@ -51,6 +51,7 @@ Every push to the repository deploys again by itself.
 
 - `/` the story site. `/register` and `/login` for real accounts. `/demo` has passwordless demo accounts with invented data.
 - `/shipper/...` and `/carrier/...` are the two roles. `/account` is the company profile and, for carriers, the verification status.
+- The home page has a scroll story (air, sea, road, rail) with photographs; credits are in `PHOTOS.md`. Every offer in the app has a load view: a cutaway of the vehicle with the booked, your and free positions.
 - `/admin` is where you verify carriers by hand. It has its own passcode (`ADMIN_PASSCODE`) and does not depend on any account.
 
 ## How the modes follow the city

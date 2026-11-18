@@ -57,6 +57,9 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 - **The site never names a real company or product.** The integration section says "your cargo system", marks the sample data as illustrative and uses an invented flight number.
 - **Pilot lane is stated plainly.** Tashkent is the only origin with data. The site says so and lists the next lanes as plans, not as features.
 
+- **The scroll story is told with four real photographs** (air, sea, road, rail), not drawings. Flat vector art looked toy-like next to the product. One number (`--p`, the scroll position) drives every layer in CSS, so there is no animation library. Transitions: sky to sea is a cross-fade, sea to road is a soft edge sweeping from the left (CSS mask), road to rail is a soft edge rising from the bottom. With reduced motion, or without JavaScript, the four scenes are stacked and still. Photo sources and the "no real brand in a photo" rule are in `PHOTOS.md`.
+- **The load view is a cutaway drawing** of a truck, aircraft, wagon, container or ship. It shows other bookings (invented references), your cargo and the free space, with "% loaded". It is a picture of how full the vehicle is, not a loading plan.
+
 ## Implementation choices
 
 - **Dates are date-only, UTC.** Seed dates are relative to the day the seed runs (`DEMO_READY_OFFSET_DAYS`, default 3). Re-run the seed or use Reset demo data before the demo.

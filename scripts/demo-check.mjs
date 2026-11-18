@@ -91,6 +91,8 @@ const firstRow = page.locator('li[id^="row-"]').first();
 await firstRow.getByRole("button", { name: "Request booking" }).click();
 const drawer = page.getByRole("dialog");
 await drawer.waitFor();
+check(await drawer.getByText("Loaded with your cargo").isVisible(), "the drawer shows how full the vehicle is");
+check((await drawer.locator("svg[role=img] rect").count()) > 10, "the drawer shows the vehicle cut away with its positions");
 check(await drawer.getByText("Commercial invoice").isVisible(), "document checklist is shown");
 check(await drawer.getByText(/Indicative checklist/).isVisible(), "checklist disclaimer is shown");
 await shot("4-drawer");

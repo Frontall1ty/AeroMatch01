@@ -7,9 +7,9 @@ import { formatDay } from "@/lib/dates";
 import { kg, m3, money } from "@/lib/format";
 import type { OfferView } from "@/lib/offers";
 import { SafetyDots } from "./CompareView";
-import { SpaceBar } from "./SpaceBar";
+import { LoadFigures, LoadLegend, LoadView } from "./LoadView";
 import { DemoBadge, ModeTag, VerifiedBadge } from "./ui";
-import { VehicleArt, artName } from "./VehicleArt";
+import { artName } from "./VehicleArt";
 
 export type ShipmentSummary = {
   id: string;
@@ -105,18 +105,23 @@ export function BookingDrawer({
 
         <div className="flex-1 space-y-5 p-4 text-sm">
           <div className="rounded border border-rule bg-paper p-3">
-            <VehicleArt mode={offer.mode} equipment={offer.equipment} vehicles={offer.cargoKind === "VEHICLES"} className="h-20 w-full max-w-[220px]" />
-            <p className="mt-1 text-xs text-muted">{artName(offer.mode, offer.equipment, offer.cargoKind === "VEHICLES")}. An illustration, not a photo of this carrier's fleet.</p>
-            <div className="mt-3">
-              <SpaceBar
-                mode={offer.mode}
-                total={offer.cargoKind === "VEHICLES" ? offer.capacityVehicles : offer.capacityWeightKg}
-                free={offer.cargoKind === "VEHICLES" ? (offer.availableVehicles ?? 0) : offer.availableWeightKg}
-                yours={offer.cargoKind === "VEHICLES" ? (shipment.vehicleCount ?? 0) : shipment.weightKg}
-                unit={offer.cargoKind === "VEHICLES" ? "slots" : "kg"}
-              />
-              <p className="mt-1 text-xs text-muted">Grey: already booked by others. Colored: your cargo.</p>
-            </div>
+            {(() => {
+              const vehicles = offer.cargoKind === "VEHICLES";
+              const total = vehicles ? offer.capacityVehicles : offer.capacityWeightKg;
+              const free = vehicles ? (offer.availableVehicles ?? 0) : offer.availableWeightKg;
+              const yours = vehicles ? (shipment.vehicleCount ?? 0) : shipment.weightKg;
+              const unit = vehicles ? ("slots" as const) : ("kg" as const);
+              return (
+                <>
+                  <LoadView mode={offer.mode} equipment={offer.equipment} seed={offer.id} total={total} free={free} yours={yours} unit={unit} size="large" className="w-full" />
+                  <div className="mt-2"><LoadLegend mode={offer.mode} /></div>
+                  <div className="mt-3 border-t border-rule pt-3"><LoadFigures total={total} free={free} yours={yours} unit={unit} mode={offer.mode} equipment={offer.equipment} /></div>
+                  <p className="mt-2 text-xs text-muted">
+                    {artName(offer.mode, offer.equipment, vehicles)}. A drawing of how full it is, with invented references for the other bookings. Not a loading plan.
+                  </p>
+                </>
+              );
+            })()}
           </div>
           <dl className="grid grid-cols-[120px_1fr] gap-x-3 gap-y-2">
             <dt className="text-muted">Route</dt>

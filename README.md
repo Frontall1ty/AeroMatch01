@@ -55,8 +55,8 @@ Every push to the repository deploys again by itself.
 
 ## How the modes follow the city
 
-- Each user has a city. A shipment starts there, and the form only offers destinations that can be reached from it.
-- **Air** runs between any two cities. **Sea** only between two coastal cities, so an inland city like Tashkent never gets sea. **Rail** and **road** are listed lane by lane in `src/lib/constants.ts` (`modesBetween`).
+- Each user has a city, chosen at sign-up as country first, then city. A shipment starts there, and "Where to?" lists every city that can be reached from it, grouped by region, with a search box, popular shortcuts, the distance and the modes that run on that lane.
+- There are 32 cities in 23 countries (`src/lib/places.ts`). **The modes come from geography, not from a list of lanes:** air runs between any two cities, sea between two coastal cities (never from an inland city), road between two cities with road access on the same landmass up to 6,500 km, and rail between two cities on the same rail network up to 10,500 km. Adding a city is one entry with its coordinates and a few flags.
 - The shipper first chooses how to send it (air, sea, rail, road), and the list below shows only that mode. Each option shows a drawing of the vehicle, the company, when it departs and arrives, how much space is free (and how much would stay free after your cargo), and the price with how it is worked out.
 - **Cheapest, Fastest and Safest** are marked on the options. "What matters most" (Cheapest, Fastest, Safest, Balanced) decides the recommended one.
 - **The handling safety score (1 to 5) is invented**, per mode and equipment, and says so on screen. Real scores would come from damage and claims data.

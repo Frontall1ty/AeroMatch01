@@ -9,13 +9,15 @@ const b = await chromium.launch();
 const problems = [];
 const ok = (c, m) => { console.log(`${c ? "  ok  " : "  FAIL"} ${m}`); if (!c) problems.push(m); };
 
+const COUNTRY = { TAS: "UZ", IST: "TR" };
 async function shipperIn(city, label) {
   const p = await (await b.newContext({ viewport: { width: 1360, height: 900 } })).newPage();
   await p.goto(`${BASE}/register`);
   await p.getByText("Shipper", { exact: true }).first().click();
   await p.getByLabel("Your name").fill("Lane Tester");
   await p.getByLabel("Company name").fill(`${label} ${stamp} LLC`);
-  await p.getByLabel("Your city").selectOption(city);
+  await p.getByLabel("Country", { exact: true }).selectOption(COUNTRY[city]);
+  await p.getByLabel("City", { exact: true }).selectOption(city);
   await p.getByLabel("Email").fill(`${label.toLowerCase()}${stamp}@example.com`);
   await p.getByLabel("Password").fill("a-long-test-password");
   await p.getByRole("button", { name: "Create account" }).click();
@@ -31,6 +33,19 @@ async function compare(p) {
   return tiles.map((t) => t.replace(/\s+/g, " "));
 }
 
+console.log("\n[Choosing a country and a city at sign-up]");
+const reg = await (await b.newContext()).newPage();
+await reg.goto(`${BASE}/register`);
+ok(await reg.getByLabel("City", { exact: true }).isDisabled(), "the city list waits for a country");
+await reg.getByLabel("Country", { exact: true }).selectOption("UZ");
+const uzCities = await reg.getByLabel("City", { exact: true }).locator("option").allTextContents();
+ok(uzCities.some((x) => x.startsWith("Tashkent")) && uzCities.some((x) => x.startsWith("Samarkand")), "Uzbekistan offers Tashkent and Samarkand");
+ok(!uzCities.some((x) => x.startsWith("Istanbul")), "the city list only shows that country's cities");
+await reg.getByLabel("Country", { exact: true }).selectOption("GE");
+ok((await reg.getByLabel("City", { exact: true }).inputValue()) === "TBS", "a country with one city fills the city in");
+const countryCount = await reg.getByLabel("Country", { exact: true }).locator("option").count();
+ok(countryCount > 15, `the country list is worldwide (${countryCount - 1} countries)`);
+
 console.log("\n[A shipper in Tashkent, an inland city]");
 const t = await shipperIn("TAS", "Inland");
 ok((await t.inputValue("#origin")) === "TAS", "the form starts in the shipper's own city");
@@ -38,6 +53,23 @@ const tTiles = await compare(t);
 console.log("   modes:", tTiles.map((x) => x.split(" ")[0]).join(", "));
 ok(tTiles.some((x) => x.startsWith("Air")) && tTiles.some((x) => x.startsWith("Rail")) && tTiles.some((x) => x.startsWith("Road")), "air, rail and road are offered");
 ok(!tTiles.some((x) => x.startsWith("Sea")), "sea is never offered from an inland city");
+
+console.log("\n[The destination picker]");
+await t.goto(`${BASE}/shipper/new`);
+const rowsAll = await t.locator('input[name="destination"]').count();
+ok(rowsAll >= 25, `lists every reachable city (${rowsAll})`);
+await t.getByPlaceholder("Search a city or country").fill("kazakh");
+await t.waitForTimeout(300);
+const kz = await t.locator('input[name="destination"]').evaluateAll((els) => els.map((e) => e.value).sort());
+ok(JSON.stringify(kz) === JSON.stringify(["ALA", "NQZ"]), `searching a country finds its cities (${kz.join(", ")})`);
+await t.getByPlaceholder("Search a city or country").fill("zzzz");
+ok(await t.getByText(/No city matches/).isVisible(), "an empty search says what to do");
+await t.getByPlaceholder("Search a city or country").fill("");
+const dxbRow = t.locator("label", { hasText: "DXB" });
+ok(/Air/.test(await dxbRow.textContent()) && /Road/.test(await dxbRow.textContent()) && !/Rail/.test(await dxbRow.textContent()), "each city shows the modes that run there (Dubai: air and road)");
+const jfkRow = t.locator("label", { hasText: "JFK" });
+ok(!/Road|Rail/.test(await jfkRow.textContent()), "a city on another landmass has no road or rail");
+await t.getByRole("button", { name: /PVG Shanghai|Shanghai/ }).first().click().catch(() => {});
 
 console.log("\n[A shipper in Istanbul, a coastal city]");
 const i = await shipperIn("IST", "Coastal");

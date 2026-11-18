@@ -18,6 +18,7 @@ import {
 } from "@/lib/constants";
 import { addDays, formatDay, parseDate, toInputDate } from "@/lib/dates";
 import { valuesForMode, type ListingValues } from "@/lib/listingValues";
+import { CitySelect } from "./CitySelect";
 import { Field, toNumber } from "./Field";
 import { SpaceCalculator } from "./SpaceCalculator";
 
@@ -184,16 +185,10 @@ export function CapacityForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field id="origin" label="From" error={err("origin")}>
-          <select id="origin" value={v.origin} onChange={(e) => chooseOrigin(e.target.value)} aria-invalid={!!err("origin")}>
-            {CITIES.map((c) => <option key={c.code} value={c.code}>{c.code} · {c.name}</option>)}
-          </select>
+          <CitySelect id="origin" value={v.origin} onChange={chooseOrigin} invalid={!!err("origin")} />
         </Field>
         <Field id="destination" label="To" error={err("destination")} hint={lanesModes.length ? `Between these cities: ${lanesModes.map((m) => MODE_LABEL[m].toLowerCase()).join(", ")}.` : undefined}>
-          <select id="destination" value={v.destination} onChange={(e) => chooseDestination(e.target.value)} aria-invalid={!!err("destination")}>
-            {destinationsFrom(v.origin).map((d) => (
-              <option key={d.code} value={d.code}>{d.code} · {d.name}{modesBetween(v.origin, d.code).includes(v.mode) ? "" : " (other mode)"}</option>
-            ))}
-          </select>
+          <CitySelect id="destination" value={v.destination} onChange={chooseDestination} cities={destinationsFrom(v.origin)} invalid={!!err("destination")} />
         </Field>
         <Field id="departureDate" label="Departure date" error={err("departureDate")}>
           <input id="departureDate" type="date" min={today} value={v.departureDate} onChange={(e) => set("departureDate", e.target.value)} aria-invalid={!!err("departureDate")} />

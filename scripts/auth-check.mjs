@@ -14,12 +14,14 @@ const ctx = async () => (await b.newContext({ viewport: { width: 1360, height: 9
 const problems = [];
 const ok = (c, m) => { console.log(`${c ? "  ok  " : "  FAIL"} ${m}`); if (!c) problems.push(m); };
 
+const COUNTRY = { TAS: "UZ", IST: "TR", ALA: "KZ" };
 async function register(page, who, role, city) {
   await page.goto(`${BASE}/register`);
   await page.getByText(role === "CARRIER" ? "Carrier" : "Shipper", { exact: true }).first().click();
   await page.getByLabel("Your name").fill(who.name);
   await page.getByLabel("Company name").fill(who.company);
-  await page.getByLabel("Your city").selectOption(city);
+  await page.getByLabel("Country", { exact: true }).selectOption(COUNTRY[city]);
+  await page.getByLabel("City", { exact: true }).selectOption(city);
   await page.getByLabel("Email").fill(who.email);
   await page.getByLabel("Password").fill(who.password);
   await page.getByRole("button", { name: "Create account" }).click();

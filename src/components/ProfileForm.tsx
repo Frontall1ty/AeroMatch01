@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { updateProfile } from "@/app/auth-actions";
-import { CITIES } from "@/lib/constants";
+import { CountryCitySelect } from "./CitySelect";
 import { Field } from "./Field";
 
 export type ProfileValues = { city: string; phone: string; address: string; taxId: string; website: string; about: string };
@@ -40,12 +40,7 @@ export function ProfileForm({ initial }: { initial: ProfileValues }) {
   return (
     <form onSubmit={submit} noValidate className="panel p-5">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="city" label="City" error={errors.city}>
-          <select id="city" value={v.city} onChange={(e) => set("city", e.target.value)} aria-invalid={!!errors.city}>
-            <option value="">Choose a city</option>
-            {CITIES.map((c) => <option key={c.code} value={c.code}>{c.name}, {c.country}</option>)}
-          </select>
-        </Field>
+        <CountryCitySelect value={v.city} onChange={(code) => set("city", code)} error={errors.city} />
         <Field id="phone" label="Phone number" error={errors.phone}>
           <input id="phone" type="tel" autoComplete="tel" value={v.phone} onChange={(e) => set("phone", e.target.value)} aria-invalid={!!errors.phone} />
         </Field>

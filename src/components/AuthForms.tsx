@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { loginAccount, registerAccount } from "@/app/auth-actions";
-import { CITIES } from "@/lib/constants";
+import { CountryCitySelect } from "./CitySelect";
 import { Field } from "./Field";
 
 export function LoginForm() {
@@ -93,12 +93,7 @@ export function RegisterForm() {
         <Field id="companyName" label="Company name" error={errors.companyName}>
           <input id="companyName" autoComplete="organization" value={v.companyName} onChange={(e) => set("companyName", e.target.value)} aria-invalid={!!errors.companyName} />
         </Field>
-        <Field id="city" label="Your city" error={errors.city} hint="Shipments start here. You can change it for each shipment.">
-          <select id="city" value={v.city} onChange={(e) => set("city", e.target.value)} aria-invalid={!!errors.city}>
-            <option value="">Choose a city</option>
-            {CITIES.map((c) => <option key={c.code} value={c.code}>{c.name}, {c.country}</option>)}
-          </select>
-        </Field>
+        <CountryCitySelect value={v.city} onChange={(code) => set("city", code)} error={errors.city} />
         <Field id="email" label="Email" error={errors.email}>
           <input id="email" type="email" autoComplete="email" inputMode="email" value={v.email} onChange={(e) => set("email", e.target.value)} aria-invalid={!!errors.email} />
         </Field>

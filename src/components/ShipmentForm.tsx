@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { createShipment } from "@/app/actions";
-import { CARGO_TYPES, CITIES, MODE_LABEL, STACK_HEIGHT_M, VEHICLE_ESTIMATE, destinationsFrom, modesBetween, type CargoKind } from "@/lib/constants";
+import { CARGO_TYPES, STACK_HEIGHT_M, VEHICLE_ESTIMATE, destinationsFrom, type CargoKind } from "@/lib/constants";
+import { CitySelect } from "./CitySelect";
+import { DestinationPicker } from "./DestinationPicker";
 import { addDays, parseDate, toInputDate } from "@/lib/dates";
 import { PIECE_PRESETS, STACK_LAYERS, totalsFromPieces } from "@/lib/fit";
 import { int } from "@/lib/format";
@@ -119,42 +121,19 @@ export function ShipmentForm({
 
       <div className="mb-6 max-w-sm">
         <Field id="origin" label="Where does the cargo start?" error={err("origin")}>
-          <select
+          <CitySelect
             id="origin"
             value={v.origin}
-            onChange={(e) => {
-              const origin = e.target.value;
+            invalid={!!err("origin")}
+            onChange={(origin) => {
               const options = destinationsFrom(origin);
               setV((p) => ({ ...p, origin, destination: options.some((c) => c.code === p.destination) ? p.destination : options[0].code }));
             }}
-            aria-invalid={!!err("origin")}
-          >
-            {CITIES.map((c) => <option key={c.code} value={c.code}>{c.name}, {c.country}</option>)}
-          </select>
+          />
         </Field>
       </div>
 
-      <fieldset className="mb-6">
-        <legend className="field-label">Where to?</legend>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {destinationsFrom(v.origin).map((d) => (
-            <label
-              key={d.code}
-              className={`flex min-h-[64px] cursor-pointer flex-col justify-center rounded border px-4 py-3 ${
-                v.destination === d.code ? "border-ink ring-1 ring-ink" : "border-rule hover:border-ink"
-              } focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-air`}
-            >
-              <input type="radio" name="destination" value={d.code} checked={v.destination === d.code} onChange={() => set("destination", d.code)} className="sr-only" />
-              <span className="flex items-baseline gap-3">
-                <span className="condensed text-[28px] font-bold leading-none">{d.code}</span>
-                <span className="text-sm text-muted">{d.name}</span>
-              </span>
-              <span className="mt-1 text-xs text-muted">{modesBetween(v.origin, d.code).map((m) => MODE_LABEL[m]).join(", ")}</span>
-            </label>
-          ))}
-        </div>
-        {err("destination") && <p className="field-error" role="alert">{err("destination")}</p>}
-      </fieldset>
+      <DestinationPicker origin={v.origin} value={v.destination} onChange={(code) => set("destination", code)} error={err("destination")} />
 
       <fieldset className="mb-6">
         <legend className="field-label">What are you shipping?</legend>

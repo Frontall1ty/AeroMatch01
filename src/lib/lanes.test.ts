@@ -22,7 +22,7 @@ describe("which modes exist between two cities", () => {
   });
   it("coastal pairs get sea", () => {
     expect(modesBetween("IST", "DXB")).toEqual(["AIR", "SEA", "ROAD"]);
-    expect(modesBetween("DXB", "PVG")).toEqual(["AIR", "SEA"]);
+    expect(modesBetween("DXB", "JFK")).toEqual(["AIR", "SEA"]); // different landmasses: no road, no rail
   });
   it("is the same in both directions and empty for the same city", () => {
     for (const a of CITIES) for (const b of CITIES) {

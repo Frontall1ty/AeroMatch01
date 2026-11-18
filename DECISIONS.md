@@ -31,6 +31,15 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 - **Free space shows three parts:** already booked by others, your cargo, and what stays free. The original capacity is stored on each listing for this.
 - **Generated lanes.** Every city pair except the three hand-written Tashkent lanes gets invented listings from the distance. A test checks that none departs before the ready date and that each listing's mode runs on its lane.
 
+## Where to, and from where
+
+- **Modes are derived from geography.** Each city has coordinates, a coastal flag, a landmass, road access and a rail network. A pair gets air always, sea if both are coastal, road if both have road access on the same landmass within 6,500 km, rail if both are on the same rail network within 10,500 km. This replaces a hand-kept list of lanes, so 32 cities give 992 lanes without writing them down. The three Tashkent pilot lanes come out exactly as before (a test checks it).
+- **Closed seas count as no coast.** Baku sits on the Caspian, so it has no sea freight. Islands and cut-off peninsulas (London, Seoul) have no road.
+- **Sign-up asks for the country first, then the city.** A country with one city fills the city in. Everywhere else a city is one list grouped by country.
+- **"Where to?" is searchable and shows the modes before you choose.** Search matches the city, the country or the airport code. Popular shortcuts are the best connected and nearest cities.
+- **The seed is generated.** Hand-written listings carry the Tashkent story. Every other lane gets invented listings from its distance (about 5,700 in all, seeded in about 2 seconds, in chunks).
+- **Not done:** flags (they do not show on Windows), a map, and cities beyond these 32. More cities are added as carriers join.
+
 ## Accounts
 
 - **Real accounts with email and password.** Hashed with scrypt (built into Node), random salt, constant-time comparison. Login answers with one message whether the email or the password was wrong, and spends the same time either way.

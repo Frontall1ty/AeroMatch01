@@ -87,15 +87,19 @@ const r0 = (n: number) => Math.round(n);
  * Plausible invented listings for every lane except the hand-written Tashkent ones.
  * Prices and transit times follow the distance, so longer lanes cost more and take longer.
  */
+const ROUTE_FACTOR: Record<Mode, number> = { AIR: 1, SEA: 1.35, RAIL: 1.3, ROAD: 1.3 };
+
 function generatedListings(): Seed[] {
   const out: Seed[] = [];
   const handWritten = new Set(["TAS-IST", "TAS-DXB", "TAS-ALA"]);
   for (const from of CITIES) {
     for (const to of CITIES) {
       if (from.code === to.code || handWritten.has(`${from.code}-${to.code}`)) continue;
-      const km = distanceKm(from.code, to.code);
+      const straight = distanceKm(from.code, to.code);
       const base = { origin: from.code, destination: to.code };
       for (const mode of modesBetween(from.code, to.code)) {
+        // Roads, rails and shipping lanes are longer than the straight line.
+        const km = Math.round(straight * ROUTE_FACTOR[mode]);
         const h = hash(`${from.code}${to.code}${mode}`);
         const id = (n: string) => `gen-${from.code}-${to.code}-${n}`.toLowerCase();
         if (mode === "AIR") {
@@ -142,9 +146,41 @@ export function demoReadyDate(): Date {
   return addDays(todayUtc(), Number.isFinite(offset) ? offset : 3);
 }
 
+const chunks = <T,>(list: T[], size: number): T[][] => Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, i * size + size));
+
 /** Wipes all data and loads the demo data. Dates are relative to today. */
 export async function seedDemoData(prisma: PrismaClient): Promise<void> {
   const ready = demoReadyDate();
+
+  const listingRows = [...LISTINGS, ...generatedListings()].map((l) => ({
+        id: l.id,
+        carrierCompanyId: l.carrier,
+        mode: l.mode,
+        origin: l.origin ?? "TAS",
+        destination: l.destination,
+        departureDate: addDays(ready, l.dep),
+        cargoKind: l.cargo ?? "GENERAL",
+        pricingUnit: l.unit,
+        unitPrice: l.price,
+        availableWeightKg: l.weight,
+        availableVolumeM3: l.volume,
+        availableFloorM2: l.floor ?? null,
+        availableVehicles: l.vehicles ?? null,
+        currency: "USD",
+        transitDaysMin: l.tMin,
+        transitDaysMax: l.tMax,
+        equipment: l.equipment,
+        cutoffHours: l.cutoff,
+        maxPieceKg: l.maxPiece,
+        acceptsDangerousGoods: l.dg,
+        minChargeableKg: l.minCh,
+        restrictions: l.restrictions,
+        safetyScore: safetyOf(l),
+        capacityWeightKg: l.cargo === "VEHICLES" ? null : tidy(l.weight / (1 - bookedShare(l.id))),
+        capacityVehicles: l.cargo === "VEHICLES" ? r0((l.vehicles ?? 0) / (1 - bookedShare(l.id))) : null,
+        status: "OPEN" as const,
+        isDemo: true,
+      }));
 
   // Only demo records are removed. Real accounts and their data are never touched.
   const demoBooking = {
@@ -176,36 +212,6 @@ export async function seedDemoData(prisma: PrismaClient): Promise<void> {
         companyId: c.id,
       })),
     }),
-    prisma.capacityListing.createMany({
-      data: [...LISTINGS, ...generatedListings()].map((l) => ({
-        id: l.id,
-        carrierCompanyId: l.carrier,
-        mode: l.mode,
-        origin: l.origin ?? "TAS",
-        destination: l.destination,
-        departureDate: addDays(ready, l.dep),
-        cargoKind: l.cargo ?? "GENERAL",
-        pricingUnit: l.unit,
-        unitPrice: l.price,
-        availableWeightKg: l.weight,
-        availableVolumeM3: l.volume,
-        availableFloorM2: l.floor ?? null,
-        availableVehicles: l.vehicles ?? null,
-        currency: "USD",
-        transitDaysMin: l.tMin,
-        transitDaysMax: l.tMax,
-        equipment: l.equipment,
-        cutoffHours: l.cutoff,
-        maxPieceKg: l.maxPiece,
-        acceptsDangerousGoods: l.dg,
-        minChargeableKg: l.minCh,
-        restrictions: l.restrictions,
-        safetyScore: safetyOf(l),
-        capacityWeightKg: l.cargo === "VEHICLES" ? null : tidy(l.weight / (1 - bookedShare(l.id))),
-        capacityVehicles: l.cargo === "VEHICLES" ? r0((l.vehicles ?? 0) / (1 - bookedShare(l.id))) : null,
-        status: "OPEN",
-        isDemo: true,
-      })),
-    }),
+    ...chunks(listingRows, 400).map((data) => prisma.capacityListing.createMany({ data })),
   ]);
 }

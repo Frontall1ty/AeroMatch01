@@ -20,6 +20,15 @@ Photos that were looked at and rejected for this reason: an airliner with a visi
 
 To change a photo: save the original in a scratch folder (not in the repository), crop to 16:9, export both widths as WebP (quality about 76), look at the full-size result for text and logos, then replace the files here and update the table above.
 
-## What is not a photo
+## Vehicle pictures in the load view (placeholders)
 
-The load view (the cutaway of a truck, aircraft, wagon, container or ship with the booked, your and free positions) is drawn in code (`src/components/LoadView.tsx`). A photographic cutaway would need isolated side-view pictures of each vehicle.
+`public/vehicles/` holds the pictures the load view lays its positions over. They were supplied by the project owner as **placeholders for the demo** and are **not cleared for public or commercial use**. Replace them before the site is shown publicly or sold.
+
+| File | Shows | Where it came from | What was done |
+|---|---|---|---|
+| `truck.webp` | Semi-trailer, side view | A truck mock-up image (a stock mock-up site) | Cropped, background made transparent |
+| `rigid.webp` | Box truck, side view | The same mock-up site | Cropped, background made transparent |
+| `plane.webp` | Freighter, side view, plain white | A free-to-view aircraft illustration from a blog | Upper drawing cropped, the second drawing cut away, background made transparent |
+| `container.webp` | Open container, side cutaway | A stock photo site (it had a watermark) | Cropped, the watermark painted over, background made transparent |
+
+Open points before going public: the licence of each picture (the container one carries a stock site's watermark, so buy or replace it), and whether the truck cab resembles a real manufacturer's model closely enough to matter. The wagon and the ship are still drawings in code (`src/components/LoadView.tsx`). To change a picture, replace the file and update its entry in `PHOTOS` at the top of that component (the box where positions go, in pixels of the picture).

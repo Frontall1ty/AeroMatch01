@@ -61,7 +61,7 @@ check(/Room for \d+ pieces like yours/.test(tableText), "offers with floor space
 check(await page.getByRole("heading", { name: "How do you want to send it?" }).isVisible(), "the shipper chooses how to send it");
 check((await page.locator('button[aria-pressed]', { hasText: /from \$/ }).count()) >= 3, "each mode shows its best price");
 check((await page.locator('li[id^="row-"] [role="img"][aria-label*="free of"]').count()) > 0, "every option shows how much space is free");
-check((await page.locator('li[id^="row-"] svg[role="img"]').count()) > 0, "every option shows a drawing of the vehicle");
+check((await page.locator('li[id^="row-"] [role="img"][aria-label*="loaded with your cargo"]').count()) > 0, "every option shows the vehicle with its load");
 const notAvail = await page.getByText(/Not available for this shipment \(\d+\)/).textContent();
 check(!!notAvail, `"${notAvail}" section present`);
 await page.getByText(/Not available for this shipment/).click();
@@ -92,7 +92,7 @@ await firstRow.getByRole("button", { name: "Request booking" }).click();
 const drawer = page.getByRole("dialog");
 await drawer.waitFor();
 check(await drawer.getByText("Loaded with your cargo").isVisible(), "the drawer shows how full the vehicle is");
-check((await drawer.locator("svg[role=img] rect").count()) > 10, "the drawer shows the vehicle cut away with its positions");
+check((await drawer.locator('[role=img][aria-label*="loaded with your cargo"] rect').count()) >= 6, "the drawer shows the vehicle cut away with its positions");
 check(await drawer.getByText("Commercial invoice").isVisible(), "document checklist is shown");
 check(await drawer.getByText(/Indicative checklist/).isVisible(), "checklist disclaimer is shown");
 await shot("4-drawer");

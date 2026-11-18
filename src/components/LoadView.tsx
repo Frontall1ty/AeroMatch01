@@ -11,15 +11,19 @@ const INK = "#111827";
 type Area = { x: number; y: number; w: number; h: number };
 
 function Cells({
-  area, cols, rows, layout, mode, seed, text, kg,
+  area, cols, rows, layout, mode, seed, text, kg, k = 1, photo = false,
 }: {
   area: Area; cols: number; rows: number;
   layout: { bookedCells: number; yoursCells: number };
   mode: Mode; seed: string; text: boolean;
   /** Capacity of one position, for the invented booked labels. */
   kg: number;
+  /** Scale of the drawing: 1 for the 400 wide cutaways, more for photographs. */
+  k?: number;
+  /** Cells laid over a photograph are see-through, so the vehicle shows through. */
+  photo?: boolean;
 }) {
-  const gap = 2;
+  const gap = 2 * k;
   const cw = area.w / cols;
   const ch = area.h / rows;
   const out = [];
@@ -35,20 +39,21 @@ function Cells({
     out.push(
       <g key={i}>
         <rect
-          x={x} y={y} width={w} height={h} rx={2}
-          fill={state === "yours" ? COLOR[mode] : state === "booked" ? "#D3D9E2" : "#FFFFFF"}
-          stroke={state === "yours" ? INK : state === "booked" ? "#9CA3AF" : "#B6BFCC"}
-          strokeWidth={state === "yours" ? 1.6 : 1}
-          strokeDasharray={state === "free" ? "3 2" : undefined}
+          x={x} y={y} width={w} height={h} rx={2 * k}
+          fill={state === "yours" ? COLOR[mode] : state === "booked" ? (photo ? "#64748B" : "#D3D9E2") : photo ? "#FFFFFF" : "#FFFFFF"}
+          fillOpacity={photo ? (state === "yours" ? 0.82 : state === "booked" ? 0.62 : 0.3) : 1}
+          stroke={state === "yours" ? INK : state === "booked" ? (photo ? "#334155" : "#9CA3AF") : photo ? "#475569" : "#B6BFCC"}
+          strokeWidth={(state === "yours" ? 1.6 : 1) * k}
+          strokeDasharray={state === "free" ? `${3 * k} ${2 * k}` : undefined}
         />
-        {text && state === "booked" && w > 18 && row === 0 && (
+        {text && state === "booked" && w > 18 * k && row === 0 && (
           <>
-            <text x={x + 3} y={y + 9} fontSize="7" fontWeight="700" fill="#374151">{fakeRef(seed, i)}</text>
-            {h > 24 && w > 30 && <text x={x + 3} y={y + 18} fontSize="6" fill="#4B5563">{Math.max(10, Math.round(kg / 10) * 10)} kg</text>}
+            <text x={x + 3 * k} y={y + 9 * k} fontSize={7 * k} fontWeight="700" fill={photo ? "#FFFFFF" : "#374151"}>{fakeRef(seed, i)}</text>
+            {h > 24 * k && w > 30 * k && <text x={x + 3 * k} y={y + 18 * k} fontSize={6 * k} fill={photo ? "#FFFFFF" : "#4B5563"}>{Math.max(10, Math.round(kg / 10) * 10)} kg</text>}
           </>
         )}
         {text && state === "yours" && firstYours && (
-          <text x={x + 3} y={y + 10} fontSize="7" fontWeight="700" fill="#FFFFFF">You</text>
+          <text x={x + 3 * k} y={y + 10 * k} fontSize={7 * k} fontWeight="700" fill="#FFFFFF">You</text>
         )}
       </g>,
     );
@@ -144,6 +149,24 @@ function areaFor(kind: LoadKind): Area {
   }
 }
 
+/**
+ * Vehicles that have a photograph. The area is where the cargo space is, in pixels of that photograph.
+ * Photos: see PHOTOS.md. Wagons and ships are still drawings.
+ */
+type Photo = { src: string; w: number; h: number; area: Area };
+const PHOTOS: Partial<Record<LoadKind, Photo>> = {
+  truck: { src: "/vehicles/truck.webp", w: 430, h: 118, area: { x: 82, y: 14, w: 326, h: 66 } },
+  plane: { src: "/vehicles/plane.webp", w: 960, h: 262, area: { x: 118, y: 150, w: 624, h: 68 } },
+  container: { src: "/vehicles/container.webp", w: 740, h: 270, area: { x: 103, y: 42, w: 535, h: 176 } },
+};
+/** A shared trailer is a smaller box truck. */
+const RIGID: Photo = { src: "/vehicles/rigid.webp", w: 430, h: 140, area: { x: 92, y: 12, w: 312, h: 96 } };
+
+function photoFor(kind: LoadKind, equipment: string): Photo | undefined {
+  if (kind === "truck" && equipment.toLowerCase().includes("groupage")) return RIGID;
+  return PHOTOS[kind];
+}
+
 export function LoadView({
   mode,
   equipment = "",
@@ -172,6 +195,19 @@ export function LoadView({
   const text = size === "large";
   const perCell = layout.cap / (cols * rows);
   const label = `${LOAD_NAME[kind]}: ${layout.loadedPct}% loaded with your cargo. Your cargo takes ${layout.yoursCells} of ${cols * rows} positions, ${layout.freePct}% would stay free.`;
+
+  const photo = photoFor(kind, equipment);
+  if (photo) {
+    return (
+      <div className={`relative ${className}`} style={{ aspectRatio: `${photo.w} / ${photo.h}` }} role="img" aria-label={label}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={photo.src} alt="" width={photo.w} height={photo.h} className="absolute inset-0 h-full w-full" loading="lazy" decoding="async" />
+        <svg viewBox={`0 0 ${photo.w} ${photo.h}`} className="absolute inset-0 h-full w-full" aria-hidden fill="none">
+          <Cells area={photo.area} cols={cols} rows={rows} layout={layout} mode={mode} seed={seed} text={text} kg={unit === "kg" ? perCell : 0} k={photo.w / 400} photo />
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <svg viewBox="0 0 400 156" className={className} role="img" aria-label={label} fill="none">

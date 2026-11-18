@@ -52,7 +52,7 @@ export async function getSession(): Promise<Session | null> {
 
 export async function requireRole(role: SessionRole): Promise<Session> {
   const session = await getSession();
-  if (!session || session.role !== role) redirect("/");
+  if (!session || session.role !== role) redirect("/demo");
   return session;
 }
 

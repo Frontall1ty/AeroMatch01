@@ -44,8 +44,13 @@ npm run db:reset            # wipe and reseed
 
 Every push to the repository deploys again by itself.
 
+## Pages
+
+- `/` the story site. `/demo` chooses a role and starts the demo. `/shipper/...` and `/carrier/...` are the two roles.
+
 ## The 3 minute demo script
 
+0. Open `/` and scroll the site, or go straight to **Open the live demo**.
 1. Carrier: **Add capacity**. Click **Duplicate last listing**, pick **In 3 days**, click **Add capacity**.
 2. Shipper: **New shipment**, **Load demo shipment** (25 crates; totals appear by themselves), **Compare options**. Point out the lane chart, the Recommended line with its reason, and the reasons under **Not available**.
 3. Switch priority to **Fastest** (air), **Cheapest** (rail, priced per m²), then **Balanced** (road, flat truck price). Point at the price column: every offer shows how it is calculated.

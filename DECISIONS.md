@@ -21,6 +21,13 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 15. **Space calculator for carriers.** Enter the empty space (presets for a 13.6 m trailer, containers, a rail platform) and the size of one piece to see how many fit, with a top view of the floor. "Use this space" fills floor and volume in the listing. The packing is a simple grid in either orientation, stacked up to 2 high when allowed. It is an estimate, not a loading plan.
 16. **Added: "Load demo shipment"** on the shipment form. **"Reset demo data"** in the footer (can be turned off).
 
+## The site
+
+- **`/` is the story site, `/demo` is the role chooser.** The site explains the product with working parts instead of feature cards: the hero chart runs the real decision rules, and each section has a small tool (cargo totals, pricing units, how many pieces fit, documents and milestones).
+- **Motion:** one entrance (the hero chart draws in, the deadline line drops). The rest answers a click. Reduced motion is respected and nothing loops.
+- **The site never names a real company or product.** The integration section says "your cargo system", marks the sample data as illustrative and uses an invented flight number.
+- **Pilot lane is stated plainly.** Tashkent is the only origin with data. The site says so and lists the next lanes as plans, not as features.
+
 ## Implementation choices
 
 - **Dates are date-only, UTC.** Seed dates are relative to the day the seed runs (`DEMO_READY_OFFSET_DAYS`, default 3). Re-run the seed or use Reset demo data before the demo.

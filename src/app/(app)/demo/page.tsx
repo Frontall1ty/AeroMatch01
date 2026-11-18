@@ -1,4 +1,4 @@
-import { switchRole } from "../actions";
+import { switchRole } from "../../actions";
 import { DemoBadge, ModeTag } from "@/components/ui";
 
 export default function Landing() {

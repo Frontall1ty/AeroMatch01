@@ -106,7 +106,98 @@
   animation: chip-in 0.35s ease-out both;
 }
 
+/* Site: headline type and the hero chart's one orchestrated entrance. */
+.display {
+  font-stretch: 62%;
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.bar-grow {
+  transform-origin: left center;
+  animation: bar-grow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes line-drop {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.line-drop {
+  transform-origin: top center;
+  animation: line-drop 0.6s ease-out 0.9s both;
+}
+
+@keyframes label-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.label-in {
+  animation: label-in 0.3s ease-out both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.pop {
+  animation: pop 0.25s ease-out both;
+}
+
+@keyframes travel {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 8px);
+    opacity: 0;
+  }
+}
+.flow-dot {
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #ffffff;
+  animation: travel 2.4s ease-in-out 3;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .bar-grow,
+  .line-drop,
+  .label-in,
+  .pop,
+  .flow-dot {
+    animation: none;
+  }
   .route-line,
   .route-head,
   .chip-anim {

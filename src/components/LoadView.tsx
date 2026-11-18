@@ -1,5 +1,5 @@
 import type { Mode } from "@/lib/constants";
-import { ShipArt } from "@/components/site/Vehicles";
+import { ShipArt, TruckArt } from "@/components/site/Vehicles";
 import { LOAD_CELLS, LOAD_NAME, cellState, fakeRef, loadKind, loadLayout, type CellState, type LoadKind } from "@/lib/load";
 
 /**
@@ -154,19 +154,15 @@ function areaFor(kind: LoadKind): Area {
  * Vehicles that have a photograph. The area is where the cargo space is, in pixels of that photograph.
  * Photos: see PHOTOS.md. The ship is drawn in code.
  */
-type Photo = { src: string; w: number; h: number; area: Area; art?: "ship" };
+type Photo = { src: string; w: number; h: number; area: Area; art?: "ship" | "truck" };
 const PHOTOS: Partial<Record<LoadKind, Photo>> = {
-  truck: { src: "/vehicles/truck.webp", w: 430, h: 118, area: { x: 82, y: 14, w: 326, h: 66 } },
+  truck: { src: "", art: "truck", w: 300, h: 100, area: { x: 12, y: 12, w: 190, h: 50 } },
   plane: { src: "/vehicles/plane.webp", w: 960, h: 262, area: { x: 118, y: 150, w: 624, h: 68 } },
   ship: { src: "", art: "ship", w: 470, h: 132, area: { x: 96, y: 18, w: 336, h: 54 } },
   wagon: { src: "/vehicles/wagon.webp", w: 625, h: 235, area: { x: 26, y: 28, w: 550, h: 138 } },
   container: { src: "/vehicles/container.webp", w: 920, h: 410, area: { x: 122, y: 64, w: 684, h: 280 } },
 };
-/** A shared trailer is a smaller box truck. */
-const RIGID: Photo = { src: "/vehicles/rigid.webp", w: 430, h: 140, area: { x: 92, y: 12, w: 312, h: 96 } };
-
-function photoFor(kind: LoadKind, equipment: string): Photo | undefined {
-  if (kind === "truck" && equipment.toLowerCase().includes("groupage")) return RIGID;
+function photoFor(kind: LoadKind): Photo | undefined {
   return PHOTOS[kind];
 }
 
@@ -199,12 +195,14 @@ export function LoadView({
   const perCell = layout.cap / (cols * rows);
   const label = `${LOAD_NAME[kind]}: ${layout.loadedPct}% loaded with your cargo. Your cargo takes ${layout.yoursCells} of ${cols * rows} positions, ${layout.freePct}% would stay free.`;
 
-  const photo = photoFor(kind, equipment);
+  const photo = photoFor(kind);
   if (photo) {
     return (
       <div className={`relative ${className}`} style={{ aspectRatio: `${photo.w} / ${photo.h}` }} role="img" aria-label={label}>
         {photo.art === "ship" ? (
           <ShipArt containers={false} className="absolute inset-0 h-full w-full" />
+        ) : photo.art === "truck" ? (
+          <TruckArt className="absolute inset-0 h-full w-full" />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo.src} alt="" width={photo.w} height={photo.h} className="absolute inset-0 h-full w-full" loading="lazy" decoding="async" />

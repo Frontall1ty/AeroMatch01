@@ -29,6 +29,7 @@ To change a photo: save the original in a scratch folder (not in the repository)
 | `truck.webp` | Semi-trailer, side view | A truck mock-up image (a stock mock-up site) | Cropped, background made transparent |
 | `rigid.webp` | Box truck, side view | The same mock-up site | Cropped, background made transparent |
 | `plane.webp` | Freighter, side view, plain white | A free-to-view aircraft illustration from a blog | Upper drawing cropped, the second drawing cut away, background made transparent |
-| `container.webp` | Open container, side cutaway | A stock photo site (it had a watermark) | Cropped, the watermark painted over, background made transparent |
+| `container.webp` | Open red container, side cutaway | A 3D render without watermark, supplied by the project owner | Cropped, background made transparent |
+| `wagon.webp` | Box wagon, side view, line drawing | A line drawing supplied by the project owner | The upper wagon cropped, background made transparent |
 
-Open points before going public: the licence of each picture (the container one carries a stock site's watermark, so buy or replace it), and whether the truck cab resembles a real manufacturer's model closely enough to matter. The wagon and the ship are still drawings in code (`src/components/LoadView.tsx`). To change a picture, replace the file and update its entry in `PHOTOS` at the top of that component (the box where positions go, in pixels of the picture).
+Open points before going public: the licence of each picture and whether the truck cab resembles a real manufacturer's model closely enough to matter. Not used: a wagon drawing with a CAD site's watermark and real railway markings. The ship is still a drawing in code (`src/components/LoadView.tsx`). To change a picture, replace the file and update its entry in `PHOTOS` at the top of that component (the box where positions go, in pixels of the picture).

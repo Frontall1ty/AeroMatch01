@@ -151,13 +151,14 @@ function areaFor(kind: LoadKind): Area {
 
 /**
  * Vehicles that have a photograph. The area is where the cargo space is, in pixels of that photograph.
- * Photos: see PHOTOS.md. Wagons and ships are still drawings.
+ * Photos: see PHOTOS.md. Ships are still drawings.
  */
 type Photo = { src: string; w: number; h: number; area: Area };
 const PHOTOS: Partial<Record<LoadKind, Photo>> = {
   truck: { src: "/vehicles/truck.webp", w: 430, h: 118, area: { x: 82, y: 14, w: 326, h: 66 } },
   plane: { src: "/vehicles/plane.webp", w: 960, h: 262, area: { x: 118, y: 150, w: 624, h: 68 } },
-  container: { src: "/vehicles/container.webp", w: 740, h: 270, area: { x: 103, y: 42, w: 535, h: 176 } },
+  wagon: { src: "/vehicles/wagon.webp", w: 625, h: 235, area: { x: 26, y: 28, w: 550, h: 138 } },
+  container: { src: "/vehicles/container.webp", w: 920, h: 410, area: { x: 122, y: 64, w: 684, h: 280 } },
 };
 /** A shared trailer is a smaller box truck. */
 const RIGID: Photo = { src: "/vehicles/rigid.webp", w: 430, h: 140, area: { x: 92, y: 12, w: 312, h: 96 } };

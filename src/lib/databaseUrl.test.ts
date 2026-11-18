@@ -20,6 +20,18 @@ describe("resolveDatabaseUrl", () => {
   it("skips Prisma's proxy address and takes the plain one", () => {
     expect(resolveDatabaseUrl({ DATABASE_URL: "prisma+postgres://accelerate.prisma-data.net/?api_key=x", POSTGRES_URL: "postgres://db.example/postgres" })).toBe("postgres://db.example/postgres");
   });
+  it("finds names with a prefix chosen in the Vercel integration", () => {
+    expect(
+      resolveDatabaseUrl({
+        STORAGE_URL: "prisma+postgres://accelerate.prisma-data.net/?api_key=x",
+        STORAGE_PRISMA_DATABASE_URL: "prisma+postgres://accelerate.prisma-data.net/?api_key=x",
+        STORAGE_POSTGRES_URL: "postgres://user:pw@db.prisma.io:5432/postgres?sslmode=require",
+      }),
+    ).toBe("postgres://user:pw@db.prisma.io:5432/postgres?sslmode=require");
+  });
+  it("an exact name wins over a prefixed one", () => {
+    expect(resolveDatabaseUrl({ STORAGE_DATABASE_URL: "postgres://prefixed", DATABASE_URL: "postgres://exact" })).toBe("postgres://exact");
+  });
   it("ignores empty and non-postgres values", () => {
     expect(resolveDatabaseUrl({ DATABASE_URL: "  ", POSTGRES_URL: "mysql://x" })).toBeUndefined();
     expect(resolveDatabaseUrl({})).toBeUndefined();

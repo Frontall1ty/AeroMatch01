@@ -25,28 +25,24 @@ BASE_URL=http://localhost:3000 npm run demo:check   # runs the demo script in a 
 npm run db:reset            # wipe and reseed
 ```
 
-## Deploy to Vercel
+## Deploy to Vercel (no terminal needed)
 
-1. Create a free PostgreSQL database (Neon or Supabase) and copy its connection string.
-2. Push this folder to a Git repository and import it in Vercel.
-3. Set these environment variables in Vercel:
+1. **Database.** Create a free PostgreSQL database at neon.tech and copy its **direct (not pooled)** connection string. Tables are created during the build, which does not work through a pooled connection.
+2. **GitHub.** Put this folder in a private GitHub repository.
+3. **Vercel.** Sign in at vercel.com with GitHub, choose **Add New, Project**, import the repository and add these environment variables before you press Deploy:
 
 | Variable | Value |
 |---|---|
-| `DATABASE_URL` | the connection string (add `?sslmode=require` if the provider asks) |
-| `SESSION_SECRET` | a long random string, for example `openssl rand -hex 32` |
-| `DEMO_PASSCODE` | optional: a passcode for the whole site, recommended for shared links |
-| `ALLOW_DEMO_RESET` | `false` for shared links, `true` if you want the Reset button |
+| `DATABASE_URL` | the Neon connection string (ends with `?sslmode=require`) |
+| `SESSION_SECRET` | a long random string, at least 32 characters |
+| `DEMO_PASSCODE` | a passcode for the whole site. Recommended for any shared link |
+| `ALLOW_DEMO_RESET` | `true` keeps the Reset demo data button in the footer, `false` hides it |
 | `DEMO_READY_OFFSET_DAYS` | optional, default 3 |
 
-4. From your computer, create the tables and load the data in the production database:
+4. **Deploy.** The build creates the tables and loads the demo data when the database is empty. It never touches data that is already there.
+5. **On the morning of the demo,** open the site and click **Reset demo data** in the footer. That moves the seeded dates to the coming days.
 
-```bash
-DATABASE_URL="<production connection string>" npx prisma db push
-DATABASE_URL="<production connection string>" npm run db:seed
-```
-
-5. Deploy. Run the seed again on the morning of the demo so the dates are fresh.
+Every push to the repository deploys again by itself.
 
 ## The 3 minute demo script
 

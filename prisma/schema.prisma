@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CompanyType {
+  SHIPPER
+  CARRIER
+  FORWARDER
+  GSA
+}
+
+enum Role {
+  SHIPPER
+  CARRIER
+}
+
+enum Mode {
+  AIR
+  ROAD
+  SEA
+}
+
+enum ListingStatus {
+  OPEN
+  FULL
+  CLOSED
+}
+
+enum BookingStatus {
+  REQUESTED
+  CONFIRMED
+  REJECTED
+  IN_PROGRESS
+  DELIVERED
+}
+
+model Company {
+  id        String      @id @default(cuid())
+  name      String
+  type      CompanyType
+  verified  Boolean     @default(false)
+  country   String
+  users     User[]
+  listings  CapacityListing[]
+  shipments ShipmentRequest[]
+}
+
+model User {
+  id        String  @id @default(cuid())
+  name      String
+  role      Role
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+}
+
+model CapacityListing {
+  id                    String        @id @default(cuid())
+  carrierCompanyId      String
+  carrier               Company       @relation(fields: [carrierCompanyId], references: [id])
+  mode                  Mode
+  origin                String
+  destination           String
+  departureDate         DateTime      @db.Date
+  availableWeightKg     Float
+  availableVolumeM3     Float
+  pricePerChargeableKg  Float
+  currency              String        @default("USD")
+  transitDaysMin        Int
+  transitDaysMax        Int
+  equipment             String
+  cutoffHours           Int
+  maxPieceKg            Float
+  acceptsDangerousGoods Boolean       @default(false)
+  minChargeableKg       Float         @default(0)
+  restrictions          String        @default("")
+  status                ListingStatus @default(OPEN)
+  isDemo                Boolean       @default(true)
+  createdAt             DateTime      @default(now())
+  bookings              Booking[]
+
+  @@index([origin, destination, status])
+  @@index([carrierCompanyId])
+}
+
+model ShipmentRequest {
+  id                 String   @id @default(cuid())
+  shipperCompanyId   String
+  shipper            Company  @relation(fields: [shipperCompanyId], references: [id])
+  origin             String
+  destination        String
+  weightKg           Float
+  volumeM3           Float
+  pieces             Int      @default(1)
+  heaviestPieceKg    Float?
+  isDangerousGoods   Boolean  @default(false)
+  cargoType          String
+  commodity          String   @default("")
+  readyDate          DateTime @db.Date
+  deliverBy          DateTime @db.Date
+  notes              String   @default("")
+  createdAt          DateTime @default(now())
+  bookings           Booking[]
+}
+
+model Booking {
+  id                  String          @id @default(cuid())
+  shipmentRequestId   String
+  shipment            ShipmentRequest @relation(fields: [shipmentRequestId], references: [id])
+  listingId           String
+  listing             CapacityListing @relation(fields: [listingId], references: [id])
+  chargeableWeightKg  Float
+  totalPrice          Float
+  status              BookingStatus   @default(REQUESTED)
+  rejectionReason     String?
+  createdAt           DateTime        @default(now())
+  events              BookingEvent[]
+
+  @@index([listingId])
+  @@index([shipmentRequestId])
+}
+
+model BookingEvent {
+  id        String   @id @default(cuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  milestone String
+  note      String   @default("")
+  createdAt DateTime @default(now())
+
+  @@unique([bookingId, milestone])
+  @@index([bookingId])
+}

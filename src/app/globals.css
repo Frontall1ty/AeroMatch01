@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper font-sans text-base text-ink antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Condensed width for airport codes and big numbers. */
+  .condensed {
+    font-stretch: 62%;
+    letter-spacing: 0.01em;
+  }
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid #1d4ed8;
+    outline-offset: 2px;
+  }
+  select,
+  input,
+  textarea {
+    @apply w-full rounded border border-rule bg-panel px-3 py-2 text-base text-ink;
+    min-height: 44px;
+  }
+  input[type="checkbox"] {
+    @apply h-5 w-5 min-h-0 w-5;
+    accent-color: #111827;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: #6b7280;
+  }
+  [aria-invalid="true"] {
+    border-color: #b91c1c;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-ink bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-[#1f2937] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-rule bg-panel px-4 py-2 text-sm font-semibold text-ink hover:border-ink disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-danger {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-bad bg-panel px-4 py-2 text-sm font-semibold text-bad hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .panel {
+    @apply rounded border border-rule bg-panel;
+  }
+  .field-label {
+    @apply mb-1 block text-sm font-semibold text-ink;
+  }
+  .field-hint {
+    @apply mt-1 text-xs text-muted;
+  }
+  .field-error {
+    @apply mt-1 text-sm font-medium text-bad;
+  }
+}
+
+/* Route line draws once when results load. */
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.route-line {
+  stroke-dasharray: 100;
+  animation: draw-line 0.9s ease-out both;
+}
+
+/* Status chip eases in when it changes. */
+@keyframes chip-in {
+  from {
+    opacity: 0.3;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.chip-anim {
+  animation: chip-in 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-line,
+  .chip-anim {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

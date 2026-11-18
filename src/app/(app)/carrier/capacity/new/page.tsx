@@ -2,7 +2,8 @@ import { prisma } from "@/lib/db";
 import { addDays, formatDay, toInputDate, todayUtc } from "@/lib/dates";
 import { kg, m3, moneyPrecise } from "@/lib/format";
 import { requireRole } from "@/lib/session";
-import { CapacityForm, valuesForMode, type ListingValues } from "@/components/CapacityForm";
+import { CapacityForm } from "@/components/CapacityForm";
+import { valuesForMode, type ListingValues } from "@/lib/listingValues";
 import { ModeTag, PageTitle, DemoBadge } from "@/components/ui";
 
 export const dynamic = "force-dynamic";

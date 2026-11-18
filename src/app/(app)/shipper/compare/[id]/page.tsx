@@ -46,13 +46,13 @@ export default async function Compare({ params }: { params: Promise<{ id: string
 
   return (
     <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-      <ShipmentRail shipment={summary} />
-      <CompareView
+      <div className="order-2 lg:order-1"><ShipmentRail shipment={summary} /></div>
+      <div className="order-1 min-w-0 lg:order-2"><CompareView
         shipment={summary}
         offers={offers}
         breakdown={breakdown}
         deadlineDay={daysBetween(shipment.readyDate, shipment.deliverBy)}
-      />
+      /></div>
     </div>
   );
 }

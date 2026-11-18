@@ -72,10 +72,10 @@ export function CompareView({
       <div className="mb-5">
         <div className="flex items-center gap-4">
           <span className="condensed text-5xl font-bold leading-none md:text-[56px]">TAS</span>
-          <svg viewBox="0 0 100 12" preserveAspectRatio="none" className="h-4 flex-1 text-ink" aria-hidden>
-            <path d="M0 6 H96" pathLength={100} className="route-line" stroke="currentColor" strokeWidth={2} fill="none" vectorEffect="non-scaling-stroke" />
-            <path d="M92 1 L99 6 L92 11" stroke="currentColor" strokeWidth={2} fill="none" vectorEffect="non-scaling-stroke" />
-          </svg>
+          <span aria-hidden className="relative h-4 flex-1">
+            <span className="route-line absolute left-0 right-1 top-1/2 h-0.5 -translate-y-1/2 bg-ink" />
+            <span className="route-head absolute right-0 top-1/2 h-0 w-0 -translate-y-1/2 border-y-[7px] border-l-[12px] border-y-transparent border-l-ink" />
+          </span>
           <span className="condensed text-5xl font-bold leading-none md:text-[56px]">{shipment.destination}</span>
         </div>
         <div className="mt-1 flex justify-between text-sm text-muted">
@@ -150,18 +150,17 @@ export function CompareView({
 
           {/* Offers: desktop table */}
           <div className="panel mt-4 hidden overflow-x-auto md:block">
-            <table className="w-full min-w-[980px] text-left text-sm">
+            <table className="w-full min-w-[900px] text-left text-sm">
               <caption className="sr-only">Offers that meet your shipment and deadline</caption>
               <thead className="border-b border-rule text-xs text-muted">
                 <tr>
-                  <th scope="col" className="p-3 font-semibold">Carrier</th>
+                  <th scope="col" className="min-w-[150px] p-3 font-semibold">Carrier</th>
                   <th scope="col" className="p-3 font-semibold">Mode</th>
                   <th scope="col" className="p-3 font-semibold">Departs</th>
                   <th scope="col" className="p-3 font-semibold">Arrives</th>
                   <th scope="col" className="p-3 font-semibold"><span className="mr-2">Price</span><DemoBadge /></th>
                   <th scope="col" className="p-3 font-semibold">Left</th>
-                  <th scope="col" className="p-3 font-semibold">Equipment</th>
-                  <th scope="col" className="p-3 font-semibold">Cutoff</th>
+                                    <th scope="col" className="p-3 font-semibold">Cutoff</th>
                   <th scope="col" className="p-3 font-semibold">Restrictions</th>
                   <th scope="col" className="p-3"><span className="sr-only">Action</span></th>
                 </tr>
@@ -184,15 +183,14 @@ export function CompareView({
                         )}
                       </div>
                     </td>
-                    <td className="p-3"><ModeTag mode={o.mode} /></td>
-                    <td className="p-3">{formatDay(new Date(o.departureDate))}</td>
-                    <td className="p-3">{arrivalText(o)}<span className="block text-xs text-muted">{o.transitDaysMin === o.transitDaysMax ? `${o.transitDaysMin} d` : `${o.transitDaysMin} to ${o.transitDaysMax} d`} transit</span></td>
+                    <td className="p-3"><ModeTag mode={o.mode} /><span className="block text-xs text-muted">{o.equipment}</span></td>
+                    <td className="whitespace-nowrap p-3">{formatDay(new Date(o.departureDate))}</td>
+                    <td className="whitespace-nowrap p-3">{arrivalText(o)}<span className="block text-xs text-muted">{o.transitDaysMin === o.transitDaysMax ? `${o.transitDaysMin} d` : `${o.transitDaysMin} to ${o.transitDaysMax} d`} transit</span></td>
                     <td className="p-3">
                       <p className="text-base font-bold">{money(o.totalPrice)}</p>
                       <p className="text-xs text-muted">{moneyPrecise(o.pricePerKg)}/kg × {int(o.chargedKg)} kg</p>
                     </td>
-                    <td className="p-3">{kg(o.availableWeightKg)}<span className="block text-xs text-muted">{m3(o.availableVolumeM3)}</span></td>
-                    <td className="p-3">{o.equipment}</td>
+                    <td className="whitespace-nowrap p-3">{kg(o.availableWeightKg)}<span className="block text-xs text-muted">{m3(o.availableVolumeM3)}</span></td>
                     <td className="p-3">{o.cutoffHours} h</td>
                     <td className="p-3 text-muted">{o.restrictions || "None"}</td>
                     <td className="p-3">

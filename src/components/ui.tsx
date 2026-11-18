@@ -21,7 +21,7 @@ export function DemoBadge({ className = "" }: { className?: string }) {
   return (
     <abbr
       title="All prices, carriers and capacities are invented demo data. They are not real quotes."
-      className={`inline-block rounded border border-rule px-1.5 py-0.5 text-xs font-semibold normal-case text-muted underline decoration-dotted underline-offset-2 ${className}`}
+      className={`inline-block whitespace-nowrap rounded border border-rule px-1.5 py-0.5 text-xs font-semibold normal-case text-muted underline decoration-dotted underline-offset-2 ${className}`}
     >
       Demo data
     </abbr>

@@ -69,15 +69,26 @@
 /* Route line draws once when results load. */
 @keyframes draw-line {
   from {
-    stroke-dashoffset: 100;
+    transform: translateY(-50%) scaleX(0);
   }
   to {
-    stroke-dashoffset: 0;
+    transform: translateY(-50%) scaleX(1);
+  }
+}
+@keyframes show-head {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 .route-line {
-  stroke-dasharray: 100;
+  transform-origin: left center;
   animation: draw-line 0.9s ease-out both;
+}
+.route-head {
+  animation: show-head 0.2s ease-out 0.8s both;
 }
 
 /* Status chip eases in when it changes. */
@@ -97,6 +108,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .route-line,
+  .route-head,
   .chip-anim {
     animation: none;
   }

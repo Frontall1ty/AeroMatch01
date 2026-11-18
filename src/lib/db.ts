@@ -1,12 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { resolveDatabaseUrl } from "./databaseUrl";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-/**
- * Vercel's Neon integration provides a pooled DATABASE_URL and a direct DATABASE_URL_UNPOOLED.
- * The direct one is used when it exists. A demo has few connections, and it avoids pooler quirks.
- */
-export const databaseUrl = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+/** Whichever host set the connection string (Neon, Supabase, Prisma Postgres), direct connection preferred. */
+export const databaseUrl = resolveDatabaseUrl();
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ datasourceUrl: databaseUrl });
 

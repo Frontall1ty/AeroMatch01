@@ -5,17 +5,18 @@
  */
 import { execSync } from "node:child_process";
 import { PrismaClient } from "@prisma/client";
+import { resolveDatabaseUrl } from "../src/lib/databaseUrl";
 import { seedDemoData } from "../src/lib/seed";
 
 const onVercel = Boolean(process.env.VERCEL);
-// Same rule as src/lib/db.ts: prefer the direct connection when the host provides one.
-const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+// Same rule as src/lib/db.ts.
+const url = resolveDatabaseUrl();
 
 async function main() {
   if (!url) {
-    console.log("DATABASE_URL is not set. Skipping database setup.");
+    console.log("No PostgreSQL connection string found. Skipping database setup.");
     if (onVercel) {
-      console.error("Add DATABASE_URL in the Vercel project settings (Environment Variables), then redeploy.");
+      console.error("Connect a database to the Vercel project (Storage tab) or add DATABASE_URL under Environment Variables, then redeploy.");
       process.exit(1);
     }
     return;

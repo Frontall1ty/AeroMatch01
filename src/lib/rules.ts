@@ -252,10 +252,6 @@ export function visibleListingsWhere(request: { origin: string; destination: str
 
 export type BookingStatusValue = "REQUESTED" | "CONFIRMED" | "REJECTED" | "IN_PROGRESS" | "DELIVERED";
 
-export function milestonesFor(mode: Mode) {
-  return MILESTONES[mode];
-}
-
 /** The milestone a carrier can mark next, given how many have been recorded. Null when finished. */
 export function nextMilestone(mode: Mode, recordedCount: number) {
   return MILESTONES[mode][recordedCount] ?? null;

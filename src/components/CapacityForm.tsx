@@ -3,10 +3,8 @@
 import { useState, useTransition } from "react";
 import { createListing } from "@/app/actions";
 import {
-  CITIES,
   LISTING_DEFAULTS,
   MODE_LABEL,
-  cityName,
   destinationsFrom,
   modesBetween,
   MODE_ORDER,

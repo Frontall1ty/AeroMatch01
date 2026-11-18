@@ -85,7 +85,7 @@ await i.locator("section[aria-labelledby=how] button", { hasText: "Sea" }).click
 await i.waitForTimeout(400);
 const rows = await i.locator('li[id^="row-"]').allTextContents();
 ok(rows.length > 0 && rows.every((r) => /Container|LCL|Ro-Ro|Demo Sea Logistics/.test(r)), `only sea options are listed (${rows.length})`);
-ok((await i.locator('li[id^="row-"] svg[role="img"]').first().getAttribute("aria-label"))?.match(/ship|vessel/i) !== null, "a ship is drawn for sea options");
+ok((await i.locator('li[id^="row-"] [role="img"][aria-label*="loaded with your cargo"]').first().getAttribute("aria-label"))?.match(/ship|vessel/i) !== null, "a ship is drawn for sea options");
 await i.getByRole("button", { name: "Show all modes" }).click();
 await i.waitForTimeout(300);
 ok((await i.locator('li[id^="row-"]').count()) > rows.length, "Show all modes brings the other modes back");

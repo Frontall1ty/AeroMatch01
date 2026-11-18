@@ -27,7 +27,6 @@ export const registerSchema = z.object({
   email,
   password,
 });
-export type RegisterInput = z.infer<typeof registerSchema>;
 
 export const loginSchema = z.object({
   email,
@@ -48,7 +47,6 @@ export const profileSchema = z.object({
   ),
   about: optionalText(500, "Keep the description under 500 characters."),
 });
-export type ProfileInput = z.infer<typeof profileSchema>;
 
 /** Demo accounts have no password. They are entered from the demo page. */
 export const DEMO_EMAIL_SUFFIX = "@demo.aeromatch.example";

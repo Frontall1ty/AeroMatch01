@@ -1,10 +1,9 @@
-import type { Mode } from "@/lib/constants";
+import { MODE_HEX, type Mode } from "@/lib/constants";
 
 /**
  * Simple side-view drawings of the vehicle that carries the cargo: aircraft, ship, wagon, truck.
  * They are illustrations, not photos of a real fleet. The body takes the mode color.
  */
-const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", SEA: "#6D28D9", RAIL: "#0F766E", ROAD: "#B45309" };
 const INK = "#111827";
 
 type Kind = "plane" | "plane-belly" | "ship" | "ship-roro" | "wagon" | "wagon-cars" | "truck" | "truck-cars";
@@ -62,7 +61,7 @@ export function VehicleArt({
   label?: boolean;
 }) {
   const kind = artKind(mode, equipment, vehicles);
-  const c = COLOR[mode];
+  const c = MODE_HEX[mode];
   const soft = c + "55";
   return (
     <svg

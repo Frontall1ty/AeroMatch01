@@ -11,6 +11,9 @@ export * from "./places";
 export const SAFETY_BY_MODE: Record<Mode, number> = { AIR: 5, RAIL: 4, SEA: 3, ROAD: 3 };
 export const SAFETY_NOTE = "Handling safety is a demo estimate, not measured data.";
 
+/** The color that stands for each mode in drawings. The same hex values as the air, sea, rail and road colors in tailwind.config.ts. */
+export const MODE_HEX: Record<Mode, string> = { AIR: "#1D4ED8", SEA: "#6D28D9", RAIL: "#0F766E", ROAD: "#B45309" };
+
 export const MODE_ORDER: Mode[] = ["AIR", "SEA", "RAIL", "ROAD"];
 export const MODE_LABEL: Record<Mode, string> = { AIR: "Air", SEA: "Sea", RAIL: "Rail", ROAD: "Road" };
 
@@ -45,10 +48,6 @@ export const PRICING_UNIT_LABEL: Record<PricingUnit, string> = {
   PER_VEHICLE: "Per vehicle",
 };
 
-export const CARGO_KIND_LABEL: Record<CargoKind, string> = {
-  GENERAL: "General cargo",
-  VEHICLES: "Vehicles",
-};
 
 export type Milestone = { label: string; code?: string };
 

@@ -6,7 +6,6 @@ import { useId, type CSSProperties } from "react";
  */
 type P = { className?: string; style?: CSSProperties };
 
-const INK = "#0F172A";
 const STEEL = "#334155";
 
 /** Unique ids for the gradients, so several vehicles on one page do not clash. */
@@ -95,10 +94,10 @@ export function TruckArt({ className, style, color = "#2563EB" }: P & { color?: 
 
 const BOX = ["#E8A12B", "#3F78D6", "#2FA37A", "#D65A4E", "#6B7A90", "#8B6AD6", "#D9B93A", "#2BA3A3"];
 
-function Box({ x, y, w, h, i, dim = false }: { x: number; y: number; w: number; h: number; i: number; dim?: boolean }) {
+function Box({ x, y, w, h, i }: { x: number; y: number; w: number; h: number; i: number }) {
   const col = BOX[i % BOX.length];
   return (
-    <g opacity={dim ? 0.55 : 1}>
+    <g>
       <rect x={x} y={y} width={w} height={h} rx="1.5" fill={col} />
       <rect x={x} y={y} width={w} height={h * 0.2} rx="1.5" fill="#fff" opacity="0.28" />
       <rect x={x} y={y + h * 0.82} width={w} height={h * 0.18} rx="1" fill="#000" opacity="0.18" />

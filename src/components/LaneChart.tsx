@@ -1,11 +1,10 @@
 "use client";
 
-import { MODE_LABEL, type Mode } from "@/lib/constants";
+import { MODE_HEX, MODE_LABEL, type Mode } from "@/lib/constants";
 import { addDays, formatDay } from "@/lib/dates";
 import { money } from "@/lib/format";
 import type { OfferView } from "@/lib/offers";
 
-const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", ROAD: "#B45309", RAIL: "#0F766E", SEA: "#6D28D9" };
 
 const W = 960;
 const LEFT = 64;
@@ -67,7 +66,7 @@ export function LaneChart({
             <g key={lane.mode}>
               <rect x={0} y={top} width={W} height={lane.height} fill={lane.mode === "RAIL" ? "#F4F6F9" : "#FFFFFF"} />
               <line x1={0} x2={W} y1={top} y2={top} stroke="#D3D9E2" />
-              <text x={8} y={top + lane.height / 2 + 5} fontSize={14} fontWeight={700} fill={COLOR[lane.mode]}>
+              <text x={8} y={top + lane.height / 2 + 5} fontSize={14} fontWeight={700} fill={MODE_HEX[lane.mode]}>
                 {MODE_LABEL[lane.mode]}
               </text>
               {lane.rows.length === 0 && (
@@ -109,7 +108,7 @@ export function LaneChart({
                       width={x2 - x1}
                       height={ROW - 12}
                       rx={4}
-                      fill={COLOR[o.mode]}
+                      fill={MODE_HEX[o.mode]}
                       fillOpacity={active ? 1 : 0.82}
                       stroke="#111827"
                       strokeWidth={rec ? 3 : active ? 2 : 0}

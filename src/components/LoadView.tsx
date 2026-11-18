@@ -1,4 +1,4 @@
-import type { Mode } from "@/lib/constants";
+import { MODE_HEX, type Mode } from "@/lib/constants";
 import { ShipArt, TruckArt } from "@/components/site/Vehicles";
 import { LOAD_CELLS, LOAD_NAME, cellState, fakeRef, loadKind, loadLayout, type CellState, type LoadKind } from "@/lib/load";
 
@@ -6,7 +6,6 @@ import { LOAD_CELLS, LOAD_NAME, cellState, fakeRef, loadKind, loadLayout, type C
  * A cutaway of the vehicle with its space split into positions. Grey is booked by others, the mode color is your
  * cargo, white is free. It is a picture of how full the vehicle is, not a loading plan.
  */
-const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", SEA: "#6D28D9", RAIL: "#0F766E", ROAD: "#B45309" };
 const INK = "#111827";
 
 type Area = { x: number; y: number; w: number; h: number };
@@ -41,7 +40,7 @@ function Cells({
       <g key={i}>
         <rect
           x={x} y={y} width={w} height={h} rx={2 * k}
-          fill={state === "yours" ? COLOR[mode] : state === "booked" ? (photo ? "#64748B" : "#D3D9E2") : photo ? "#FFFFFF" : "#FFFFFF"}
+          fill={state === "yours" ? MODE_HEX[mode] : state === "booked" ? (photo ? "#64748B" : "#D3D9E2") : photo ? "#FFFFFF" : "#FFFFFF"}
           fillOpacity={photo ? (state === "yours" ? 0.82 : state === "booked" ? 0.62 : 0.3) : 1}
           stroke={state === "yours" ? INK : state === "booked" ? (photo ? "#334155" : "#9CA3AF") : photo ? "#475569" : "#B6BFCC"}
           strokeWidth={(state === "yours" ? 1.6 : 1) * k}
@@ -73,7 +72,7 @@ function Wheel({ x, y, r = 9 }: { x: number; y: number; r?: number }) {
 }
 
 function Body({ kind, mode, belly }: { kind: LoadKind; mode: Mode; belly: boolean }) {
-  const c = COLOR[mode];
+  const c = MODE_HEX[mode];
   switch (kind) {
     case "truck":
       return (
@@ -251,7 +250,7 @@ export function LoadLegend({ mode }: { mode: Mode }) {
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
       <li className="flex items-center gap-1.5"><span aria-hidden className="h-3 w-3 rounded-sm border border-[#9CA3AF] bg-[#D3D9E2]" />Booked by others</li>
-      <li className="flex items-center gap-1.5"><span aria-hidden className="h-3 w-3 rounded-sm border border-ink" style={{ background: COLOR[mode] }} />Your cargo</li>
+      <li className="flex items-center gap-1.5"><span aria-hidden className="h-3 w-3 rounded-sm border border-ink" style={{ background: MODE_HEX[mode] }} />Your cargo</li>
       <li className="flex items-center gap-1.5"><span aria-hidden className="h-3 w-3 rounded-sm border border-dashed border-[#B6BFCC] bg-white" />Free</li>
     </ul>
   );

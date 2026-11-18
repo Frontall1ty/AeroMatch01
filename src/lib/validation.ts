@@ -65,7 +65,6 @@ export const shipmentSchema = z
     if (by < ready) ctx.addIssue({ code: "custom", path: ["deliverBy"], message: "Deliver-by date must be on or after the ready date." });
   });
 
-export type ShipmentFormInput = z.infer<typeof shipmentSchema>;
 
 export const listingSchema = z
   .object({
@@ -119,7 +118,6 @@ export const listingSchema = z
     }
   });
 
-export type ListingFormInput = z.infer<typeof listingSchema>;
 
 export type ActionFail = { ok: false; error: string; fieldErrors?: Record<string, string> };
 export type ActionResult = { ok: true } | ActionFail;

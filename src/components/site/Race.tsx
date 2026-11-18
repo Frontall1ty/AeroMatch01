@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { MODE_LABEL, type Mode } from "@/lib/constants";
+import { MODE_HEX, MODE_LABEL, type Mode } from "@/lib/constants";
 import { recommend, type Priority } from "@/lib/decision";
 import { RACE_MAX_KM, RACE_MIN_KM, formatDays, raceLanes } from "@/lib/race";
 import { useInView } from "./hooks";
@@ -14,7 +14,6 @@ const PRIORITIES: { key: Priority; label: string }[] = [
 ];
 
 const WIDTH: Record<Mode, string> = { ROAD: "clamp(120px, 25%, 270px)", RAIL: "clamp(170px, 38%, 420px)", SEA: "clamp(140px, 28%, 320px)", AIR: "clamp(130px, 26%, 300px)" };
-const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", SEA: "#6D28D9", RAIL: "#0F766E", ROAD: "#B45309" };
 
 /** Four vehicles race over a distance. The finish order is the real decision rule with demo figures. */
 export function Race() {
@@ -100,7 +99,7 @@ export function Race() {
                 {l.available && l.mode === "SEA" ? (
                   <div className="race-water absolute inset-x-0 bottom-1 h-[18px] rounded-sm" />
                 ) : (
-                  <div className="absolute inset-x-0 bottom-3 border-b-[3px] border-dashed" style={{ borderColor: l.available ? COLOR[l.mode] : "#D3D9E2", opacity: 0.35 }} />
+                  <div className="absolute inset-x-0 bottom-3 border-b-[3px] border-dashed" style={{ borderColor: l.available ? MODE_HEX[l.mode] : "#D3D9E2", opacity: 0.35 }} />
                 )}
                 <div className="race-finish absolute bottom-1.5 right-0 top-1" />
                 {l.available ? (

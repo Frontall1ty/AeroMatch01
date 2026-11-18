@@ -21,6 +21,16 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 15. **Space calculator for carriers.** Enter the empty space (presets for a 13.6 m trailer, containers, a rail platform) and the size of one piece to see how many fit, with a top view of the floor. "Use this space" fills floor and volume in the listing. The packing is a simple grid in either orientation, stacked up to 2 high when allowed. It is an estimate, not a loading plan.
 16. **Added: "Load demo shipment"** on the shipment form. **"Reset demo data"** in the footer (can be turned off).
 
+## Accounts
+
+- **Real accounts with email and password.** Hashed with scrypt (built into Node), random salt, constant-time comparison. Login answers with one message whether the email or the password was wrong, and spends the same time either way.
+- **The cookie holds only a signed user id.** Role and company come from the database on every request. Every server action checks role and ownership again.
+- **New carriers start unverified and hidden.** Verification is by hand: the profile must be complete or the carrier must have 3 delivered shipments, and a person presses Verify. This keeps fraud out without an automatic rule that can be gamed.
+- **Admin is a passcode, not an account.** If admin were "the user with this email", anyone could register that email first. `ADMIN_PASSCODE` is separate and switches admin off when empty.
+- **Demo accounts have no password.** They hold invented data, are recognised by their email ending, and are switched off with `ALLOW_DEMO_ACCOUNTS=false`. Registering with that email ending is refused.
+- **Reset demo data only touches demo records**, so real accounts survive it.
+- **Not done, on purpose:** email verification and password reset (the app sends no email), two-factor login, session revocation.
+
 ## The site
 
 - **`/` is the story site, `/demo` is the role chooser.** The site explains the product with working parts instead of feature cards: the hero chart runs the real decision rules, and each section has a small tool (cargo totals, pricing units, how many pieces fit, documents and milestones).

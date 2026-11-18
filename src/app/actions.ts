@@ -17,13 +17,7 @@ import {
   vehicleEstimate,
 } from "@/lib/rules";
 import { seedDemoData } from "@/lib/seed";
-import {
-  DEFAULT_CARRIER_COMPANY,
-  DEFAULT_SHIPPER_COMPANY,
-  getSession,
-  sessionFor,
-  setSession,
-} from "@/lib/session";
+import { sessionFor } from "@/lib/session";
 import { fieldErrorsFrom, listingSchema, shipmentSchema, type ActionFail, type ActionResult } from "@/lib/validation";
 
 const WRONG_ROLE: ActionFail = {
@@ -33,28 +27,6 @@ const WRONG_ROLE: ActionFail = {
 const bookingActionError = (error: string): ActionFail => ({ ok: false, error });
 
 class ActionError extends Error {}
-
-/* ---------- Role switcher (demo only) ---------- */
-
-export async function switchRole(role: "SHIPPER" | "CARRIER", next?: string) {
-  const current = await getSession();
-  const companyId =
-    role === "SHIPPER"
-      ? DEFAULT_SHIPPER_COMPANY
-      : current?.role === "CARRIER"
-        ? current.companyId
-        : DEFAULT_CARRIER_COMPANY;
-  await setSession({ role, companyId });
-  redirect(next ?? (role === "SHIPPER" ? "/shipper/new" : "/carrier/capacity/new"));
-}
-
-export async function switchCarrierCompany(formData: FormData) {
-  const companyId = String(formData.get("companyId") ?? "");
-  const company = await prisma.company.findUnique({ where: { id: companyId } });
-  if (!company || company.type === "SHIPPER") return;
-  await setSession({ role: "CARRIER", companyId });
-  revalidatePath("/", "layout");
-}
 
 /* ---------- Shipper ---------- */
 

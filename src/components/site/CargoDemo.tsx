@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { MODE_LABEL, MODE_ORDER, VOLUMETRIC_FACTOR } from "@/lib/constants";
+import { MODE_LABEL, VOLUMETRIC_FACTOR } from "@/lib/constants";
 import { totalsFromPieces } from "@/lib/fit";
 import { int } from "@/lib/format";
 import { chargeableWeight } from "@/lib/rules";
 import { ModeTag } from "@/components/ui";
 import { CountUp } from "./CountUp";
-import { CRATES } from "./siteData";
+import { CRATES, SITE_MODES } from "./siteData";
 
-const FILL = { AIR: "bg-air", RAIL: "bg-rail", ROAD: "bg-road" } as const;
+const FILL = { AIR: "bg-air", SEA: "bg-sea", RAIL: "bg-rail", ROAD: "bg-road" } as const;
 
 type Fields = { n: string; kg: string; l: string; w: string; h: string };
 
@@ -24,7 +24,7 @@ export function CargoDemo() {
   const totals = ok ? totalsFromPieces(v.n, { lengthCm: v.l, widthCm: v.w, heightCm: v.h, weightKg: v.kg, stackable: stack }) : null;
 
   const rows = totals
-    ? MODE_ORDER.map((m) => ({ m, ...chargeableWeight({ mode: m, weightKg: totals.weightKg, volumeM3: totals.volumeM3 }) }))
+    ? SITE_MODES.map((m) => ({ m, ...chargeableWeight({ mode: m, weightKg: totals.weightKg, volumeM3: totals.volumeM3 }) }))
     : [];
   const scale = Math.max(1, ...rows.flatMap((r) => [r.actualKg, r.volumetricKg]));
 

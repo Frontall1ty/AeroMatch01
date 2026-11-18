@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DOCUMENT_CHECKLIST, DOCUMENT_CHECKLIST_NOTE, MILESTONES, MODE_LABEL, MODE_ORDER, type Mode } from "@/lib/constants";
+import { DOCUMENT_CHECKLIST, DOCUMENT_CHECKLIST_NOTE, MILESTONES, MODE_LABEL, type Mode } from "@/lib/constants";
 import { prefersReducedMotion, useInView } from "./hooks";
+import { SITE_MODES } from "./siteData";
 
 /** Documents and milestones differ by mode. The timeline plays once, then you can step through it. */
 export function LocalDemo() {
@@ -30,7 +31,7 @@ export function LocalDemo() {
   return (
     <div ref={ref} className="panel p-4 md:p-5">
       <div role="group" aria-label="Mode" className="flex overflow-hidden rounded border border-rule">
-        {MODE_ORDER.map((m) => (
+        {SITE_MODES.map((m) => (
           <button
             key={m}
             type="button"

@@ -5,8 +5,7 @@ import { addDays, formatDay } from "@/lib/dates";
 import { money } from "@/lib/format";
 import type { OfferView } from "@/lib/offers";
 
-const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", ROAD: "#B45309", RAIL: "#0F766E" };
-const LANES: Mode[] = ["AIR", "RAIL", "ROAD"];
+const COLOR: Record<Mode, string> = { AIR: "#1D4ED8", ROAD: "#B45309", RAIL: "#0F766E", SEA: "#6D28D9" };
 
 const W = 960;
 const LEFT = 64;
@@ -17,6 +16,7 @@ const LANE_PAD = 10;
 const AXIS = 30;
 
 export function LaneChart({
+  modes,
   offers,
   readyDate,
   deadlineDay,
@@ -26,6 +26,7 @@ export function LaneChart({
   onActive,
   onSelect,
 }: {
+  modes: Mode[]; // the modes that exist on this lane
   offers: OfferView[]; // OK offers only
   readyDate: string;
   deadlineDay: number;
@@ -41,7 +42,7 @@ export function LaneChart({
   const plotW = W - LEFT - RIGHT;
   const x = (day: number) => LEFT + (day / maxDay) * plotW;
 
-  const lanes = LANES.map((mode) => {
+  const lanes = modes.map((mode) => {
     const rows = offers
       .filter((o) => o.mode === mode)
       .sort((a, b) => a.arrivalMinDay - b.arrivalMinDay || a.totalPrice - b.totalPrice);

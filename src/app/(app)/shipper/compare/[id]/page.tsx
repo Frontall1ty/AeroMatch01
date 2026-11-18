@@ -5,7 +5,7 @@ import { buildOffers } from "@/lib/offers";
 import { chargeableWeight, visibleListingsWhere } from "@/lib/rules";
 import { requireRole } from "@/lib/session";
 import { CompareView, ShipmentRail } from "@/components/CompareView";
-import type { Mode } from "@/lib/constants";
+import { MODE_ORDER, type Mode } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +24,7 @@ export default async function Compare({ params }: { params: Promise<{ id: string
   const offers = buildOffers(shipment, listings);
 
   const breakdown = Object.fromEntries(
-    (["AIR", "RAIL", "ROAD"] as Mode[]).map((m) => [
+    MODE_ORDER.map((m) => [
       m,
       chargeableWeight({ mode: m, weightKg: shipment.weightKg, volumeM3: shipment.volumeM3 }),
     ]),

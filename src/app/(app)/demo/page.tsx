@@ -1,47 +1,67 @@
-import { switchRole } from "../../actions";
-import { DemoBadge, ModeTag } from "@/components/ui";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { DEMO_EMAIL_SUFFIX } from "@/lib/accountSchemas";
+import { demoLogin } from "@/app/auth-actions";
+import { DemoBadge, PageTitle } from "@/components/ui";
 
-export default function Landing() {
-  return (
-    <div className="mx-auto max-w-3xl py-8 md:py-14">
-      <h1 className="text-[40px] font-bold leading-[1.05] md:text-[56px]">
-        Compare every way to ship. Book the one that fits.
-      </h1>
-      <p className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1">
-        <ModeTag mode="AIR" />
-        <ModeTag mode="RAIL" />
-        <ModeTag mode="ROAD" />
-      </p>
-      <p className="mt-5 max-w-2xl text-xl">
-        Enter your cargo once. See every option side by side, which ones meet your deadline and budget, and request a
-        booking.
-      </p>
+export const dynamic = "force-dynamic";
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <form action={switchRole.bind(null, "SHIPPER", undefined)}>
-          <button className="btn w-full !min-h-[56px] text-base">Continue as shipper</button>
-          <p className="mt-2 text-sm text-muted">Create a shipment, compare options, request a booking, follow milestones.</p>
-        </form>
-        <form action={switchRole.bind(null, "CARRIER", undefined)}>
-          <button className="btn-secondary w-full !min-h-[56px] text-base">Continue as carrier</button>
-          <p className="mt-2 text-sm text-muted">Add capacity in under a minute, approve requests, update milestones.</p>
-        </form>
+export default async function DemoAccounts() {
+  if (process.env.ALLOW_DEMO_ACCOUNTS === "false") {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <PageTitle title="Demo accounts are switched off" />
+        <p className="text-muted">Log in with your own account, or sign up.</p>
+        <div className="mt-4 flex gap-3">
+          <Link href="/login" className="btn">Log in</Link>
+          <Link href="/register" className="btn-secondary">Sign up</Link>
+        </div>
       </div>
+    );
+  }
 
-      <section className="panel mt-10 p-4 text-sm">
-        <p className="flex flex-wrap items-center gap-2 font-semibold">
-          <DemoBadge /> This is a demo.
-        </p>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
-          <li>
-            The demo covers one pilot lane: Tashkent (TAS) to Istanbul (IST), Dubai (DXB) and Almaty (ALA). More lanes are
-            added as carriers join.
-          </li>
-          <li>All prices, carriers and capacities are invented. No carrier is connected.</li>
-          <li>Capacity is entered by hand by carriers. Tracking is a milestone timeline updated by hand.</li>
-          <li>There is no real login. The role switcher in the header is for the demo only.</li>
-        </ul>
-      </section>
+  const users = await prisma.user.findMany({
+    where: { email: { endsWith: DEMO_EMAIL_SUFFIX }, passwordHash: null },
+    include: { company: true },
+    orderBy: { name: "asc" },
+  });
+  const shippers = users.filter((u) => u.role === "SHIPPER");
+  const carriers = users.filter((u) => u.role === "CARRIER");
+
+  const row = (u: (typeof users)[number]) => (
+    <li key={u.id}>
+      <form action={demoLogin.bind(null, u.id)}>
+        <button className="flex w-full flex-wrap items-center justify-between gap-2 p-4 text-left hover:bg-paper">
+          <span>
+            <span className="block font-semibold">{u.company.name}</span>
+            <span className="text-sm text-muted">{u.company.type === "SHIPPER" ? "Shipper" : u.company.type === "GSA" ? "Cargo agent" : u.company.type === "FORWARDER" ? "Forwarder" : "Carrier"}</span>
+          </span>
+          {u.role === "CARRIER" && (
+            <span className={`rounded border px-2 py-0.5 text-xs font-semibold ${u.company.verified ? "border-good text-good" : "border-road text-road"}`}>
+              {u.company.verified ? "Verified" : "Not verified: hidden from shippers"}
+            </span>
+          )}
+        </button>
+      </form>
+    </li>
+  );
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <PageTitle title="Demo accounts">
+        <DemoBadge />
+      </PageTitle>
+      <p className="mb-6 text-muted">
+        These accounts hold invented data and need no password. Open a shipper and a carrier in two windows to see a booking from both sides.
+        For a real account, <Link href="/register" className="font-semibold text-ink underline underline-offset-2">sign up</Link> or{" "}
+        <Link href="/login" className="font-semibold text-ink underline underline-offset-2">log in</Link>.
+      </p>
+
+      <h2 className="mb-2 text-xl font-semibold">Shipper</h2>
+      <ul className="panel divide-y divide-rule">{shippers.map(row)}</ul>
+
+      <h2 className="mb-2 mt-8 text-xl font-semibold">Carriers</h2>
+      <ul className="panel divide-y divide-rule">{carriers.map(row)}</ul>
     </div>
   );
 }

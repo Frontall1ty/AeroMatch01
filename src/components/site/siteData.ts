@@ -23,6 +23,9 @@ export const HERO_OFFERS: HeroOffer[] = [
   { id: "road-groupage", mode: "ROAD", carrier: "Demo Trucking Co", detail: "Groupage trailer, per m²", totalPrice: 4440, transitDaysMin: 6, transitDaysMax: 8, depart: 1 },
 ];
 
+/** The site tells the Tashkent story: air, rail and road. Sea appears for coastal origins in the app. */
+export const SITE_MODES: Mode[] = ["AIR", "RAIL", "ROAD"];
+
 export const HERO_DEADLINE_DAY = 14;
 export const HERO_AXIS_DAYS = 16;
 

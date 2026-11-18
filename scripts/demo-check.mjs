@@ -16,6 +16,11 @@ const problems = [];
 page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
 page.on("console", (m) => m.type() === "error" && problems.push(`console: ${m.text()}`));
 
+const asAccount = async (company, url) => {
+  await page.goto(`${BASE}/demo`);
+  await page.getByRole("button", { name: new RegExp(company) }).click();
+  await page.waitForURL(url);
+};
 const step = (n) => console.log(`\n[${n}]`);
 const check = (cond, msg) => {
   console.log(`${cond ? "  ok " : "  FAIL"} ${msg}`);
@@ -25,9 +30,7 @@ const shot = async (name) => shotsDir && (await page.screenshot({ path: `${shots
 const t0 = Date.now();
 
 step("1. Carrier adds capacity with Duplicate last listing");
-await page.goto(BASE);
-await page.getByRole("button", { name: "Continue as carrier" }).click();
-await page.waitForURL("**/carrier/capacity/new");
+await asAccount("Demo Air Cargo A", "**/carrier/capacity/new");
 const tCarrier = Date.now();
 await page.getByRole("button", { name: "Duplicate last listing" }).click();
 await page.getByRole("button", { name: "In 3 days" }).click();
@@ -37,8 +40,7 @@ check(true, `capacity published in ${((Date.now() - tCarrier) / 1000).toFixed(1)
 await shot("1-carrier-capacity");
 
 step("2. Shipper creates the demo shipment");
-await page.getByRole("button", { name: "Shipper", exact: true }).click();
-await page.waitForURL("**/shipper/new");
+await asAccount("Demo Textile Export LLC", "**/shipper/new");
 await page.getByRole("button", { name: "Load demo shipment" }).click();
 const live = await page.locator("p", { hasText: "Your shipment:" }).first().textContent();
 check(/6,000 kg, 40 m³, about 22\.2 m² of floor space/.test(live), `piece size gives the totals automatically (${live.trim()})`);
@@ -94,8 +96,7 @@ const bookingUrl = page.url();
 check(true, "booking requested");
 
 step("5. Carrier approves and advances milestones to Delivered");
-await page.getByRole("button", { name: "Carrier", exact: true }).click();
-await page.waitForURL("**/carrier/capacity/new");
+await asAccount("Demo Air Cargo A", "**/carrier/capacity/new");
 await page.goto(`${BASE}/carrier/requests`);
 await page.getByRole("button", { name: "Approve" }).first().click();
 await page.getByText("No requests waiting").waitFor();
@@ -109,8 +110,7 @@ await page.getByText("Delivered. All milestones are recorded.").waitFor();
 check(true, "booking delivered");
 
 step("6. Shipper sees the full timeline");
-await page.getByRole("button", { name: "Shipper", exact: true }).click();
-await page.waitForURL("**/shipper/new");
+await asAccount("Demo Textile Export LLC", "**/shipper/new");
 await page.goto(bookingUrl.split("?")[0]);
 await page.getByText("Delivered").first().waitFor();
 const done = await page.locator("ol li:has-text('(done)')").count();
@@ -133,8 +133,7 @@ check(await page.getByText("Carries general cargo only").first().isVisible(), "g
 await shot("7-vehicles");
 
 step("8. Carrier space calculator");
-await page.getByRole("button", { name: "Carrier", exact: true }).click();
-await page.waitForURL("**/carrier/capacity/new");
+await asAccount("Demo Air Cargo A", "**/carrier/capacity/new");
 await page.getByText("Road", { exact: true }).first().click();
 await page.getByText("Space calculator: how many pieces fit?").click();
 await page.getByLabel("Common piece sizes").selectOption({ index: 1 });

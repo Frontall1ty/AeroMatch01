@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { DemoBadge } from "@/components/ui";
+import { getSession, homeFor } from "@/lib/session";
 
 const NAV = [
-  { href: "#cargo", label: "One entry" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#capacity", label: "Capacity" },
-  { href: "#local", label: "Documents" },
-  { href: "#systems", label: "Integration" },
+  { href: "/#cargo", label: "One entry" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/#capacity", label: "Capacity" },
+  { href: "/#local", label: "Documents" },
+  { href: "/#systems", label: "Integration" },
 ];
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
   return (
     <>
       <a
@@ -30,11 +32,16 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
               </a>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-3">
-            <span className="hidden sm:block"><DemoBadge /></span>
-            <Link href="/demo" className="btn !min-h-[40px]">
-              Open the live demo
-            </Link>
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <span className="hidden lg:block"><DemoBadge /></span>
+            {session ? (
+              <Link href={homeFor(session.role)} className="btn !min-h-[40px]">Open the app</Link>
+            ) : (
+              <>
+                <Link href="/login" className="btn-secondary !min-h-[40px] !px-3 sm:!px-4">Log in</Link>
+                <Link href="/register" className="btn !min-h-[40px] !px-3 sm:!px-4">Sign up</Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -43,7 +50,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 px-4 py-5 text-sm text-muted">
           <p>AeroMatch demo. All prices, carriers and capacities are invented. No carrier is connected.</p>
           <Link href="/demo" className="font-semibold text-ink underline underline-offset-2 hover:no-underline">
-            Open the live demo
+            Try a demo account
           </Link>
         </div>
       </footer>

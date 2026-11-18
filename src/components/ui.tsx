@@ -5,6 +5,7 @@ const MODE_CLASS: Record<Mode, string> = {
   AIR: "bg-air",
   ROAD: "bg-road",
   RAIL: "bg-rail",
+  SEA: "bg-sea",
 };
 
 /** Mode color identifies modes only. Never decoration. */

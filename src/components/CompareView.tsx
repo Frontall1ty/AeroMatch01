@@ -48,6 +48,8 @@ export function CompareView({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
 
+  // Only modes that exist on this lane. For example, sea never appears for an inland city.
+  const modes = useMemo(() => MODE_ORDER.filter((m) => offers.some((o) => o.mode === m)), [offers]);
   const ok = useMemo(() => offers.filter((o) => o.status === "OK"), [offers]);
   const notOk = useMemo(() => offers.filter((o) => o.status !== "OK"), [offers]);
   const { recommended } = useMemo(() => recommend(ok, priority), [ok, priority]);
@@ -110,7 +112,7 @@ export function CompareView({
             <>
               <p className="mb-2 text-sm font-semibold">Charged weight by mode</p>
               <div className="grid gap-2 sm:grid-cols-3">
-                {MODE_ORDER.map((m) => (
+                {modes.map((m) => (
                   <div key={m} className="text-sm">
                     <ModeTag mode={m} />
                     <p className="text-muted">
@@ -155,6 +157,7 @@ export function CompareView({
       ) : (
         <>
           <LaneChart
+            modes={modes}
             offers={ok}
             readyDate={shipment.readyDate}
             deadlineDay={deadlineDay}

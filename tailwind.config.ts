@@ -13,6 +13,7 @@ const config: Config = {
         air: "#1D4ED8",
         road: "#B45309",
         rail: "#0F766E",
+        sea: "#6D28D9",
         good: "#15803D",
         bad: "#B91C1C",
       },

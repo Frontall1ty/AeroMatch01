@@ -60,7 +60,7 @@ export default async function AddCapacity({ searchParams }: { searchParams: Prom
       )}
       {!company.verified && (
         <p className="mb-4 rounded border border-road px-3 py-2 text-sm text-road">
-          This carrier is not verified, so shippers do not see its listings.
+          Your company is not verified yet, so shippers do not see your listings. Complete your profile or finish 3 shipments and our team will verify you.
         </p>
       )}
 

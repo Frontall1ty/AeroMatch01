@@ -23,6 +23,7 @@ enum Mode {
   AIR
   ROAD
   RAIL
+  SEA
 }
 
 enum PricingUnit {
@@ -52,22 +53,33 @@ enum BookingStatus {
 }
 
 model Company {
-  id        String      @id @default(cuid())
-  name      String
-  type      CompanyType
-  verified  Boolean     @default(false)
-  country   String
+  id          String      @id @default(cuid())
+  name        String
+  type        CompanyType
+  verified    Boolean     @default(false)
+  verifiedAt  DateTime?
+  country     String
+  city        String?
+  phone       String?
+  address     String?
+  taxId       String?
+  website     String?
+  about       String?
+  createdAt   DateTime    @default(now())
   users     User[]
   listings  CapacityListing[]
   shipments ShipmentRequest[]
 }
 
 model User {
-  id        String  @id @default(cuid())
-  name      String
-  role      Role
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  id           String   @id @default(cuid())
+  name         String
+  email        String?  @unique
+  passwordHash String?
+  role         Role
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id])
+  createdAt    DateTime @default(now())
 }
 
 model CapacityListing {

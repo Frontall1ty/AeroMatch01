@@ -1,4 +1,4 @@
-export type Mode = "AIR" | "ROAD" | "RAIL";
+export type Mode = "AIR" | "ROAD" | "RAIL" | "SEA";
 export type PricingUnit = "PER_KG" | "PER_M2" | "PER_VEHICLE" | "FLAT";
 export type CargoKind = "GENERAL" | "VEHICLES";
 
@@ -27,19 +27,21 @@ export const MODES_BY_DESTINATION: Record<string, Mode[]> = {
   ALA: ["AIR", "RAIL", "ROAD"],
 };
 
-export const MODE_ORDER: Mode[] = ["AIR", "RAIL", "ROAD"];
-export const MODE_LABEL: Record<Mode, string> = { AIR: "Air", RAIL: "Rail", ROAD: "Road" };
+export const MODE_ORDER: Mode[] = ["AIR", "SEA", "RAIL", "ROAD"];
+export const MODE_LABEL: Record<Mode, string> = { AIR: "Air", SEA: "Sea", RAIL: "Rail", ROAD: "Road" };
 
 /**
  * Volumetric factors, kg per m³. Used for per-kg pricing.
  * Simplified. Verify against current industry practice before any real use.
  * AIR 167 = 6000 cm³ per kg (IATA convention). ROAD 333 = 3 m³ per tonne (common European road convention).
  * RAIL 500 is a placeholder for less-than-wagon rail cargo: confirm with a rail forwarder.
+ * SEA 1000 = 1 m³ per tonne (weight or measurement rule). Sea freight is usually priced per container.
  */
 export const VOLUMETRIC_FACTOR: Record<Mode, number> = {
   AIR: 167,
   ROAD: 333,
   RAIL: 500,
+  SEA: 1000,
 };
 
 /**
@@ -93,6 +95,13 @@ export const MILESTONES: Record<Mode, Milestone[]> = {
     { label: "Arrived at terminal" },
     { label: "Delivered" },
   ],
+  SEA: [
+    { label: "Booked" },
+    { label: "Gate-in at port" },
+    { label: "Vessel departed" },
+    { label: "Arrived at port" },
+    { label: "Delivered" },
+  ],
 };
 
 export const DOCUMENT_CHECKLIST_NOTE =
@@ -122,6 +131,14 @@ export const DOCUMENT_CHECKLIST: Record<Mode, string[]> = {
     "Certificate of origin, if required",
     "Transit documents, if applicable",
   ],
+  SEA: [
+    "Bill of lading",
+    "Commercial invoice",
+    "Packing list",
+    "Export customs declaration",
+    "Certificate of origin, if required",
+    "Documents for the inland leg, if any",
+  ],
 };
 
 /** Extra documents when the cargo is vehicles. */
@@ -141,6 +158,7 @@ export const PRICING_UNITS_BY_MODE: Record<Mode, PricingUnit[]> = {
   AIR: ["PER_KG"],
   ROAD: ["PER_KG", "PER_M2", "FLAT", "PER_VEHICLE"],
   RAIL: ["PER_KG", "PER_M2", "FLAT", "PER_VEHICLE"],
+  SEA: ["PER_KG", "FLAT", "PER_VEHICLE"],
 };
 
 /** Sensible defaults when a carrier adds capacity, per mode. All amounts are demo values. */
@@ -203,4 +221,32 @@ export const LISTING_DEFAULTS: Record<
     maxPieceKg: 5000,
     minChargeableKg: 1000,
   },
+  SEA: {
+    equipment: ["Container, 40 ft", "Container, 20 ft", "LCL consolidation"],
+    vehicleEquipment: "Ro-Ro vessel",
+    weightKg: 25000,
+    volumeM3: 60,
+    floorM2: 0,
+    vehicles: 20,
+    price: { PER_KG: 0.06, PER_M2: 0, FLAT: 3200, PER_VEHICLE: 450 },
+    transitMin: 12,
+    transitMax: 18,
+    cutoffHours: 72,
+    maxPieceKg: 5000,
+    minChargeableKg: 1000,
+  },
 };
+
+/**
+ * Cities people can register from. A city decides where a shipment starts and which modes exist:
+ * sea only exists between two coastal cities. All lanes and prices are invented demo data.
+ */
+export type City = { code: string; name: string; country: string; coastal: boolean };
+export const CITIES: City[] = [
+  { code: "TAS", name: "Tashkent", country: "Uzbekistan", coastal: false },
+  { code: "SKD", name: "Samarkand", country: "Uzbekistan", coastal: false },
+  { code: "ALA", name: "Almaty", country: "Kazakhstan", coastal: false },
+  { code: "IST", name: "Istanbul", country: "Turkey", coastal: true },
+  { code: "DXB", name: "Dubai", country: "United Arab Emirates", coastal: true },
+];
+export const cityByCode = (code: string | null | undefined) => CITIES.find((c) => c.code === code);

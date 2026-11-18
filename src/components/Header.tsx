@@ -1,21 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
-import { switchRole } from "@/app/actions";
-import { CarrierSelect } from "./CarrierSelect";
+import { logout } from "@/app/auth-actions";
 import { DemoBadge } from "./ui";
 
 export async function Header() {
   const session = await getSession();
 
-  const carriers =
-    session?.role === "CARRIER"
-      ? await prisma.company.findMany({
-          where: { type: { not: "SHIPPER" } },
-          orderBy: { name: "asc" },
-          select: { id: true, name: true, verified: true },
-        })
-      : [];
   const pending =
     session?.role === "CARRIER"
       ? await prisma.booking.count({ where: { status: "REQUESTED", listing: { carrierCompanyId: session.companyId } } })
@@ -35,23 +26,6 @@ export async function Header() {
           ]
         : [];
 
-  const roleBtn = (role: "SHIPPER" | "CARRIER", label: string) => {
-    const active = session?.role === role;
-    return (
-      <form action={switchRole.bind(null, role, undefined)}>
-        <button
-          type="submit"
-          aria-pressed={active}
-          className={`min-h-[36px] px-3 text-sm font-semibold ${
-            active ? "bg-ink text-white" : "bg-panel text-ink hover:bg-paper"
-          }`}
-        >
-          {label}
-        </button>
-      </form>
-    );
-  };
-
   return (
     <header className="border-b border-rule bg-panel">
       <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
@@ -68,13 +42,35 @@ export async function Header() {
             </Link>
           ))}
         </nav>
+
         <div className="ml-auto flex flex-wrap items-center gap-3">
           <DemoBadge />
-          {session?.role === "CARRIER" && <CarrierSelect companies={carriers} currentId={session.companyId} />}
-          <div role="group" aria-label="Demo role" className="flex overflow-hidden rounded border border-rule">
-            {roleBtn("SHIPPER", "Shipper")}
-            {roleBtn("CARRIER", "Carrier")}
-          </div>
+          {session ? (
+            <>
+              {session.role === "CARRIER" && !session.verified && (
+                <Link href="/account" className="rounded border border-road px-2 py-1 text-xs font-semibold text-road hover:bg-paper">
+                  Not verified yet
+                </Link>
+              )}
+              <Link href="/account" className="max-w-[220px] truncate text-sm hover:underline" title={`${session.name}, ${session.companyName}`}>
+                <span className="font-semibold">{session.name}</span>
+                <span className="text-muted"> · {session.companyName}</span>
+              </Link>
+              {session.isDemo && (
+                <Link href="/demo" className="text-sm font-semibold underline underline-offset-2 hover:no-underline">
+                  Switch demo account
+                </Link>
+              )}
+              <form action={logout}>
+                <button className="btn-secondary !min-h-[36px] !px-3">Log out</button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="btn-secondary !min-h-[36px] !px-3">Log in</Link>
+              <Link href="/register" className="btn !min-h-[36px] !px-3">Sign up</Link>
+            </>
+          )}
         </div>
       </div>
     </header>

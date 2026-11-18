@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { switchRole } from "@/app/actions";
 import { CargoDemo } from "@/components/site/CargoDemo";
 import { FitDemo } from "@/components/site/FitDemo";
 import { HeroLanes } from "@/components/site/HeroLanes";
@@ -55,8 +54,8 @@ export default function Site() {
               would cost. Then request a booking.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/demo" className="btn !min-h-[52px] px-6 text-base">Open the live demo</Link>
-              <a href="#cargo" className="btn-secondary !min-h-[52px] px-6 text-base">See how it works</a>
+              <Link href="/register" className="btn !min-h-[52px] px-6 text-base">Sign up</Link>
+              <a href="#who" className="btn-secondary !min-h-[52px] px-6 text-base">See how it works</a>
             </div>
             <p className="mt-4 max-w-[48ch] text-sm text-muted">
               Pilot lane: Tashkent to Istanbul, Dubai and Almaty. Everything you see is demo data.
@@ -65,6 +64,37 @@ export default function Site() {
           <HeroLanes />
         </div>
       </section>
+
+      <Section
+        id="who"
+        title="Two sides of one shipment."
+        lead="Shippers need to know what is available and what it costs. Carriers need someone to fill their free space. AeroMatch puts both in the same place, from the city where the cargo starts."
+      >
+        <div className="panel divide-y divide-rule">
+          <div className="p-5">
+            <h3 className="text-xl font-semibold">If you ship cargo</h3>
+            <p className="mt-2 text-muted">
+              Enter your cargo once. See which modes run from your city, which have space, which meet your deadline and what each
+              costs. Each option is marked cheaper, faster or safer, so you choose on what matters. Request a booking and follow it
+              step by step.
+            </p>
+          </div>
+          <div className="p-5">
+            <h3 className="text-xl font-semibold">If you carry cargo</h3>
+            <p className="mt-2 text-muted">
+              Put your free space in front of shippers. Add a flight, a truck, a wagon or a vessel in about a minute, set your own
+              price, then approve requests and update the milestones. Small carriers are welcome.
+            </p>
+          </div>
+          <div className="p-5">
+            <h3 className="text-xl font-semibold">How we keep it trustworthy</h3>
+            <p className="mt-2 text-muted">
+              Every carrier is verified by our team before shippers see its offers. A carrier is verified once its company profile is
+              complete or it has finished 3 shipments. Nothing is paid inside AeroMatch.
+            </p>
+          </div>
+        </div>
+      </Section>
 
       <Section
         id="reasons"
@@ -152,18 +182,15 @@ export default function Site() {
       <section className="border-t border-rule bg-panel">
         <div className="mx-auto max-w-[1180px] px-4 py-14 md:py-20">
           <h2 className="display text-[clamp(44px,6vw,76px)]">Try it with a shipment of your own.</h2>
-          <div className="mt-8 grid max-w-[640px] gap-3 sm:grid-cols-2">
-            <form action={switchRole.bind(null, "SHIPPER", undefined)}>
-              <button className="btn w-full !min-h-[56px] text-base">Continue as shipper</button>
-              <p className="mt-2 text-sm text-muted">Describe a shipment, compare, request a booking.</p>
-            </form>
-            <form action={switchRole.bind(null, "CARRIER", undefined)}>
-              <button className="btn-secondary w-full !min-h-[56px] text-base">Continue as carrier</button>
-              <p className="mt-2 text-sm text-muted">Add capacity, approve requests, update milestones.</p>
-            </form>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/register" className="btn !min-h-[56px] px-8 text-base">Sign up</Link>
+            <Link href="/login" className="btn-secondary !min-h-[56px] px-8 text-base">Log in</Link>
           </div>
+          <p className="mt-4 text-sm text-muted">
+            Just looking? <Link href="/demo" className="font-semibold text-ink underline underline-offset-2">Use a demo account</Link>, no sign-up needed.
+          </p>
           <p className="mt-6 max-w-[60ch] text-sm text-muted">
-            There is no real login in the demo. The role switcher is for the demo only, and all prices, carriers and capacities are invented.
+            Accounts are real, but every price, carrier and capacity shown here is invented demo data, and no carrier is connected.
           </p>
         </div>
       </section>

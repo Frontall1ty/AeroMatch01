@@ -37,6 +37,9 @@ npm run db:reset            # wipe and reseed
 | `SESSION_SECRET` | a long random string, at least 32 characters |
 | `DEMO_PASSCODE` | a passcode for the whole site. Recommended for any shared link |
 | `ALLOW_DEMO_RESET` | `true` keeps the Reset demo data button in the footer, `false` hides it |
+| `ADMIN_PASSCODE` | a passcode for `/admin`, where you verify carriers by hand. Admin is off without it |
+| `ALLOW_REGISTRATION` | `false` closes sign-up |
+| `ALLOW_DEMO_ACCOUNTS` | `false` hides the passwordless demo accounts at `/demo` |
 | `DEMO_READY_OFFSET_DAYS` | optional, default 3 |
 
 4. **Redeploy** (Deployments, then Redeploy). The build creates the tables and loads the demo data when the database is empty. It never touches data that is already there.
@@ -46,11 +49,20 @@ Every push to the repository deploys again by itself.
 
 ## Pages
 
-- `/` the story site. `/demo` chooses a role and starts the demo. `/shipper/...` and `/carrier/...` are the two roles.
+- `/` the story site. `/register` and `/login` for real accounts. `/demo` has passwordless demo accounts with invented data.
+- `/shipper/...` and `/carrier/...` are the two roles. `/account` is the company profile and, for carriers, the verification status.
+- `/admin` is where you verify carriers by hand. It has its own passcode (`ADMIN_PASSCODE`) and does not depend on any account.
+
+## Accounts and verification
+
+- Sign-up needs an email and a password of at least 10 characters. Passwords are hashed with scrypt. Email addresses are not verified, because the app sends no email.
+- A new carrier starts **not verified**. It can add capacity, but shippers do not see its offers.
+- A carrier qualifies for verification when its company profile is complete (city, phone, address, tax ID) **or** it has 3 delivered shipments. Qualifying never verifies by itself. You check the company and press **Verify** in `/admin`.
+- "Reset demo data" removes only demo records (ids that start with `demo-`). Real accounts are never touched.
 
 ## The 3 minute demo script
 
-0. Open `/` and scroll the site, or go straight to **Open the live demo**.
+0. Open `/`, read the site, then go to `/demo` and choose the demo carrier **Demo Air Cargo A**.
 1. Carrier: **Add capacity**. Click **Duplicate last listing**, pick **In 3 days**, click **Add capacity**.
 2. Shipper: **New shipment**, **Load demo shipment** (25 crates; totals appear by themselves), **Compare options**. Point out the lane chart, the Recommended line with its reason, and the reasons under **Not available**.
 3. Switch priority to **Fastest** (air), **Cheapest** (rail, priced per m²), then **Balanced** (road, flat truck price). Point at the price column: every offer shows how it is calculated.
@@ -64,7 +76,7 @@ Every push to the repository deploys again by itself.
 
 - All data is fictional and no carrier is connected.
 - Capacity is entered manually by design.
-- No real authentication. The role switcher is for the demo only.
+- Accounts are real but simple: no email check, no password reset, and a session cannot be revoked before it expires. Rate limits are in memory and per server instance.
 - Volumetric factors, milestone codes, availability rules and the document checklist are simplified and need review with industry practitioners. Rail volumetric factor and the floor-space estimate (volume ÷ 2 m) are placeholders. Road forwarders usually quote loading metres (LDM), not m².
 - Not built: admin screens, payments, notifications, carrier APIs, real tracking, document upload, other languages, recurring capacity agreements, consolidation, analytics.
 

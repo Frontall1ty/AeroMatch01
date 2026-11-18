@@ -1,4 +1,5 @@
 import type { CargoKind, Mode, PricingUnit, PrismaClient } from "@prisma/client";
+import { DEMO_EMAIL_SUFFIX } from "./accountSchemas";
 import { addDays, todayUtc } from "./dates";
 
 type Seed = {
@@ -31,12 +32,12 @@ type Seed = {
  * about 22.2 m² of floor space), ready on day 0, deliver by day 14.
  */
 export const COMPANIES = [
-  { id: "demo-shipper", name: "Demo Textile Export LLC", type: "SHIPPER", verified: true, country: "Uzbekistan" },
-  { id: "demo-air-a", name: "Demo Air Cargo A", type: "CARRIER", verified: true, country: "Uzbekistan" },
-  { id: "demo-air-b", name: "Demo Air Cargo B", type: "GSA", verified: true, country: "Uzbekistan" },
-  { id: "demo-trucking", name: "Demo Trucking Co", type: "CARRIER", verified: true, country: "Uzbekistan" },
-  { id: "demo-rail", name: "Demo Rail Freight", type: "CARRIER", verified: true, country: "Uzbekistan" },
-  { id: "demo-freight-road", name: "Demo Freight Road", type: "FORWARDER", verified: false, country: "Uzbekistan" },
+  { id: "demo-shipper", slug: "shipper", name: "Demo Textile Export LLC", type: "SHIPPER", verified: true, country: "Uzbekistan", city: "TAS" },
+  { id: "demo-air-a", slug: "air-a", name: "Demo Air Cargo A", type: "CARRIER", verified: true, country: "Uzbekistan", city: "TAS" },
+  { id: "demo-air-b", slug: "air-b", name: "Demo Air Cargo B", type: "GSA", verified: true, country: "Uzbekistan", city: "TAS" },
+  { id: "demo-trucking", slug: "trucking", name: "Demo Trucking Co", type: "CARRIER", verified: true, country: "Uzbekistan", city: "TAS" },
+  { id: "demo-rail", slug: "rail", name: "Demo Rail Freight", type: "CARRIER", verified: true, country: "Uzbekistan", city: "TAS" },
+  { id: "demo-freight-road", slug: "freight-road", name: "Demo Freight Road", type: "FORWARDER", verified: false, country: "Uzbekistan", city: "TAS" },
 ] as const;
 
 const LISTINGS: Seed[] = [
@@ -75,19 +76,33 @@ export function demoReadyDate(): Date {
 export async function seedDemoData(prisma: PrismaClient): Promise<void> {
   const ready = demoReadyDate();
 
+  // Only demo records are removed. Real accounts and their data are never touched.
+  const demoBooking = {
+    OR: [{ listing: { carrierCompanyId: { startsWith: "demo-" } } }, { shipment: { shipperCompanyId: { startsWith: "demo-" } } }],
+  };
   await prisma.$transaction([
-    prisma.bookingEvent.deleteMany(),
-    prisma.booking.deleteMany(),
-    prisma.shipmentRequest.deleteMany(),
-    prisma.capacityListing.deleteMany(),
-    prisma.user.deleteMany(),
-    prisma.company.deleteMany(),
-    prisma.company.createMany({ data: COMPANIES.map((c) => ({ ...c })) }),
+    prisma.booking.deleteMany({ where: demoBooking }), // milestone events go with them
+    prisma.shipmentRequest.deleteMany({ where: { shipperCompanyId: { startsWith: "demo-" } } }),
+    prisma.capacityListing.deleteMany({ where: { carrierCompanyId: { startsWith: "demo-" } } }),
+    prisma.user.deleteMany({ where: { companyId: { startsWith: "demo-" } } }),
+    prisma.company.deleteMany({ where: { id: { startsWith: "demo-" } } }),
+    prisma.company.createMany({
+      data: COMPANIES.map(({ slug: _slug, ...c }) => ({
+        ...c,
+        // The unverified demo carrier has an incomplete profile on purpose: it shows how verification works.
+        phone: c.verified ? "+998 00 000 00 00" : null,
+        address: c.verified ? "1 Example Street, Tashkent" : null,
+        taxId: c.verified ? "000000000" : null,
+        about: "Demo company with invented data.",
+        verifiedAt: c.verified ? new Date() : null,
+      })),
+    }),
     prisma.user.createMany({
       data: COMPANIES.map((c) => ({
         id: `user-${c.id}`,
-        name: `${c.name} (demo user)`,
-        role: c.type === "SHIPPER" ? "SHIPPER" : "CARRIER",
+        name: "Demo user",
+        email: `${c.slug}${DEMO_EMAIL_SUFFIX}`,
+        role: c.type === "SHIPPER" ? ("SHIPPER" as const) : ("CARRIER" as const),
         companyId: c.id,
       })),
     }),

@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { MODE_LABEL, MODE_ORDER, type Mode } from "@/lib/constants";
+import { MODE_LABEL, type Mode } from "@/lib/constants";
 import { money } from "@/lib/format";
 import { recommend, recommendationReason, type Priority } from "@/lib/rules";
 import { DemoBadge, ModeTag } from "@/components/ui";
-import { HERO_AXIS_DAYS, HERO_DEADLINE_DAY, HERO_OFFERS } from "./siteData";
+import { HERO_AXIS_DAYS, HERO_DEADLINE_DAY, HERO_OFFERS, SITE_MODES } from "./siteData";
 
-const FILL: Record<Mode, string> = { AIR: "bg-air", RAIL: "bg-rail", ROAD: "bg-road" };
+const FILL: Record<Mode, string> = { AIR: "bg-air", SEA: "bg-sea", RAIL: "bg-rail", ROAD: "bg-road" };
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "CHEAPEST", label: "Cheapest" },
   { value: "FASTEST", label: "Fastest" },
@@ -60,7 +60,7 @@ export function HeroLanes() {
           </span>
         </div>
 
-        {MODE_ORDER.map((mode) => {
+        {SITE_MODES.map((mode) => {
           const rows = HERO_OFFERS.filter((o) => o.mode === mode).sort((a, b) => a.depart + a.transitDaysMin - (b.depart + b.transitDaysMin));
           return (
             <div key={mode} className="grid grid-cols-[4rem_1fr] border-t border-rule">

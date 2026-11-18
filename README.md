@@ -27,19 +27,19 @@ npm run db:reset            # wipe and reseed
 
 ## Deploy to Vercel (no terminal needed)
 
-1. **Database.** Create a free PostgreSQL database at neon.tech and copy its **direct (not pooled)** connection string. Tables are created during the build, which does not work through a pooled connection.
-2. **GitHub.** Put this folder in a private GitHub repository.
-3. **Vercel.** Sign in at vercel.com with GitHub, choose **Add New, Project**, import the repository and add these environment variables before you press Deploy:
+1. **GitHub.** Put this folder in a private GitHub repository.
+2. **Vercel project.** Sign in at vercel.com with GitHub, choose **Add New, Project**, import the repository and add `SESSION_SECRET` (a long random string, at least 32 characters) and `DEMO_PASSCODE` (a passcode for the whole site, recommended for shared links) under Environment Variables. The first deploy fails because there is no database yet. That is expected.
+3. **Database.** In the project, open **Storage**, choose **Create Database**, then **Neon (Postgres)**, and connect it to the project. Vercel adds `DATABASE_URL` and `DATABASE_URL_UNPOOLED` for you. The app uses the direct one. Without the Vercel integration, set `DATABASE_URL` yourself to a direct (not pooled) connection string.
 
 | Variable | Value |
 |---|---|
-| `DATABASE_URL` | the Neon connection string (ends with `?sslmode=require`) |
+| `DATABASE_URL` | added by the Neon integration |
 | `SESSION_SECRET` | a long random string, at least 32 characters |
 | `DEMO_PASSCODE` | a passcode for the whole site. Recommended for any shared link |
 | `ALLOW_DEMO_RESET` | `true` keeps the Reset demo data button in the footer, `false` hides it |
 | `DEMO_READY_OFFSET_DAYS` | optional, default 3 |
 
-4. **Deploy.** The build creates the tables and loads the demo data when the database is empty. It never touches data that is already there.
+4. **Redeploy** (Deployments, then Redeploy). The build creates the tables and loads the demo data when the database is empty. It never touches data that is already there.
 5. **On the morning of the demo,** open the site and click **Reset demo data** in the footer. That moves the seeded dates to the coming days.
 
 Every push to the repository deploys again by itself.

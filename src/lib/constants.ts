@@ -2,30 +2,61 @@ export type Mode = "AIR" | "ROAD" | "RAIL" | "SEA";
 export type PricingUnit = "PER_KG" | "PER_M2" | "PER_VEHICLE" | "FLAT";
 export type CargoKind = "GENERAL" | "VEHICLES";
 
-export const ORIGIN = "TAS";
+/**
+ * Cities and the modes that exist between them. A city decides where a shipment starts. Sea exists only
+ * between two coastal cities, so an inland city like Tashkent never gets a sea option. Rail and road are listed
+ * lane by lane. All lanes, distances and prices are invented demo data.
+ */
+export type City = { code: string; name: string; country: string; coastal: boolean };
+export const CITIES: City[] = [
+  { code: "TAS", name: "Tashkent", country: "Uzbekistan", coastal: false },
+  { code: "ALA", name: "Almaty", country: "Kazakhstan", coastal: false },
+  { code: "IST", name: "Istanbul", country: "Turkey", coastal: true },
+  { code: "DXB", name: "Dubai", country: "United Arab Emirates", coastal: true },
+  { code: "PVG", name: "Shanghai", country: "China", coastal: true },
+  { code: "HAM", name: "Hamburg", country: "Germany", coastal: true },
+];
+export const cityByCode = (code: string | null | undefined) => CITIES.find((c) => c.code === code);
+export const cityName = (code: string) => cityByCode(code)?.name ?? code;
 
-export const DESTINATIONS = [
-  { code: "IST", city: "Istanbul", country: "Turkey" },
-  { code: "DXB", city: "Dubai", country: "United Arab Emirates" },
-  { code: "ALA", city: "Almaty", country: "Kazakhstan" },
-] as const;
+const pair = (a: string, b: string) => [a, b].sort().join("-");
+const ROAD_PAIRS = new Set(
+  ["TAS-ALA", "TAS-IST", "TAS-DXB", "TAS-PVG", "TAS-HAM", "ALA-IST", "ALA-DXB", "ALA-PVG", "ALA-HAM", "IST-DXB", "IST-HAM"].map((p) => p.split("-") as [string, string]).map(([x, y]) => pair(x, y)),
+);
+const RAIL_PAIRS = new Set(
+  ["TAS-ALA", "TAS-IST", "TAS-PVG", "TAS-HAM", "ALA-IST", "ALA-PVG", "ALA-HAM", "IST-PVG", "IST-HAM", "PVG-HAM"].map((p) => p.split("-") as [string, string]).map(([x, y]) => pair(x, y)),
+);
 
-export const AIRPORT_CITY: Record<string, string> = {
-  TAS: "Tashkent",
-  IST: "Istanbul",
-  DXB: "Dubai",
-  ALA: "Almaty",
+/** Approximate route distance in km, for generating plausible demo prices and transit times. */
+export const DISTANCE_KM: Record<string, number> = {
+  "ALA-TAS": 800, "IST-TAS": 3400, "DXB-TAS": 2500, "PVG-TAS": 4300, "HAM-TAS": 4900,
+  "ALA-IST": 3700, "ALA-DXB": 3000, "ALA-PVG": 3600, "ALA-HAM": 4700,
+  "DXB-IST": 3000, "IST-PVG": 8300, "HAM-IST": 2000, "DXB-PVG": 6000, "DXB-HAM": 5300, "HAM-PVG": 8500,
 };
+export const distanceKm = (a: string, b: string) => DISTANCE_KM[pair(a, b)] ?? 4000;
+
+/** Modes that exist between two cities. Empty when the cities are the same. */
+export function modesBetween(origin: string, destination: string): Mode[] {
+  const from = cityByCode(origin);
+  const to = cityByCode(destination);
+  if (!from || !to || origin === destination) return [];
+  const key = pair(origin, destination);
+  const modes: Mode[] = ["AIR"];
+  if (from.coastal && to.coastal) modes.push("SEA");
+  if (RAIL_PAIRS.has(key)) modes.push("RAIL");
+  if (ROAD_PAIRS.has(key)) modes.push("ROAD");
+  return modes;
+}
+
+/** Cities a shipment can go to from an origin. */
+export const destinationsFrom = (origin: string) => CITIES.filter((c) => c.code !== origin && modesBetween(origin, c.code).length > 0);
 
 /**
- * Uzbekistan is landlocked, so there is no sea mode. Rail and road are the overland modes.
- * Dubai has no direct rail link from Tashkent, so it is offered by air and road only.
+ * Handling safety, 1 to 5, as a demo estimate: how likely cargo is to be damaged, lost or delayed by handling.
+ * It is invented, not measured. Real scores would come from claims and damage data.
  */
-export const MODES_BY_DESTINATION: Record<string, Mode[]> = {
-  IST: ["AIR", "RAIL", "ROAD"],
-  DXB: ["AIR", "ROAD"],
-  ALA: ["AIR", "RAIL", "ROAD"],
-};
+export const SAFETY_BY_MODE: Record<Mode, number> = { AIR: 5, RAIL: 4, SEA: 3, ROAD: 3 };
+export const SAFETY_NOTE = "Handling safety is a demo estimate, not measured data.";
 
 export const MODE_ORDER: Mode[] = ["AIR", "SEA", "RAIL", "ROAD"];
 export const MODE_LABEL: Record<Mode, string> = { AIR: "Air", SEA: "Sea", RAIL: "Rail", ROAD: "Road" };
@@ -236,17 +267,3 @@ export const LISTING_DEFAULTS: Record<
     minChargeableKg: 1000,
   },
 };
-
-/**
- * Cities people can register from. A city decides where a shipment starts and which modes exist:
- * sea only exists between two coastal cities. All lanes and prices are invented demo data.
- */
-export type City = { code: string; name: string; country: string; coastal: boolean };
-export const CITIES: City[] = [
-  { code: "TAS", name: "Tashkent", country: "Uzbekistan", coastal: false },
-  { code: "SKD", name: "Samarkand", country: "Uzbekistan", coastal: false },
-  { code: "ALA", name: "Almaty", country: "Kazakhstan", coastal: false },
-  { code: "IST", name: "Istanbul", country: "Turkey", coastal: true },
-  { code: "DXB", name: "Dubai", country: "United Arab Emirates", coastal: true },
-];
-export const cityByCode = (code: string | null | undefined) => CITIES.find((c) => c.code === code);

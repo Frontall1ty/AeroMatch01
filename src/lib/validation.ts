@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CARGO_TYPES, DESTINATIONS, MODES_BY_DESTINATION, PRICING_UNITS_BY_MODE } from "./constants";
+import { CARGO_TYPES, CITIES, modesBetween, PRICING_UNITS_BY_MODE } from "./constants";
 import { parseDate, todayUtc } from "./dates";
 
 const dateStr = z
@@ -7,14 +7,15 @@ const dateStr = z
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a valid date.")
   .refine((v) => !Number.isNaN(parseDate(v).getTime()), "Enter a valid date.");
 
-const destination = z.enum(DESTINATIONS.map((d) => d.code) as [string, ...string[]], {
-  error: "Choose Istanbul, Dubai or Almaty.",
-});
+const cityCode = (message: string) => z.enum(CITIES.map((c) => c.code) as [string, ...string[]], { error: message });
+const origin = cityCode("Choose where the cargo starts.");
+const destination = cityCode("Choose where the cargo goes.");
 
 const optionalPositive = (message: string, max: number) => z.number().positive(message).max(max).nullable();
 
 export const shipmentSchema = z
   .object({
+    origin,
     destination,
     cargoKind: z.enum(["GENERAL", "VEHICLES"]),
     weightKg: z.number().max(500_000, "Weight is too large for this demo.").nullable(),
@@ -36,6 +37,11 @@ export const shipmentSchema = z
     notes: z.string().trim().max(500, "Keep notes under 500 characters.").default(""),
   })
   .superRefine((v, ctx) => {
+    if (v.origin === v.destination) {
+      ctx.addIssue({ code: "custom", path: ["destination"], message: "Choose a destination that is not the starting city." });
+    } else if (modesBetween(v.origin, v.destination).length === 0) {
+      ctx.addIssue({ code: "custom", path: ["destination"], message: "No way to send cargo between these cities in the demo." });
+    }
     const dims = [v.pieceLengthCm, v.pieceWidthCm, v.pieceHeightCm, v.pieceWeightKg];
     const byPieces = dims.every((d) => d != null);
     if (v.cargoKind === "GENERAL" && dims.some((d) => d != null) && !byPieces) {
@@ -63,7 +69,8 @@ export type ShipmentFormInput = z.infer<typeof shipmentSchema>;
 
 export const listingSchema = z
   .object({
-    mode: z.enum(["AIR", "ROAD", "RAIL"]),
+    mode: z.enum(["AIR", "ROAD", "RAIL", "SEA"]),
+    origin,
     destination,
     cargoKind: z.enum(["GENERAL", "VEHICLES"]),
     pricingUnit: z.enum(["PER_KG", "PER_M2", "PER_VEHICLE", "FLAT"]),
@@ -86,8 +93,10 @@ export const listingSchema = z
     if (v.transitDaysMax < v.transitDaysMin) {
       ctx.addIssue({ code: "custom", path: ["transitDaysMax"], message: "Slowest transit must be at least the fastest transit." });
     }
-    if (!MODES_BY_DESTINATION[v.destination]?.includes(v.mode)) {
-      ctx.addIssue({ code: "custom", path: ["destination"], message: "This mode is not available to that destination." });
+    if (v.origin === v.destination) {
+      ctx.addIssue({ code: "custom", path: ["destination"], message: "Choose a destination that is not the starting city." });
+    } else if (!modesBetween(v.origin, v.destination).includes(v.mode)) {
+      ctx.addIssue({ code: "custom", path: ["mode"], message: "This mode does not run between these cities." });
     }
     if (!PRICING_UNITS_BY_MODE[v.mode].includes(v.pricingUnit)) {
       ctx.addIssue({ code: "custom", path: ["pricingUnit"], message: "This mode cannot be priced that way." });

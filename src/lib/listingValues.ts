@@ -2,6 +2,7 @@ import { LISTING_DEFAULTS, type CargoKind, type Mode, type PricingUnit } from ".
 
 export type ListingValues = {
   mode: Mode;
+  origin: string;
   destination: string;
   departureDate: string;
   cargoKind: CargoKind;
@@ -24,6 +25,7 @@ export type ListingValues = {
 /** Pre-filled values for a mode, cargo kind and pricing unit. A carrier only changes what differs. */
 export function valuesForMode(
   mode: Mode,
+  origin: string,
   destination: string,
   departureDate: string,
   cargoKind: CargoKind = "GENERAL",
@@ -33,6 +35,7 @@ export function valuesForMode(
   const unit: PricingUnit = cargoKind === "VEHICLES" ? "PER_VEHICLE" : (pricingUnit ?? "PER_KG");
   return {
     mode,
+    origin,
     destination,
     departureDate,
     cargoKind,

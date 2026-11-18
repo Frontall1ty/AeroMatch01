@@ -31,7 +31,7 @@ export default async function MyBookings() {
             <li key={b.id}>
               <Link href={`/shipper/bookings/${b.id}`} className="flex flex-wrap items-center justify-between gap-3 p-4 hover:bg-paper">
                 <div>
-                  <p className="font-semibold">TAS to {b.listing.destination} · {b.listing.carrier.name}</p>
+                  <p className="font-semibold">{b.listing.origin} to {b.listing.destination} · {b.listing.carrier.name}</p>
                   <p className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted">
                     <ModeTag mode={b.listing.mode} />
                     <span>Departs {formatDay(b.listing.departureDate)}</span>

@@ -21,6 +21,16 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 15. **Space calculator for carriers.** Enter the empty space (presets for a 13.6 m trailer, containers, a rail platform) and the size of one piece to see how many fit, with a top view of the floor. "Use this space" fills floor and volume in the listing. The packing is a simple grid in either orientation, stacked up to 2 high when allowed. It is an estimate, not a loading plan.
 16. **Added: "Load demo shipment"** on the shipment form. **"Reset demo data"** in the footer (can be turned off).
 
+## Cities, modes and the comparison
+
+- **The city decides the modes.** Sea returns, but only between two coastal cities. Rail and road are listed lane by lane. Everything about a lane (modes, distance) lives in `src/lib/constants.ts`, so a new city is one entry there.
+- **The shipper chooses the mode first.** Mode tiles show the best price, the time range, the safety and how many options fit. Choosing one filters the chart and the list. The recommendation and the Cheapest, Fastest and Safest labels are computed on what is shown.
+- **A fourth priority, Safest.** Weights (price, time, safety): Cheapest 0.7, 0.2, 0.1. Fastest 0.15, 0.7, 0.15. Safest 0.15, 0.15, 0.7. Balanced 0.45, 0.4, 0.15. On the demo shipment each gives a different offer. When every offer is equally safe, safety has no effect.
+- **Handling safety is invented.** Air 5, rail 4, sea 3, road 3, and 2 for a shared groupage trailer. It is labelled as a demo estimate wherever it is shown. It is not a claim about any real carrier.
+- **Vehicle drawings are illustrations.** They are drawn in code (aircraft, container ship, roll-on roll-off vessel, rail wagon, truck, car carriers). Photos of a real fleet would imply a real carrier.
+- **Free space shows three parts:** already booked by others, your cargo, and what stays free. The original capacity is stored on each listing for this.
+- **Generated lanes.** Every city pair except the three hand-written Tashkent lanes gets invented listings from the distance. A test checks that none departs before the ready date and that each listing's mode runs on its lane.
+
 ## Accounts
 
 - **Real accounts with email and password.** Hashed with scrypt (built into Node), random salt, constant-time comparison. Login answers with one message whether the email or the password was wrong, and spends the same time either way.

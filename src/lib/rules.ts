@@ -9,6 +9,8 @@ import {
 } from "./constants";
 import { addDays, daysBetween } from "./dates";
 
+export * from "./decision";
+
 const n0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const n1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -244,67 +246,6 @@ export function visibleListingsWhere(request: { origin: string; destination: str
     departureDate: { gte: request.readyDate },
     carrier: { verified: true },
   };
-}
-
-/* ---------- 6.3 Decision layer ---------- */
-
-export type Priority = "CHEAPEST" | "FASTEST" | "BALANCED";
-
-export const PRIORITY_WEIGHTS: Record<Priority, { price: number; time: number }> = {
-  CHEAPEST: { price: 0.8, time: 0.2 },
-  FASTEST: { price: 0.2, time: 0.8 },
-  BALANCED: { price: 0.5, time: 0.5 },
-};
-
-export type ScorableOffer = { id: string; totalPrice: number; transitDaysMin: number; transitDaysMax: number };
-
-export const transitMid = (o: Pick<ScorableOffer, "transitDaysMin" | "transitDaysMax">) =>
-  (o.transitDaysMin + o.transitDaysMax) / 2;
-
-function normalise(value: number, min: number, max: number): number {
-  return max === min ? 0 : (value - min) / (max - min);
-}
-
-/** Lowest score wins. Ties go to the lower price, then the shorter transit, then id. */
-export function recommend<T extends ScorableOffer>(
-  offers: T[],
-  priority: Priority,
-): { recommended: T | null; scores: Map<string, number> } {
-  const scores = new Map<string, number>();
-  if (offers.length === 0) return { recommended: null, scores };
-
-  const prices = offers.map((o) => o.totalPrice);
-  const times = offers.map(transitMid);
-  const [pMin, pMax] = [Math.min(...prices), Math.max(...prices)];
-  const [tMin, tMax] = [Math.min(...times), Math.max(...times)];
-  const w = PRIORITY_WEIGHTS[priority];
-
-  for (const o of offers) {
-    scores.set(o.id, w.price * normalise(o.totalPrice, pMin, pMax) + w.time * normalise(transitMid(o), tMin, tMax));
-  }
-
-  const sorted = [...offers].sort(
-    (a, b) =>
-      scores.get(a.id)! - scores.get(b.id)! ||
-      a.totalPrice - b.totalPrice ||
-      transitMid(a) - transitMid(b) ||
-      a.id.localeCompare(b.id),
-  );
-  return { recommended: sorted[0], scores };
-}
-
-export function recommendationReason(recommended: ScorableOffer, offers: ScorableOffer[]): string {
-  const cheapest = [...offers].sort((a, b) => a.totalPrice - b.totalPrice || transitMid(a) - transitMid(b))[0];
-  if (!cheapest || cheapest.id === recommended.id || recommended.totalPrice <= cheapest.totalPrice) {
-    return "Lowest price among options that meet your deadline.";
-  }
-  const extra = recommended.totalPrice - cheapest.totalPrice;
-  const daysSaved = transitMid(cheapest) - transitMid(recommended);
-  const extraText = `Costs $${n0.format(Math.round(extra))} more than the cheapest option`;
-  if (daysSaved < 0.5) return `${extraText} with a similar transit time.`;
-  const perDay = Math.round(extra / daysSaved);
-  const days = Math.max(1, Math.round(daysSaved));
-  return `${extraText} and arrives about ${plural(days, "day")} earlier ($${n0.format(perDay)} per day saved).`;
 }
 
 /* ---------- 6.4 Milestones ---------- */

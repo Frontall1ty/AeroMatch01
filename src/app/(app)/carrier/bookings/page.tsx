@@ -39,7 +39,7 @@ export default async function ActiveBookings() {
                   </div>
                   <p className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted">
                     <ModeTag mode={b.listing.mode} />
-                    <span>TAS to {b.listing.destination}, departs {formatDay(b.listing.departureDate)}</span>
+                    <span>{b.listing.origin} to {b.listing.destination}, departs {formatDay(b.listing.departureDate)}</span>
                   </p>
                   <p className="mt-2 text-sm">
                     {b.shipment.commodity}, {b.shipment.cargoKind === "VEHICLES" ? `${b.shipment.vehicleCount} vehicles` : `${kg(b.shipment.weightKg)}`} · <span className="font-semibold">{money(b.totalPrice)}</span> <DemoBadge />

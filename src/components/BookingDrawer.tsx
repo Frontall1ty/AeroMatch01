@@ -6,10 +6,14 @@ import { DOCUMENT_CHECKLIST, DOCUMENT_CHECKLIST_NOTE, MODE_LABEL, VEHICLE_DOCUME
 import { formatDay } from "@/lib/dates";
 import { kg, m3, money } from "@/lib/format";
 import type { OfferView } from "@/lib/offers";
+import { SafetyDots } from "./CompareView";
+import { SpaceBar } from "./SpaceBar";
 import { DemoBadge, ModeTag, VerifiedBadge } from "./ui";
+import { VehicleArt, artName } from "./VehicleArt";
 
 export type ShipmentSummary = {
   id: string;
+  origin: string;
   destination: string;
   cargoKind: CargoKind;
   vehicleCount: number | null;
@@ -100,9 +104,23 @@ export function BookingDrawer({
         </div>
 
         <div className="flex-1 space-y-5 p-4 text-sm">
+          <div className="rounded border border-rule bg-paper p-3">
+            <VehicleArt mode={offer.mode} equipment={offer.equipment} vehicles={offer.cargoKind === "VEHICLES"} className="h-20 w-full max-w-[220px]" />
+            <p className="mt-1 text-xs text-muted">{artName(offer.mode, offer.equipment, offer.cargoKind === "VEHICLES")}. An illustration, not a photo of this carrier's fleet.</p>
+            <div className="mt-3">
+              <SpaceBar
+                mode={offer.mode}
+                total={offer.cargoKind === "VEHICLES" ? offer.capacityVehicles : offer.capacityWeightKg}
+                free={offer.cargoKind === "VEHICLES" ? (offer.availableVehicles ?? 0) : offer.availableWeightKg}
+                yours={offer.cargoKind === "VEHICLES" ? (shipment.vehicleCount ?? 0) : shipment.weightKg}
+                unit={offer.cargoKind === "VEHICLES" ? "slots" : "kg"}
+              />
+              <p className="mt-1 text-xs text-muted">Grey: already booked by others. Colored: your cargo.</p>
+            </div>
+          </div>
           <dl className="grid grid-cols-[120px_1fr] gap-x-3 gap-y-2">
             <dt className="text-muted">Route</dt>
-            <dd className="font-semibold">TAS to {shipment.destination} · <ModeTag mode={offer.mode} /></dd>
+            <dd className="font-semibold">{shipment.origin} to {shipment.destination} · <ModeTag mode={offer.mode} /></dd>
             <dt className="text-muted">Equipment</dt>
             <dd>{offer.equipment}</dd>
             <dt className="text-muted">Departs</dt>
@@ -111,6 +129,8 @@ export function BookingDrawer({
             <dd>{formatDay(new Date(offer.arrivalMinDate))} to {formatDay(new Date(offer.arrivalMaxDate))}</dd>
             <dt className="text-muted">Cutoff</dt>
             <dd>{offer.cutoffHours} h before departure</dd>
+            <dt className="text-muted">Safety</dt>
+            <dd><SafetyDots score={offer.safetyScore} /> <span className="text-xs text-muted">demo estimate</span></dd>
             <dt className="text-muted">Cargo</dt>
             <dd>
               {shipment.cargoKind === "VEHICLES"

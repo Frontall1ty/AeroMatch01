@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { destinationsFrom } from "@/lib/constants";
 import { addDays, formatDay, toInputDate, todayUtc } from "@/lib/dates";
 import { kg, m3, moneyPrecise } from "@/lib/format";
 import { requireRole } from "@/lib/session";
@@ -24,6 +25,7 @@ export default async function AddCapacity({ searchParams }: { searchParams: Prom
   const last: ListingValues | null = lastRow
     ? {
         mode: lastRow.mode,
+        origin: lastRow.origin,
         destination: lastRow.destination,
         departureDate: toInputDate(lastRow.departureDate),
         cargoKind: lastRow.cargoKind,
@@ -45,7 +47,9 @@ export default async function AddCapacity({ searchParams }: { searchParams: Prom
     : null;
 
   // Sensible start: a freighter-style air listing a week out. A trucking company can switch mode with one click.
-  const initial = valuesForMode("AIR", "IST", toInputDate(addDays(todayUtc(), 3)));
+  const home = company.city ?? "TAS";
+  const first = destinationsFrom(home)[0].code;
+  const initial = valuesForMode("AIR", home, first, toInputDate(addDays(todayUtc(), 3)));
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -89,7 +93,7 @@ export default async function AddCapacity({ searchParams }: { searchParams: Prom
                 {listings.map((l) => (
                   <tr key={l.id} className="border-b border-rule last:border-0">
                     <td className="p-3"><ModeTag mode={l.mode} /></td>
-                    <td className="p-3">TAS to {l.destination}</td>
+                    <td className="p-3">{l.origin} to {l.destination}</td>
                     <td className="p-3">{formatDay(l.departureDate)}</td>
                     <td className="p-3">{l.cargoKind === "VEHICLES" ? `${l.availableVehicles ?? 0} vehicle slots` : `${kg(l.availableWeightKg)}, ${m3(l.availableVolumeM3)}${l.availableFloorM2 != null ? `, ${l.availableFloorM2} m² floor` : ""}`}</td>
                     <td className="p-3">{moneyPrecise(l.unitPrice)} <span className="text-xs text-muted">{PRICE_SHORT[l.pricingUnit]}</span></td>

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { cityByCode, destinationsFrom } from "@/lib/constants";
 import { addDays, toInputDate, todayUtc } from "@/lib/dates";
 import { getDemoReadyDate } from "@/lib/queries";
 import { requireRole } from "@/lib/session";
@@ -12,8 +13,10 @@ export default async function NewShipment({ searchParams }: { searchParams: Prom
   const { edit } = await searchParams;
 
   const ready = await getDemoReadyDate();
+  const home = session.city && cityByCode(session.city) ? session.city : "TAS";
   const blank: ShipmentDefaults = {
-    destination: "IST",
+    origin: home,
+    destination: (destinationsFrom(home).find((c) => c.code === "IST") ?? destinationsFrom(home)[0]).code,
     cargoKind: "GENERAL",
     sizeMode: "PIECES",
     pieces: "",
@@ -53,6 +56,7 @@ export default async function NewShipment({ searchParams }: { searchParams: Prom
       const vehicles = s.cargoKind === "VEHICLES";
       const hasPiece = s.pieceLengthCm != null && s.pieceWidthCm != null && s.pieceHeightCm != null && s.pieceWeightKg != null;
       defaults = {
+        origin: s.origin,
         destination: s.destination,
         cargoKind: s.cargoKind,
         sizeMode: hasPiece ? "PIECES" : "TOTALS",

@@ -86,7 +86,7 @@ export default async function BookingDetail({
         <section className="panel p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="condensed text-[28px] font-bold leading-none">TAS to {l.destination}</p>
+              <p className="condensed text-[28px] font-bold leading-none">{l.origin} to {l.destination}</p>
               <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
                 {l.carrier.name} {l.carrier.verified && <VerifiedBadge />} <ModeTag mode={l.mode} />
               </p>

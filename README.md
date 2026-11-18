@@ -1,6 +1,6 @@
 # AeroMatch demo
 
-A Tashkent-origin freight comparison and booking demo. One cargo entry, air, rail and road compared side by side with a decision layer. Each carrier prices in its own way (per kg, per m² of floor space, flat, or per vehicle). Capacity entry takes under a minute, and document checklists and milestones are specific to each mode.
+A freight comparison and booking demo. A shipment starts in the shipper's own city. One cargo entry, then every mode that runs from that city (air, rail, road and, from coastal cities, sea) side by side, with the vehicle, the company, the departure, the free space and the price. Each option is marked cheapest, fastest or safest. Each carrier prices in its own way (per kg, per m² of floor space, flat, or per vehicle). Capacity entry takes under a minute, and document checklists and milestones are specific to each mode.
 
 > **All data is fictional.** Prices, carriers and capacities are invented. No carrier is connected. There is no real authentication.
 
@@ -52,6 +52,26 @@ Every push to the repository deploys again by itself.
 - `/` the story site. `/register` and `/login` for real accounts. `/demo` has passwordless demo accounts with invented data.
 - `/shipper/...` and `/carrier/...` are the two roles. `/account` is the company profile and, for carriers, the verification status.
 - `/admin` is where you verify carriers by hand. It has its own passcode (`ADMIN_PASSCODE`) and does not depend on any account.
+
+## How the modes follow the city
+
+- Each user has a city. A shipment starts there, and the form only offers destinations that can be reached from it.
+- **Air** runs between any two cities. **Sea** only between two coastal cities, so an inland city like Tashkent never gets sea. **Rail** and **road** are listed lane by lane in `src/lib/constants.ts` (`modesBetween`).
+- The shipper first chooses how to send it (air, sea, rail, road), and the list below shows only that mode. Each option shows a drawing of the vehicle, the company, when it departs and arrives, how much space is free (and how much would stay free after your cargo), and the price with how it is worked out.
+- **Cheapest, Fastest and Safest** are marked on the options. "What matters most" (Cheapest, Fastest, Safest, Balanced) decides the recommended one.
+- **The handling safety score (1 to 5) is invented**, per mode and equipment, and says so on screen. Real scores would come from damage and claims data.
+- Seeded lanes: the Tashkent lanes to Istanbul, Dubai and Almaty are written by hand (they carry the demo story). All other city pairs are generated from the distance, so longer lanes cost more and take longer.
+
+## Payments and what comes after a booking
+
+Not built, on purpose. The app takes a request and the carrier approves it. No money moves and nothing is sent by email.
+The plan, in the order it can be added:
+
+1. **Invoice and bank transfer (no licence needed).** After approval the carrier issues an invoice with its bank details and marks it paid when the transfer arrives. AeroMatch bills its commission to the carrier separately. This is how most business freight is paid.
+2. **Escrow** (money held until delivery) with a licensed payment partner. Holding other people's money is regulated, so it needs a licensed partner and a lawyer, not code alone.
+3. **Documents** uploaded and checked per shipment, then **insurance** and a **customs broker** as add-ons.
+4. **Real tracking** from carrier systems or devices, in place of the hand-updated milestones.
+5. **Claims and disputes**, and carrier ratings from real deliveries.
 
 ## Accounts and verification
 

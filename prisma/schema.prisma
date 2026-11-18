@@ -106,6 +106,9 @@ model CapacityListing {
   acceptsDangerousGoods Boolean       @default(false)
   minChargeableKg       Float         @default(0)
   restrictions          String        @default("")
+  safetyScore           Int           @default(3)
+  capacityWeightKg      Float?
+  capacityVehicles      Int?
   status                ListingStatus @default(OPEN)
   isDemo                Boolean       @default(true)
   createdAt             DateTime      @default(now())

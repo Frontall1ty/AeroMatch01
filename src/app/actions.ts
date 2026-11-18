@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { MILESTONES } from "@/lib/constants";
+import { MILESTONES, SAFETY_BY_MODE } from "@/lib/constants";
 import { parseDate } from "@/lib/dates";
 import { totalsFromPieces } from "@/lib/fit";
 import {
@@ -17,7 +17,7 @@ import {
   vehicleEstimate,
 } from "@/lib/rules";
 import { seedDemoData } from "@/lib/seed";
-import { sessionFor } from "@/lib/session";
+import { getSession, isAdmin, sessionFor } from "@/lib/session";
 import { fieldErrorsFrom, listingSchema, shipmentSchema, type ActionFail, type ActionResult } from "@/lib/validation";
 
 const WRONG_ROLE: ActionFail = {
@@ -63,7 +63,7 @@ export async function createShipment(input: unknown): Promise<ActionResult> {
   const created = await prisma.shipmentRequest.create({
     data: {
       shipperCompanyId: session.companyId,
-      origin: "TAS",
+      origin: v.origin,
       destination: v.destination,
       cargoKind: v.cargoKind,
       weightKg: estimate ? estimate.weightKg : totals ? totals.weightKg : (v.weightKg ?? 0),
@@ -156,7 +156,7 @@ export async function createListing(input: unknown): Promise<ActionResult> {
     data: {
       carrierCompanyId: session.companyId, // never taken from the client
       mode: v.mode,
-      origin: "TAS",
+      origin: v.origin,
       destination: v.destination,
       departureDate: parseDate(v.departureDate),
       cargoKind: v.cargoKind,
@@ -175,6 +175,9 @@ export async function createListing(input: unknown): Promise<ActionResult> {
       acceptsDangerousGoods: v.cargoKind === "VEHICLES" ? false : v.acceptsDangerousGoods,
       minChargeableKg: v.pricingUnit === "PER_KG" ? v.minChargeableKg : 0,
       restrictions: v.restrictions,
+      safetyScore: SAFETY_BY_MODE[v.mode],
+      capacityWeightKg: v.cargoKind === "VEHICLES" ? null : v.availableWeightKg,
+      capacityVehicles: v.cargoKind === "VEHICLES" ? v.availableVehicles : null,
       status: "OPEN",
       isDemo: true,
     },
@@ -332,6 +335,8 @@ export async function advanceMilestone(input: unknown): Promise<ActionResult> {
 
 export async function resetDemoData() {
   if (process.env.ALLOW_DEMO_RESET === "false") return;
+  // Only someone who is logged in (or the admin) can reset. It only touches demo records.
+  if (!(await getSession()) && !(await isAdmin())) return;
   await seedDemoData(prisma);
   revalidatePath("/", "layout");
   redirect("/");

@@ -13,7 +13,8 @@
     "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
     "demo:check": "node scripts/demo-check.mjs",
     "check:capacity": "node scripts/capacity-check.mjs",
-    "check:auth": "node scripts/auth-check.mjs"
+    "check:auth": "node scripts/auth-check.mjs",
+    "check:lanes": "node scripts/lanes-check.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

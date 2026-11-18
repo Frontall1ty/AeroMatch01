@@ -44,6 +44,7 @@ await c.waitForURL("**/account?welcome=1");
 ok(await c.getByText("Not verified yet").first().isVisible(), "a new carrier starts as not verified");
 ok(await c.getByText(/Still missing: .*phone number/i).isVisible(), "the account page lists what is missing");
 await c.goto(`${BASE}/carrier/capacity/new`);
+await c.selectOption("#destination", "IST");
 await c.getByRole("button", { name: "In 3 days" }).click();
 await c.getByRole("button", { name: "Add capacity" }).click();
 await c.getByText("Capacity added.").first().waitFor();

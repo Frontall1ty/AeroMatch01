@@ -32,6 +32,7 @@ export default async function Compare({ params }: { params: Promise<{ id: string
 
   const summary = {
     id: shipment.id,
+    origin: shipment.origin,
     destination: shipment.destination,
     cargoKind: shipment.cargoKind,
     vehicleCount: shipment.vehicleCount,

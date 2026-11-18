@@ -3,10 +3,12 @@
 import { useState, useTransition } from "react";
 import { createListing } from "@/app/actions";
 import {
-  DESTINATIONS,
+  CITIES,
   LISTING_DEFAULTS,
-  MODES_BY_DESTINATION,
   MODE_LABEL,
+  cityName,
+  destinationsFrom,
+  modesBetween,
   MODE_ORDER,
   PRICING_UNIT_LABEL,
   PRICING_UNITS_BY_MODE,
@@ -56,23 +58,35 @@ export function CapacityForm({
 
   const set = <K extends keyof ListingValues>(k: K, val: ListingValues[K]) => setV((p) => ({ ...p, [k]: val }));
   const err = (k: string) => errors[k];
-  const allowedModes = (dest: string) => MODES_BY_DESTINATION[dest] ?? [];
+  const lanesModes = modesBetween(v.origin, v.destination);
   const vehicles = v.cargoKind === "VEHICLES";
 
+  /** The first destination from an origin where the mode runs. */
+  function firstDestination(origin: string, mode: Mode, preferred: string) {
+    if (modesBetween(origin, preferred).includes(mode)) return preferred;
+    return destinationsFrom(origin).find((c) => modesBetween(origin, c.code).includes(mode))?.code ?? preferred;
+  }
+
   function chooseMode(mode: Mode) {
-    const dest = allowedModes(v.destination).includes(mode) ? v.destination : "IST";
+    const dest = firstDestination(v.origin, mode, v.destination);
     const kind: CargoKind = mode === "AIR" ? "GENERAL" : v.cargoKind;
     const unit = PRICING_UNITS_BY_MODE[mode].includes(v.pricingUnit) ? v.pricingUnit : "PER_KG";
-    setV(valuesForMode(mode, dest, v.departureDate, kind, kind === "VEHICLES" ? undefined : unit));
+    setV(valuesForMode(mode, v.origin, dest, v.departureDate, kind, kind === "VEHICLES" ? undefined : unit));
+  }
+
+  function chooseOrigin(origin: string) {
+    const dest = destinationsFrom(origin).find((c) => modesBetween(origin, c.code).includes(v.mode))?.code ?? destinationsFrom(origin)[0].code;
+    const mode = modesBetween(origin, dest).includes(v.mode) ? v.mode : "AIR";
+    setV((p) => (mode === p.mode ? { ...p, origin, destination: dest } : valuesForMode(mode, origin, dest, p.departureDate)));
   }
 
   function chooseDestination(dest: string) {
-    const mode = allowedModes(dest).includes(v.mode) ? v.mode : "AIR";
-    setV((p) => (mode === p.mode ? { ...p, destination: dest } : valuesForMode(mode, dest, p.departureDate)));
+    const mode = modesBetween(v.origin, dest).includes(v.mode) ? v.mode : "AIR";
+    setV((p) => (mode === p.mode ? { ...p, destination: dest } : valuesForMode(mode, p.origin, dest, p.departureDate)));
   }
 
   function chooseKind(kind: CargoKind) {
-    setV(valuesForMode(v.mode, v.destination, v.departureDate, kind, "PER_KG"));
+    setV(valuesForMode(v.mode, v.origin, v.destination, v.departureDate, kind, "PER_KG"));
   }
 
   function choosePricing(unit: PricingUnit) {
@@ -103,6 +117,7 @@ export function CapacityForm({
     start(async () => {
       const result = await createListing({
         mode: v.mode,
+        origin: v.origin,
         destination: v.destination,
         cargoKind: v.cargoKind,
         pricingUnit: v.pricingUnit,
@@ -145,7 +160,7 @@ export function CapacityForm({
   return (
     <form onSubmit={submit} noValidate className="panel p-5">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">Origin is fixed to Tashkent (TAS). Fields are pre-filled. Change what differs.</p>
+        <p className="text-sm text-muted">Fields are pre-filled. Change what differs.</p>
         <button type="button" className="btn-secondary" onClick={duplicateLast} disabled={!last}>
           Duplicate last listing
         </button>
@@ -154,7 +169,7 @@ export function CapacityForm({
 
       <fieldset className="mb-5">
         <legend className="field-label">Mode</legend>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {MODE_ORDER.map((m) => (
             <label
               key={m}
@@ -168,10 +183,15 @@ export function CapacityForm({
       </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="destination" label="Destination" error={err("destination")}>
+        <Field id="origin" label="From" error={err("origin")}>
+          <select id="origin" value={v.origin} onChange={(e) => chooseOrigin(e.target.value)} aria-invalid={!!err("origin")}>
+            {CITIES.map((c) => <option key={c.code} value={c.code}>{c.code} · {c.name}</option>)}
+          </select>
+        </Field>
+        <Field id="destination" label="To" error={err("destination")} hint={lanesModes.length ? `Between these cities: ${lanesModes.map((m) => MODE_LABEL[m].toLowerCase()).join(", ")}.` : undefined}>
           <select id="destination" value={v.destination} onChange={(e) => chooseDestination(e.target.value)} aria-invalid={!!err("destination")}>
-            {DESTINATIONS.filter((d) => allowedModes(d.code).includes(v.mode)).map((d) => (
-              <option key={d.code} value={d.code}>{d.code} · {d.city}</option>
+            {destinationsFrom(v.origin).map((d) => (
+              <option key={d.code} value={d.code}>{d.code} · {d.name}{modesBetween(v.origin, d.code).includes(v.mode) ? "" : " (other mode)"}</option>
             ))}
           </select>
         </Field>
@@ -280,7 +300,7 @@ export function CapacityForm({
 
       {dateOk && Number.isFinite(price) && (
         <p className="mt-5 rounded border border-rule bg-paper px-3 py-2 text-sm">
-          <span className="font-semibold">Shippers will see:</span> {MODE_LABEL[v.mode]}, TAS to {v.destination}, departs {formatDay(parseDate(v.departureDate))}, arrives {arrives}, {priceText}, {capacityText} left.
+          <span className="font-semibold">Shippers will see:</span> {MODE_LABEL[v.mode]}, {v.origin} to {v.destination}, departs {formatDay(parseDate(v.departureDate))}, arrives {arrives}, {priceText}, {capacityText} left.
         </p>
       )}
 

@@ -51,7 +51,7 @@ export default async function Requests() {
                   <p className="text-base font-semibold">{r.shipment.shipper.name}</p>
                   <p className="mt-1 flex flex-wrap items-center gap-3 text-muted">
                     <ModeTag mode={r.listing.mode} />
-                    <span>TAS to {r.listing.destination}, departs {formatDay(r.listing.departureDate)}</span>
+                    <span>{r.listing.origin} to {r.listing.destination}, departs {formatDay(r.listing.departureDate)}</span>
                   </p>
                   <dl className="mt-3 grid grid-cols-[120px_1fr] gap-x-3 gap-y-1">
                     <dt className="text-muted">Cargo</dt>

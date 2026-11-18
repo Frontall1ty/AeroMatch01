@@ -2,13 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { createShipment } from "@/app/actions";
-import { CARGO_TYPES, DESTINATIONS, STACK_HEIGHT_M, VEHICLE_ESTIMATE, type CargoKind } from "@/lib/constants";
+import { CARGO_TYPES, CITIES, MODE_LABEL, STACK_HEIGHT_M, VEHICLE_ESTIMATE, destinationsFrom, modesBetween, type CargoKind } from "@/lib/constants";
 import { addDays, parseDate, toInputDate } from "@/lib/dates";
 import { PIECE_PRESETS, STACK_LAYERS, totalsFromPieces } from "@/lib/fit";
 import { int } from "@/lib/format";
 import { Field, toNumber } from "./Field";
 
 export type ShipmentDefaults = {
+  origin: string;
   destination: string;
   cargoKind: CargoKind;
   sizeMode: "PIECES" | "TOTALS";
@@ -73,6 +74,7 @@ export function ShipmentForm({
     setFormError("");
     start(async () => {
       const result = await createShipment({
+        origin: v.origin,
         destination: v.destination,
         cargoKind: v.cargoKind,
         weightKg: byPieces || vehicles ? null : numOrNull(v.weightKg),
@@ -109,25 +111,45 @@ export function ShipmentForm({
   return (
     <form onSubmit={submit} noValidate className="panel p-5">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">Origin is Tashkent (TAS). Four answers are enough to compare.</p>
-        <button type="button" className="btn-secondary" onClick={() => { setV(demo); setErrors({}); }}>
+        <p className="text-sm text-muted">Four answers are enough to compare.</p>
+        <button type="button" className="btn-secondary" onClick={() => { setV({ ...demo, origin: v.origin, destination: v.destination }); setErrors({}); }}>
           Load demo shipment
         </button>
+      </div>
+
+      <div className="mb-6 max-w-sm">
+        <Field id="origin" label="Where does the cargo start?" error={err("origin")}>
+          <select
+            id="origin"
+            value={v.origin}
+            onChange={(e) => {
+              const origin = e.target.value;
+              const options = destinationsFrom(origin);
+              setV((p) => ({ ...p, origin, destination: options.some((c) => c.code === p.destination) ? p.destination : options[0].code }));
+            }}
+            aria-invalid={!!err("origin")}
+          >
+            {CITIES.map((c) => <option key={c.code} value={c.code}>{c.name}, {c.country}</option>)}
+          </select>
+        </Field>
       </div>
 
       <fieldset className="mb-6">
         <legend className="field-label">Where to?</legend>
         <div className="grid gap-3 sm:grid-cols-3">
-          {DESTINATIONS.map((d) => (
+          {destinationsFrom(v.origin).map((d) => (
             <label
               key={d.code}
-              className={`flex min-h-[64px] cursor-pointer items-center gap-3 rounded border px-4 py-3 ${
+              className={`flex min-h-[64px] cursor-pointer flex-col justify-center rounded border px-4 py-3 ${
                 v.destination === d.code ? "border-ink ring-1 ring-ink" : "border-rule hover:border-ink"
               } focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-air`}
             >
               <input type="radio" name="destination" value={d.code} checked={v.destination === d.code} onChange={() => set("destination", d.code)} className="sr-only" />
-              <span className="condensed text-[28px] font-bold leading-none">{d.code}</span>
-              <span className="text-sm text-muted">{d.city}</span>
+              <span className="flex items-baseline gap-3">
+                <span className="condensed text-[28px] font-bold leading-none">{d.code}</span>
+                <span className="text-sm text-muted">{d.name}</span>
+              </span>
+              <span className="mt-1 text-xs text-muted">{modesBetween(v.origin, d.code).map((m) => MODE_LABEL[m]).join(", ")}</span>
             </label>
           ))}
         </div>

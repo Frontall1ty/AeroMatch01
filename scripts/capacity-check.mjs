@@ -21,7 +21,7 @@ for (let i = 0; i < 4; i++) {
   await p.getByRole("button", { name: "Load demo shipment" }).click();
   await p.getByRole("button", { name: "Compare options" }).click();
   await p.waitForURL("**/shipper/compare/**");
-  const row = p.locator("tbody tr", { hasText: "$14,028" }).first();
+  const row = p.locator('li[id^="row-"]', { hasText: "$14,028" }).first();
   await row.getByRole("button", { name: "Request booking" }).click();
   await p.getByRole("dialog").getByRole("button", { name: "Request booking" }).click();
   await p.waitForURL("**/shipper/bookings/**");

@@ -223,7 +223,7 @@ describe("6.3 decision layer", () => {
     { id: "road-groupage", totalPrice: 4000, transitDaysMin: 6, transitDaysMax: 8 },
     { id: "rail", totalPrice: 2200, transitDaysMin: 9, transitDaysMax: 12 },
   ];
-  it("recommends a different mode for each priority", () => {
+  it("recommends a different mode for the three original priorities", () => {
     expect(recommend(offers, "FASTEST").recommended?.id).toBe("air-fast");
     expect(recommend(offers, "BALANCED").recommended?.id).toBe("road-full");
     expect(recommend(offers, "CHEAPEST").recommended?.id).toBe("rail");

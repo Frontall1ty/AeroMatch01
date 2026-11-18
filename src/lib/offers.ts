@@ -6,6 +6,7 @@ import type { CargoKind, Mode, PricingUnit } from "./constants";
 type ListingRow = {
   id: string;
   mode: Mode;
+  origin: string;
   destination: string;
   cargoKind: CargoKind;
   pricingUnit: PricingUnit;
@@ -15,6 +16,9 @@ type ListingRow = {
   availableVolumeM3: number;
   availableFloorM2: number | null;
   availableVehicles: number | null;
+  safetyScore: number;
+  capacityWeightKg: number | null;
+  capacityVehicles: number | null;
   transitDaysMin: number;
   transitDaysMax: number;
   equipment: string;
@@ -32,6 +36,8 @@ export type OfferView = {
   carrierName: string;
   carrierVerified: boolean;
   mode: Mode;
+  origin: string;
+  destination: string;
   cargoKind: CargoKind;
   pricingUnit: PricingUnit;
   unitPrice: number;
@@ -54,6 +60,10 @@ export type OfferView = {
   availableVolumeM3: number;
   availableFloorM2: number | null;
   availableVehicles: number | null;
+  /** Handling safety, 1 to 5, a demo estimate. */
+  safetyScore: number;
+  capacityWeightKg: number | null;
+  capacityVehicles: number | null;
   equipment: string;
   cutoffHours: number;
   maxPieceKg: number;
@@ -89,6 +99,8 @@ export function buildOffers(shipment: ShipmentInput, listings: ListingRow[]): Of
       carrierName: l.carrier.name,
       carrierVerified: l.carrier.verified,
       mode: l.mode,
+      origin: l.origin,
+      destination: l.destination,
       cargoKind: l.cargoKind,
       pricingUnit: l.pricingUnit,
       unitPrice: l.unitPrice,
@@ -108,6 +120,9 @@ export function buildOffers(shipment: ShipmentInput, listings: ListingRow[]): Of
       availableVolumeM3: l.availableVolumeM3,
       availableFloorM2: l.availableFloorM2,
       availableVehicles: l.availableVehicles,
+      safetyScore: l.safetyScore,
+      capacityWeightKg: l.capacityWeightKg,
+      capacityVehicles: l.capacityVehicles,
       equipment: l.equipment,
       cutoffHours: l.cutoffHours,
       maxPieceKg: l.maxPieceKg,

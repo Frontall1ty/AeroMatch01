@@ -26,6 +26,8 @@ export function Race() {
 
   const lanes = useMemo(() => raceLanes(km, ocean), [km, ocean]);
   const open = lanes.filter((l) => l.available);
+  /** Finishing order: the shortest time arrives first. */
+  const rank = new Map([...open].sort((a, b) => a.days - b.days).map((l, i) => [l.mode, i + 1]));
   const scorable = open.map((l) => ({ id: l.mode, totalPrice: l.price, transitDaysMin: l.days, transitDaysMax: l.days, safetyScore: l.safety }));
   const { recommended } = recommend(scorable, priority);
   const minD = Math.min(...open.map((l) => l.days));
@@ -85,9 +87,21 @@ export function Race() {
               className={`relative grid items-center gap-3 rounded border p-3 md:grid-cols-[88px_minmax(0,1fr)_minmax(0,300px)] ${isBest ? "border-ink bg-white shadow-[0_0_0_2px_#111827]" : "border-rule bg-white"} ${l.available ? "" : "opacity-60"}`}
             >
               {isBest && <span className="absolute -top-2.5 left-3 rounded bg-ink px-2 py-0.5 text-xs font-bold text-white">Best pick</span>}
-              <p className="text-xl font-bold" style={{ color: l.available ? undefined : "#4B5563" }}>{MODE_LABEL[l.mode]}</p>
+              <div>
+                <p className="text-xl font-bold" style={{ color: l.available ? undefined : "#4B5563" }}>{MODE_LABEL[l.mode]}</p>
+                {l.available && (
+                  <p className="condensed text-sm font-bold text-muted">
+                    <span className="sr-only">Arrives in place </span>#{rank.get(l.mode)}
+                    <span className="font-normal"> to arrive</span>
+                  </p>
+                )}
+              </div>
               <div className="race-track relative h-[64px]" aria-hidden>
-                <div className="absolute inset-x-0 bottom-3 border-b-[3px] border-dashed" style={{ borderColor: l.available ? COLOR[l.mode] : "#D3D9E2", opacity: 0.35 }} />
+                {l.available && l.mode === "SEA" ? (
+                  <div className="race-water absolute inset-x-0 bottom-1 h-[18px] rounded-sm" />
+                ) : (
+                  <div className="absolute inset-x-0 bottom-3 border-b-[3px] border-dashed" style={{ borderColor: l.available ? COLOR[l.mode] : "#D3D9E2", opacity: 0.35 }} />
+                )}
                 <div className="race-finish absolute bottom-1.5 right-0 top-1" />
                 {l.available ? (
                   <div

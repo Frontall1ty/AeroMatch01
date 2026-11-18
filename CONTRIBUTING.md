@@ -66,7 +66,7 @@ The site and the app share one look. If you change it, change it in `tailwind.co
 
 - **Colors:** Paper `#F4F6F9`, Panel `#FFFFFF`, Ink `#111827`, Rule `#D3D9E2`. Mode colors only mean a mode: Air `#1D4ED8`, Rail `#0F766E`, Road `#B45309`, Sea `#6D28D9`. Good `#15803D`, Bad `#B91C1C`. Do not use a mode color as decoration.
 - **Type:** Archivo (variable). Condensed width (`.condensed`, `.display`) for airport codes, big numbers and headlines, normal width for text. Numbers use tabular figures.
-- **Photos:** the story uses four Pexels photographs (`PHOTOS.md`). A new photo must not show any real company name, logo, livery or readable registration.
+- **Pictures:** the site is drawn in code, and the load view lays positions over vehicle pictures (`PHOTOS.md`). A new picture must not show any real company name, logo, livery or readable registration.
 - **Shape:** one 6 px radius. No gradients. No decorative shadows.
 - **Motion:** respect `prefers-reduced-motion`. Nothing loops forever.
 - **Words:** plain English, sentence case, the same name for the same action everywhere ("Request booking", "Approve", "Add capacity"). Never write "AI-powered". Never write a real airline, carrier or company name, and never imply a real integration.

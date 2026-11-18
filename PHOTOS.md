@@ -1,24 +1,12 @@
-# Photos
+# Pictures
 
-The scroll story on the home page (`src/components/site/Story.tsx`, `src/app/story.css`) uses four photographs from [Pexels](https://www.pexels.com). The Pexels licence allows free commercial use and does not require credit. We credit them anyway (the line at the bottom of the story).
+The home page uses **no photographs** any more. The scroll story, the race and the shipment board are drawn in code (`src/components/site/Vehicles.tsx`, `Story.tsx`, `Race.tsx`, `Board.tsx`, `src/app/story.css`). The first version of the story used four Pexels photographs; it was replaced because flat drawings in one style looked better with the rest of the site.
 
-| File in `public/photos/` | Scene | Pexels photo ID | Edits |
-|---|---|---|---|
-| `sky-*.webp` | Air: wing in the sky | 18813721 | Cropped to 16:9 |
-| `sea-*.webp` | Sea: container ship from above | 12530458 | Cropped to 16:9 |
-| `road-*.webp` | Road: truck from above | 9195241 | Rotated about 37° to level the road, cropped to 16:9, two small company marks on the trailer painted over |
-| `rail-*.webp` | Rail: rail yard at dusk | 13876842 | Cropped to 16:9 |
+## The rule for any picture
 
-Each photo exists in two sizes, `-1280.webp` and `-1920.webp`. The page picks one with `srcset`.
-The page address of a photo is `https://www.pexels.com/photo/<ID>/`.
+**No picture may show a real company's name, logo or livery, and no readable aircraft registration.** This is the same rule as for the rest of the site: no real airline, carrier or forwarder, and no implied integration. The vehicles in `Vehicles.tsx` are generic on purpose, and their containers carry colors only, no logos.
 
-## The rule for new photos
-
-**No photo may show a real company's name, logo or livery, and no readable aircraft registration.** This is the same rule as for the rest of the site: no real airline, carrier or forwarder, and no implied integration.
-
-Photos that were looked at and rejected for this reason: an airliner with a visible airline tail (Pexels 29057221), a locomotive in a real railroad's colours (5793667), a cargo airliner with an airline name (19912350), a tank car with a leasing company's mark (19323203), a truck with a company logo (14005602), and an airliner from below with a registration and tail stripe (32155436).
-
-To change a photo: save the original in a scratch folder (not in the repository), crop to 16:9, export both widths as WebP (quality about 76), look at the full-size result for text and logos, then replace the files here and update the table above.
+Pictures that were supplied or found and not used because of this rule: container-ship side views with real shipping lines' logos, a company name and a stock-site watermark, an airliner with an airline livery and registration, and a wagon drawing with a CAD site's watermark and real railway markings.
 
 ## Vehicle pictures in the load view (placeholders)
 
@@ -32,4 +20,4 @@ To change a photo: save the original in a scratch folder (not in the repository)
 | `container.webp` | Open red container, side cutaway | A 3D render without watermark, supplied by the project owner | Cropped, background made transparent |
 | `wagon.webp` | Box wagon, side view, line drawing | A line drawing supplied by the project owner | The upper wagon cropped, background made transparent |
 
-Open points before going public: the licence of each picture and whether the truck cab resembles a real manufacturer's model closely enough to matter. Not used: a wagon drawing with a CAD site's watermark and real railway markings. The ship is still a drawing in code (`src/components/LoadView.tsx`). To change a picture, replace the file and update its entry in `PHOTOS` at the top of that component (the box where positions go, in pixels of the picture).
+Open points before going public: the licence of each picture and whether the truck cab resembles a real manufacturer's model closely enough to matter. The ship in the load view is drawn in code (`ShipArt`) (`src/components/LoadView.tsx`). To change a picture, replace the file and update its entry in `PHOTOS` at the top of that component (the box where positions go, in pixels of the picture).

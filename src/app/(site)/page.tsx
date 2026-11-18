@@ -4,6 +4,8 @@ import { FitDemo } from "@/components/site/FitDemo";
 import { HeroLanes } from "@/components/site/HeroLanes";
 import { Integration } from "@/components/site/Integration";
 import { Story } from "@/components/site/Story";
+import { Board } from "@/components/site/Board";
+import { Race } from "@/components/site/Race";
 import { LoadViewDemo } from "@/components/site/LoadViewDemo";
 import { LocalDemo } from "@/components/site/LocalDemo";
 import { PricingDemo } from "@/components/site/PricingDemo";
@@ -15,17 +17,20 @@ function Section({
   lead,
   children,
   dark = false,
+  wide = false,
 }: {
   id: string;
   title: string;
   lead: React.ReactNode;
   children: React.ReactNode;
   dark?: boolean;
+  /** The content goes under the heading, full width. */
+  wide?: boolean;
 }) {
   return (
     <section id={id} className={`scroll-mt-14 ${dark ? "bg-ink text-white" : "border-t border-rule"}`}>
-      <div className="mx-auto grid max-w-[1180px] gap-8 px-4 py-14 md:py-20 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-14">
-        <div className="lg:sticky lg:top-24 lg:self-start">
+      <div className={`mx-auto grid max-w-[1180px] gap-8 px-4 py-14 md:py-20 lg:gap-14 ${wide ? "" : "lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]"}`}>
+        <div className={wide ? "" : "lg:sticky lg:top-24 lg:self-start"}>
           <h2 className="text-[32px] font-bold leading-[1.05] md:text-[44px]">{title}</h2>
           <div className={`mt-4 max-w-[46ch] text-lg ${dark ? "text-white/80" : "text-muted"}`}>{lead}</div>
         </div>
@@ -68,6 +73,24 @@ export default function Site() {
       </section>
 
       <Story />
+
+      <Section
+        id="board"
+        wide
+        title="Every shipment on one board."
+        lead="Once a booking is made, you follow it the way you follow a flight: where it left from, where it is going, the way it travels and its status. Filter by air, sea, rail or road."
+      >
+        <Board />
+      </Section>
+
+      <Section
+        id="race"
+        wide
+        title="Race the four ways."
+        lead="Move the distance, say if the cargo crosses an ocean, and choose what matters most. The faster, cheaper and safer way changes with the distance, and some ways drop out."
+      >
+        <Race />
+      </Section>
 
       <Section
         id="who"

@@ -1,4 +1,5 @@
 import type { Mode } from "@/lib/constants";
+import { ShipArt } from "@/components/site/Vehicles";
 import { LOAD_CELLS, LOAD_NAME, cellState, fakeRef, loadKind, loadLayout, type CellState, type LoadKind } from "@/lib/load";
 
 /**
@@ -151,12 +152,13 @@ function areaFor(kind: LoadKind): Area {
 
 /**
  * Vehicles that have a photograph. The area is where the cargo space is, in pixels of that photograph.
- * Photos: see PHOTOS.md. Ships are still drawings.
+ * Photos: see PHOTOS.md. The ship is drawn in code.
  */
-type Photo = { src: string; w: number; h: number; area: Area };
+type Photo = { src: string; w: number; h: number; area: Area; art?: "ship" };
 const PHOTOS: Partial<Record<LoadKind, Photo>> = {
   truck: { src: "/vehicles/truck.webp", w: 430, h: 118, area: { x: 82, y: 14, w: 326, h: 66 } },
   plane: { src: "/vehicles/plane.webp", w: 960, h: 262, area: { x: 118, y: 150, w: 624, h: 68 } },
+  ship: { src: "", art: "ship", w: 470, h: 132, area: { x: 96, y: 18, w: 336, h: 54 } },
   wagon: { src: "/vehicles/wagon.webp", w: 625, h: 235, area: { x: 26, y: 28, w: 550, h: 138 } },
   container: { src: "/vehicles/container.webp", w: 920, h: 410, area: { x: 122, y: 64, w: 684, h: 280 } },
 };
@@ -201,8 +203,12 @@ export function LoadView({
   if (photo) {
     return (
       <div className={`relative ${className}`} style={{ aspectRatio: `${photo.w} / ${photo.h}` }} role="img" aria-label={label}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo.src} alt="" width={photo.w} height={photo.h} className="absolute inset-0 h-full w-full" loading="lazy" decoding="async" />
+        {photo.art === "ship" ? (
+          <ShipArt containers={false} className="absolute inset-0 h-full w-full" />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photo.src} alt="" width={photo.w} height={photo.h} className="absolute inset-0 h-full w-full" loading="lazy" decoding="async" />
+        )}
         <svg viewBox={`0 0 ${photo.w} ${photo.h}`} className="absolute inset-0 h-full w-full" aria-hidden fill="none">
           <Cells area={photo.area} cols={cols} rows={rows} layout={layout} mode={mode} seed={seed} text={text} kg={unit === "kg" ? perCell : 0} k={photo.w / 400} photo />
         </svg>

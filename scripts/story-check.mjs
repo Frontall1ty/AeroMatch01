@@ -1,4 +1,4 @@
-// The scroll story: the three photo transitions happen at the right places, the photos load, and reduced motion shows still scenes.
+// The scroll story: the three transitions happen at the right places, and reduced motion shows still scenes.
 // Usage: BASE_URL=http://localhost:3000 node scripts/story-check.mjs
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
@@ -70,12 +70,8 @@ const rail = await at(1);
 ok(rail.rail && rail.rail.solid >= 100 && rail.railText > 0.99, "on the rail: fully revealed and the rail text shows");
 ok(errors.length === 0, `no errors in the page${errors.length ? ": " + errors.join("; ") : ""}`);
 
-const photos = await page.evaluate(() => [...document.querySelectorAll(".story-photo")].map((i) => ({ src: i.currentSrc, ok: i.complete && i.naturalWidth > 0 })));
-ok(photos.length === 4, "four photographs are on the page");
-await page.evaluate(() => document.querySelectorAll(".story-photo").forEach((i) => (i.loading = "eager")));
-await page.waitForTimeout(1500);
-const loaded = await page.evaluate(() => [...document.querySelectorAll(".story-photo")].map((i) => i.complete && i.naturalWidth > 0));
-ok(loaded.every(Boolean), "all four photographs load");
+const vehicles = await page.evaluate(() => document.querySelectorAll(".story-vehicle svg, svg.story-vehicle").length);
+ok(vehicles === 4, `four vehicles are drawn (plane, ship, truck, train): ${vehicles}`);
 
 console.log("\n[Reduced motion shows still scenes]");
 const calm = await (await b.newContext({ viewport: { width: 1360, height: 800 }, reducedMotion: "reduce" })).newPage();

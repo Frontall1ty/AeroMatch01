@@ -1,13 +1,13 @@
 /*
- * The scroll story: sky, sea, road, rail, shown as four photographs.
+ * The scroll story: sky, sea, road, rail, drawn in code as flat, light scenes.
  * One number drives everything: --p, how far through the story you have scrolled (0 to 1).
  * Every layer is calculated from it, so there is no animation library.
  *
  * The three transitions:
- *   1. Sky to sea:  the photographs cross-fade, so the wing dissolves into the water below it.
- *   2. Sea to road: a soft edge sweeps from left to right and the road photograph appears behind it.
- *   3. Road to rail: a soft edge rises from the bottom and the rail yard appears under it.
- * Photo credits are in PHOTOS.md.
+ *   1. Sky to sea:  the sea scene fades in over the sky while the plane flies out and the ship sails in.
+ *   2. Sea to road: a soft edge sweeps from left to right and the road scene appears behind it.
+ *   3. Road to rail: a soft edge rises from the bottom and the rail scene appears under it.
+ * The race and the shipment board on the site use the rules at the end of this file.
  */
 .story {
   --p: 0;
@@ -22,7 +22,7 @@
   height: calc(100vh - var(--story-top));
   height: calc(100svh - var(--story-top));
   overflow: hidden;
-  background: #0b2a44;
+  background: #eaf5ff;
   /* progress of each scene and each transition */
   --a: clamp(0, calc(var(--p) / 0.32), 1);
   --t1: clamp(0, calc((var(--p) - 0.2) / 0.12), 1);
@@ -38,34 +38,15 @@
   inset: 0;
   overflow: hidden;
 }
+.story-layer { position: absolute; left: 0; right: 0; will-change: transform; }
 
-/* ---------- Photographs ---------- */
-.story-photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  will-change: transform;
-}
-.story-sky .story-photo { transform: scale(calc(1.04 + var(--a) * 0.1)) translateX(calc(var(--a) * -2.5%)); }
-.story-sea .story-photo { transform: scale(calc(1.04 + var(--s) * 0.1)) translateX(calc(var(--s) * 2.5%)); }
-.story-road .story-photo { object-position: 30% 50%; transform: scale(calc(1.02 + var(--r) * 0.12)) translateX(calc(var(--r) * -3%)); }
-.story-rail .story-photo { transform: scale(calc(1.04 + var(--k) * 0.08)) translateY(calc(var(--k) * -2%)); }
-
-/* a gradient so that the white text stays readable on the sky */
-.story-shade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(90deg, rgba(4, 22, 40, 0.62) 0%, rgba(4, 22, 40, 0.18) 55%, rgba(4, 22, 40, 0) 100%);
-  opacity: calc(1 - clamp(0, calc((var(--p) - 0.12) / 0.1), 1));
-}
+/* ---------- Scenes ---------- */
+.story-sky { background: linear-gradient(180deg, #8ec5f4 0%, #c9e4fb 52%, #f0f8ff 100%); }
+.story-sea { background: linear-gradient(180deg, #e3f1fd 0 38%, #8fcbea 38% 100%); opacity: var(--t1); }
+.story-road { background: linear-gradient(180deg, #d8ebfb 0 34%, #a9cf8c 34% 100%); }
+.story-rail { background: linear-gradient(180deg, #dcecfb 0 34%, #b5d39a 34% 100%); }
 
 /* ---------- The transitions ---------- */
-.story-sea {
-  opacity: var(--t1);
-}
 .story-road {
   --edge: calc(var(--t2) * 135%);
   -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--edge) - 35%), transparent var(--edge));
@@ -77,6 +58,62 @@
   mask-image: linear-gradient(0deg, #000 calc(var(--edge) - 35%), transparent var(--edge));
 }
 
+/* ---------- Scenery ---------- */
+.story-sun { position: absolute; right: 12%; top: 9%; width: 90px; height: 90px; border-radius: 50%; background: #fff7d6; opacity: 0.9; box-shadow: 0 0 0 22px rgba(255, 247, 214, 0.35); }
+.story-cloud { position: absolute; fill: #fff; }
+.story-hills { top: 20%; height: 18%; }
+.story-hills svg { display: block; width: 110%; height: 100%; }
+
+.story-waves {
+  top: 38%;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44' viewBox='0 0 160 44'%3E%3Cpath d='M0 22 Q20 6 40 22 T80 22 T120 22 T160 22' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 160px 44px;
+  opacity: 0.45;
+  background-position-x: calc(var(--p) * var(--wspeed, -1100px));
+}
+
+.story-roadbed { top: 48%; height: 20%; background: #475569; }
+.story-roadbed::before, .story-roadbed::after { content: ""; position: absolute; left: 0; right: 0; height: 5px; background: #e2e8f0; }
+.story-roadbed::before { top: 7%; }
+.story-roadbed::after { bottom: 7%; }
+.story-lane {
+  position: absolute; left: 0; right: 0; top: 50%; height: 6px; transform: translateY(-50%);
+  background: repeating-linear-gradient(90deg, #fff 0 64px, transparent 64px 128px);
+  background-position-x: calc(var(--r) * -2600px);
+}
+.story-trees { top: 36%; height: 12%; background-image: radial-gradient(circle at 50% 100%, #6f9f58 0 46%, transparent 47%); background-size: 70px 100%; opacity: 0.85; background-position-x: calc(var(--r) * -500px); }
+
+.story-ballast { top: 46%; height: 20%; background: #b9b2a6; }
+.story-sleepers { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #6b5646 0 10px, transparent 10px 26px); background-position-x: calc(var(--k) * -1300px); }
+.story-railline { position: absolute; left: 0; right: 0; height: 6px; background: #94a3b8; }
+
+/* ---------- Vehicles ---------- */
+.story-vehicle { position: absolute; left: 0; will-change: transform; }
+.story-plane {
+  top: 38%;
+  width: min(46vw, 540px);
+  transform: translate(calc(-30vw + var(--a) * 135vw), calc(var(--a) * -6vh));
+  opacity: calc(1 - var(--t1) * 1.15);
+}
+.story-ship {
+  top: 18%;
+  width: min(80vw, 880px);
+  transform: translateX(calc(-70vw + var(--s) * 190vw));
+}
+.story-truck {
+  top: 42%;
+  width: min(42vw, 470px);
+  transform: translateX(calc(-46vw + var(--r) * 152vw));
+}
+.story-train {
+  --tw: min(96vw, 1320px);
+  top: 33%;
+  width: var(--tw);
+  /* enters from the left and stops in the middle of the screen */
+  transform: translateX(calc(-1 * var(--tw) + var(--k) * (var(--tw) + (100vw - var(--tw)) / 2)));
+}
+
 /* ---------- Text ---------- */
 .story-text {
   position: absolute;
@@ -85,8 +122,9 @@
   width: min(440px, 92vw);
   padding: 20px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.97);
   color: #111827;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12);
 }
 .story-text-air {
   opacity: calc(1 - clamp(0, calc((var(--p) - 0.17) / 0.07), 1));
@@ -105,8 +143,7 @@
   left: 4vw;
   top: 5vh;
   max-width: min(560px, 92vw);
-  color: #ffffff;
-  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+  color: #0b2a44;
   opacity: calc(1 - clamp(0, calc((var(--p) - 0.12) / 0.06), 1));
 }
 
@@ -117,7 +154,7 @@
   top: 0;
   height: 4px;
   width: calc(var(--p) * 100%);
-  background: #ffffff;
+  background: #111827;
   z-index: 6;
 }
 .story-steps {
@@ -162,11 +199,13 @@
   font-size: 12px;
   color: #4b5563;
 }
-.story-note a { text-decoration: underline; }
 
 /* ---------- Phones ---------- */
 @media (max-width: 640px) {
-  .story-road .story-photo { object-position: 24% 50%; }
+  .story-plane { top: 36%; width: 76vw; }
+  .story-ship { top: 22%; width: 130vw; }
+  .story-truck { top: 40%; width: 70vw; }
+  .story-train { --tw: 160vw; top: 36%; }
   .story-text { bottom: 64px; padding: 16px; }
   .story-intro { top: 60px; }
   .story-skip { display: none; }
@@ -186,8 +225,27 @@
     -webkit-mask-image: none !important;
     mask-image: none !important;
   }
-  .story-photo { transform: none !important; }
+  .story-vehicle { transform: none !important; opacity: 1 !important; left: 6vw; }
   .story-text { opacity: 1 !important; }
   .story-intro { opacity: 1 !important; }
   .story-progress, .story-steps, .story-skip, .story-note { display: none; }
 }
+
+/* ---------- The race (site section) ---------- */
+.race-vehicle { will-change: left; }
+.race-go { animation: race-run var(--dur, 3s) cubic-bezier(0.35, 0.05, 0.25, 1) forwards; }
+@keyframes race-run {
+  from { left: 0; }
+  to { left: calc(100% - var(--vw, 100%)); }
+}
+.race-vehicle { --vw: 100%; }
+.race-finish {
+  width: 8px;
+  background-image: conic-gradient(#111827 25%, #fff 0 50%, #111827 0 75%, #fff 0);
+  background-size: 8px 8px;
+  opacity: 0.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .race-go { animation: none; left: calc(100% - var(--vw, 100%)); }
+}
+.flap { box-shadow: inset 0 -1px 0 rgba(17, 24, 39, 0.12); }

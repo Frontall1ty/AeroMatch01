@@ -8,7 +8,7 @@ export default function Landing() {
         TAS <span className="text-muted">to</span> IST, DXB, ALA
       </h1>
       <p className="mt-5 max-w-2xl text-xl">
-        Enter your cargo once. Compare air, road and sea from Tashkent side by side, see which option fits your deadline
+        Enter your cargo once. Compare air, rail and road from Tashkent side by side, see which option fits your deadline
         and budget, and request a booking.
       </p>
 

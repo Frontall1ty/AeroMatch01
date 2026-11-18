@@ -3,7 +3,7 @@ import "@fontsource-variable/archivo/wdth.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AeroMatch: compare air, road and sea freight from Tashkent",
+  title: "AeroMatch: compare air, rail and road freight from Tashkent",
   description: "Demo: one cargo entry, three modes compared, with a decision layer. All data is fictional.",
   robots: { index: false, follow: false },
 };

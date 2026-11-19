@@ -77,7 +77,12 @@
   }
   /* a dark panel for the console look: the admin, the board */
   .panel-dark {
-    @apply rounded border border-console-rule bg-console-raised text-console-text;
+    @apply rounded text-console-text;
+    background: linear-gradient(135deg, rgba(150, 215, 255, 0.13), rgba(150, 215, 255, 0.04));
+    border: 1px solid rgba(160, 225, 255, 0.22);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: 0 8px 30px rgba(2, 8, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.24);
   }
   /* Registration marks in the corners, like a drawing. Put on a positioned panel. */
   .ticks {
@@ -179,6 +184,32 @@
 .grid-dots {
   background-image: radial-gradient(rgba(143, 176, 214, 0.16) 1px, transparent 1px);
   background-size: 22px 22px;
+}
+/* Soft colored light behind the glass, so the blur has something to blur. */
+.aurora {
+  background-image:
+    radial-gradient(55% 50% at 10% 5%, rgba(90, 209, 238, 0.26), transparent 70%),
+    radial-gradient(45% 50% at 92% 18%, rgba(124, 108, 255, 0.24), transparent 70%),
+    radial-gradient(60% 40% at 55% 105%, rgba(34, 197, 160, 0.16), transparent 70%);
+}
+/* Glass: a frosted, see-through panel with a cool tint. Works where something sits behind it. */
+.glass {
+  background: linear-gradient(135deg, rgba(150, 215, 255, 0.14), rgba(150, 215, 255, 0.04));
+  border: 1px solid rgba(160, 225, 255, 0.24);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: 0 10px 40px rgba(2, 8, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+.glass-light {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(238, 248, 255, 0.82));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  box-shadow: 0 12px 44px rgba(2, 8, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: #12233a; }
+  .glass-light { background: #ffffff; }
 }
 /* The route: a thin line with a node at each end. */
 .route-rule {

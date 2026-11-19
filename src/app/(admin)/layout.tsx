@@ -14,7 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const admin = await isAdmin();
   const waiting = admin ? await waitingCarrierCount() : 0;
   return (
-    <div className="on-dark min-h-screen bg-console text-console-text">
+    <div className="on-dark aurora min-h-screen bg-console bg-fixed text-console-text">
       <header className="border-b border-console-rule">
         <div className="mx-auto flex max-w-[1280px] items-center gap-4 px-4 py-2.5">
           <Brand href={admin ? "/admin" : "/"} />

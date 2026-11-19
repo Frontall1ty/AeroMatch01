@@ -122,10 +122,13 @@
   width: min(440px, 92vw);
   padding: 20px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.97);
-  color: #0f1b2d;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.93), rgba(236, 247, 255, 0.82));
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   border-top: 3px solid #5ad1ee;
-  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+  color: #0f1b2d;
+  box-shadow: 0 12px 40px rgba(2, 8, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 .story-text-air {
   opacity: calc(1 - clamp(0, calc((var(--p) - 0.17) / 0.07), 1));

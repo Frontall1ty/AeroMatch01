@@ -24,7 +24,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       >
         Skip to content
       </a>
-      <header className="on-dark sticky top-0 z-30 border-b border-console-rule bg-console/95 text-console-text backdrop-blur-sm">
+      <header className="on-dark sticky top-0 z-30 border-b border-console-rule bg-console/80 text-console-text backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex max-w-[1180px] items-center gap-6 px-4 py-2.5">
           <Brand />
           <nav aria-label="Sections" className="hidden items-center gap-5 md:flex">

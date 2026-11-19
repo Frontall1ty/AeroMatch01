@@ -29,7 +29,7 @@ function Section({
   wide?: boolean;
 }) {
   return (
-    <section id={id} className={`scroll-mt-14 ${dark ? "on-dark bg-console text-console-text" : "border-t border-rule"}`}>
+    <section id={id} className={`scroll-mt-14 ${dark ? "on-dark aurora bg-console text-console-text" : "border-t border-rule"}`}>
       <div className={`mx-auto grid max-w-[1180px] gap-8 px-4 py-14 md:py-20 lg:gap-14 ${wide ? "" : "lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]"}`}>
         <div className={wide ? "" : "lg:sticky lg:top-24 lg:self-start"}>
           <h2 className="h-wide text-[28px] md:text-[38px]">{title}</h2>
@@ -68,7 +68,7 @@ export default function Site() {
   return (
     <>
       {/* Hero: the decision chart is the page's one bold element */}
-      <section className="on-dark grid-dots border-b border-console-rule bg-console text-console-text">
+      <section className="on-dark aurora grid-dots border-b border-console-rule bg-console text-console-text">
        <div className="mx-auto max-w-[1180px] px-4 pb-14 pt-10 md:pb-20 md:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
           <div>
@@ -86,7 +86,7 @@ export default function Site() {
               Pilot lane: Tashkent to Istanbul, Dubai and Almaty. Everything you see is demo data.
             </p>
           </div>
-          <div className="on-light ticks text-ink"><HeroLanes /></div>
+          <div className="on-light text-ink"><HeroLanes /></div>
         </div>
        </div>
       </section>
@@ -108,6 +108,7 @@ export default function Site() {
       <Section
         id="board"
         wide
+        dark
         title="Every shipment on one board."
         lead="Once a booking is made, you follow it the way you follow a flight: where it left from, where it is going, the way it travels and its status. Filter by air, sea, rail or road."
       >
@@ -259,7 +260,7 @@ export default function Site() {
         </div>
       </Section>
 
-      <section className="on-dark grid-dots border-t border-console-rule bg-console text-console-text">
+      <section className="on-dark aurora grid-dots border-t border-console-rule bg-console text-console-text">
         <div className="mx-auto max-w-[1180px] px-4 py-14 md:py-20">
           <div className="route-rule mb-6 w-24" aria-hidden />
           <h2 className="display text-[clamp(30px,4vw,52px)]">Try it with a shipment of your own.</h2>

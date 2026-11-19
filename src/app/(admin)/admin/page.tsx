@@ -9,7 +9,7 @@ import { requireAdmin } from "@/lib/session";
 export const dynamic = "force-dynamic";
 
 const STATUS: { key: string; label: string; color: string }[] = [
-  { key: "REQUESTED", label: "Requested", color: "#A3A3A3" },
+  { key: "REQUESTED", label: "Requested", color: "#9FB0C4" },
   { key: "CONFIRMED", label: "Confirmed", color: "#8FA6FF" },
   { key: "IN_PROGRESS", label: "In progress", color: "#FB9A5A" },
   { key: "DELIVERED", label: "Delivered", color: "#6FD79A" },

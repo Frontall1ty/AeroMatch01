@@ -26,7 +26,7 @@ export function HeroLanes() {
   let delay = 250;
 
   return (
-    <div className="glass-light rounded p-4 md:p-5 text-ink">
+    <div className="panel p-4 md:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold">25 crates, 6,000 kg, 40 m³ from Tashkent to Istanbul</p>

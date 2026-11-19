@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export default async function Gate({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   return (
-    <div className="on-dark aurora min-h-screen bg-console text-console-text">
+    <div className="on-dark grid-dots min-h-screen bg-console text-console-text">
       <header className="border-b border-console-rule">
         <div className="mx-auto flex max-w-[1180px] items-center px-4 py-2.5"><Brand /></div>
       </header>

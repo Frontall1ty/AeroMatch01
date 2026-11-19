@@ -55,14 +55,14 @@ export function BarList({ rows, empty = "Nothing yet." }: { rows: { label: strin
 }
 
 /** One bar per day. Reads as text for screen readers. */
-export function DayBars({ buckets, color = "#F2F2F2", label }: { buckets: { day: string; count: number }[]; color?: string; label: string }) {
+export function DayBars({ buckets, color = "#5AD1EE", label }: { buckets: { day: string; count: number }[]; color?: string; label: string }) {
   const max = Math.max(1, ...buckets.map((b) => b.count));
   const total = buckets.reduce((a, b) => a + b.count, 0);
   const w = 14 * 22;
   return (
     <div>
       <svg viewBox={`0 0 ${w} 84`} className="w-full" role="img" aria-label={`${label}: ${total} in the last ${buckets.length} days`}>
-        <line x1="0" y1="72.5" x2={w} y2="72.5" stroke="#2E2E2E" />
+        <line x1="0" y1="72.5" x2={w} y2="72.5" stroke="#25405E" />
         {buckets.map((b, i) => {
           const h = (b.count / max) * 64;
           return (
@@ -70,12 +70,12 @@ export function DayBars({ buckets, color = "#F2F2F2", label }: { buckets: { day:
               <rect x={i * 22 + 4} y={72 - h} width="14" height={Math.max(h, b.count ? 2 : 0)} rx="2" fill={color}>
                 <title>{`${b.day}: ${b.count}`}</title>
               </rect>
-              {b.count > 0 && <text x={i * 22 + 11} y={72 - h - 4} textAnchor="middle" fontSize="9" fill="#F2F2F2">{b.count}</text>}
+              {b.count > 0 && <text x={i * 22 + 11} y={72 - h - 4} textAnchor="middle" fontSize="9" fill="#E6EDF5">{b.count}</text>}
             </g>
           );
         })}
-        <text x="4" y="83" fontSize="8" fill="#A3A3A3">{buckets[0]?.day.slice(5)}</text>
-        <text x={w - 4} y="83" fontSize="8" textAnchor="end" fill="#A3A3A3">{buckets.at(-1)?.day.slice(5)}</text>
+        <text x="4" y="83" fontSize="8" fill="#9FB0C4">{buckets[0]?.day.slice(5)}</text>
+        <text x={w - 4} y="83" fontSize="8" textAnchor="end" fill="#9FB0C4">{buckets.at(-1)?.day.slice(5)}</text>
       </svg>
     </div>
   );

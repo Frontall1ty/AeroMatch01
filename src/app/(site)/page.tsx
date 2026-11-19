@@ -29,10 +29,10 @@ function Section({
   wide?: boolean;
 }) {
   return (
-    <section id={id} className={`scroll-mt-14 ${dark ? "on-dark aurora bg-console text-console-text" : "border-t border-rule"}`}>
-      <div className={`col-lines mx-auto grid max-w-[1180px] gap-8 px-4 py-14 md:py-20 lg:gap-14 ${wide ? "" : "lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]"}`}>
+    <section id={id} className={`scroll-mt-14 ${dark ? "on-dark bg-console text-console-text" : "border-t border-rule"}`}>
+      <div className={`mx-auto grid max-w-[1180px] gap-8 px-4 py-14 md:py-20 lg:gap-14 ${wide ? "" : "lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]"}`}>
         <div className={wide ? "" : "lg:sticky lg:top-24 lg:self-start"}>
-          <h2 className="h-wide text-[30px] md:text-[44px]">{title}</h2>
+          <h2 className="h-wide text-[28px] md:text-[38px]">{title}</h2>
           <div className={`mt-4 max-w-[46ch] text-lg ${dark ? "text-console-muted" : "text-muted"}`}>{lead}</div>
         </div>
         <div className="min-w-0">{children}</div>
@@ -68,13 +68,12 @@ export default function Site() {
   return (
     <>
       {/* Hero: the decision chart is the page's one bold element */}
-      <section className="on-dark aurora border-b border-console-rule bg-console text-console-text">
-       <div className="col-lines mx-auto max-w-[1180px] px-4 pb-14 pt-10 md:pb-20 md:pt-16">
-        <p className="mb-8 flex flex-wrap justify-between gap-2 text-xs font-medium uppercase tracking-widest text-console-muted"><span>Freight comparison</span><span>Pilot lane TAS to IST</span></p>
+      <section className="on-dark grid-dots border-b border-console-rule bg-console text-console-text">
+       <div className="mx-auto max-w-[1180px] px-4 pb-14 pt-10 md:pb-20 md:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
           <div>
             <div className="route-rule mb-6 w-24" aria-hidden />
-            <h1 className="display text-[clamp(36px,5vw,70px)]">Compare every way to ship. Book the one that fits.</h1>
+            <h1 className="display text-[clamp(32px,4.2vw,56px)]">Compare every way to ship. Book the one that fits.</h1>
             <p className="mt-6 max-w-[44ch] text-xl text-console-muted">
               Enter your cargo once. See air, rail and road side by side, which ones meet your deadline, and what each
               would cost. Then request a booking.
@@ -87,7 +86,7 @@ export default function Site() {
               Pilot lane: Tashkent to Istanbul, Dubai and Almaty. Everything you see is demo data.
             </p>
           </div>
-          <div className="on-light text-ink"><HeroLanes /></div>
+          <div className="on-light ticks text-ink"><HeroLanes /></div>
         </div>
        </div>
       </section>
@@ -109,7 +108,6 @@ export default function Site() {
       <Section
         id="board"
         wide
-        dark
         title="Every shipment on one board."
         lead="Once a booking is made, you follow it the way you follow a flight: where it left from, where it is going, the way it travels and its status. Filter by air, sea, rail or road."
       >
@@ -261,10 +259,10 @@ export default function Site() {
         </div>
       </Section>
 
-      <section className="on-dark aurora border-t border-console-rule bg-console text-console-text">
-        <div className="col-lines mx-auto max-w-[1180px] px-4 py-14 md:py-20">
+      <section className="on-dark grid-dots border-t border-console-rule bg-console text-console-text">
+        <div className="mx-auto max-w-[1180px] px-4 py-14 md:py-20">
           <div className="route-rule mb-6 w-24" aria-hidden />
-          <h2 className="display text-[clamp(32px,4.6vw,64px)]">Try it with a shipment of your own.</h2>
+          <h2 className="display text-[clamp(30px,4vw,52px)]">Try it with a shipment of your own.</h2>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/register" className="btn-bright !min-h-[56px] px-8 text-base">Sign up</Link>
             <Link href="/login" className="btn-ghost !min-h-[56px] px-8 text-base">Log in</Link>

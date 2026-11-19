@@ -16,23 +16,22 @@
   }
   /* Condensed width for airport codes and big numbers. */
   .condensed {
-    font-family: "Archivo Variable", Archivo, system-ui, sans-serif;
     font-stretch: 62%;
     letter-spacing: 0.01em;
   }
   :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 2px solid #0a0a0a;
+    outline: 2px solid #0a7391;
     outline-offset: 2px;
   }
   .on-dark :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline-color: #ffffff;
+    outline-color: #5ad1ee;
   }
   .on-light :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline-color: #0a0a0a;
+    outline-color: #0a7391;
   }
   /* labels and messages on the dark surfaces, and back to normal inside a light panel placed on them */
-  .on-dark .field-label { color: #f2f2f2; }
-  .on-dark .field-hint { color: #a3a3a3; }
+  .on-dark .field-label { color: #e6edf5; }
+  .on-dark .field-hint { color: #9fb0c4; }
   .on-dark .field-error { color: #fca5a5; }
   .on-light .field-label { color: #0f1b2d; }
   .on-light .field-hint { color: #475569; }
@@ -45,7 +44,7 @@
   }
   input[type="checkbox"] {
     @apply h-5 w-5 min-h-0 w-5;
-    accent-color: #0a0a0a;
+    accent-color: #0a7391;
   }
   input::placeholder,
   textarea::placeholder {
@@ -78,12 +77,7 @@
   }
   /* a dark panel for the console look: the admin, the board */
   .panel-dark {
-    @apply rounded text-console-text;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.035));
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    backdrop-filter: blur(20px) saturate(150%);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    @apply rounded border border-console-rule bg-console-raised text-console-text;
   }
   /* Registration marks in the corners, like a drawing. Put on a positioned panel. */
   .ticks {
@@ -96,7 +90,7 @@
     width: 14px;
     height: 14px;
     pointer-events: none;
-    border-color: rgba(255, 255, 255, 0.85);
+    border-color: #5ad1ee;
     border-style: solid;
     border-width: 0;
   }
@@ -114,7 +108,7 @@
   }
   .ticks-light::before,
   .ticks-light::after {
-    border-color: #0a0a0a;
+    border-color: #0a7391;
   }
   .field-label {
     @apply mb-1 block text-sm font-semibold text-ink;
@@ -169,74 +163,27 @@
 
 /* Site: headline type and the hero chart's one orchestrated entrance. */
 .display {
-  font-weight: 500;
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  font-stretch: 125%;
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
 }
 /* Section headlines: the same wide, even cut at a smaller size. */
 .h-wide {
-  font-weight: 500;
-  line-height: 1.06;
-  letter-spacing: -0.035em;
+  font-stretch: 125%;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
 }
 /* A fine dot grid for the dark surfaces. */
 .grid-dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.10) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(143, 176, 214, 0.16) 1px, transparent 1px);
   background-size: 22px 22px;
-}
-/* A soft light behind the glass, so the blur has something to blur. */
-.aurora {
-  background-image:
-    radial-gradient(60% 50% at 12% 8%, rgba(255, 255, 255, 0.16), transparent 70%),
-    radial-gradient(45% 45% at 88% 22%, rgba(150, 160, 175, 0.20), transparent 70%),
-    radial-gradient(55% 40% at 50% 100%, rgba(255, 255, 255, 0.08), transparent 70%);
-}
-.aurora-light {
-  background-image:
-    radial-gradient(50% 60% at 10% 0%, rgba(255, 255, 255, 0.95), transparent 70%),
-    radial-gradient(45% 50% at 95% 30%, rgba(190, 195, 205, 0.55), transparent 70%);
-}
-/* The page grid of the template: thin vertical lines in four columns. Put on a relative wrapper. */
-.col-lines {
-  position: relative;
-  isolation: isolate;
-}
-.col-lines::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: linear-gradient(90deg, var(--line, rgba(10, 10, 10, 0.09)) 1px, transparent 1px);
-  background-size: 25% 100%;
-  border-right: 1px solid var(--line, rgba(10, 10, 10, 0.09));
-}
-.on-dark .col-lines { --line: rgba(255, 255, 255, 0.09); }
-.on-dark .on-light .col-lines { --line: rgba(10, 10, 10, 0.09); }
-
-/* Glass: a frosted, see-through panel. Works where something sits behind it. */
-.glass {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035));
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-  backdrop-filter: blur(22px) saturate(150%);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-}
-.glass-light {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.8));
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  backdrop-filter: blur(18px) saturate(160%);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass { background: #161616; }
-  .glass-light { background: #ffffff; }
 }
 /* The route: a thin line with a node at each end. */
 .route-rule {
   height: 1px;
-  background: linear-gradient(90deg, #ffffff, rgba(255, 255, 255, 0.12) 70%, transparent);
+  background: linear-gradient(90deg, #5ad1ee, rgba(90, 209, 238, 0.15) 70%, transparent);
 }
 
 @keyframes bar-grow {

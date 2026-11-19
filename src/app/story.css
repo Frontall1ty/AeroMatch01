@@ -22,7 +22,7 @@
   height: calc(100vh - var(--story-top));
   height: calc(100svh - var(--story-top));
   overflow: hidden;
-  background: #060606;
+  background: #0b1626;
   /* progress of each scene and each transition */
   --a: clamp(0, calc(var(--p) / 0.32), 1);
   --t1: clamp(0, calc((var(--p) - 0.2) / 0.12), 1);
@@ -41,10 +41,10 @@
 .story-layer { position: absolute; left: 0; right: 0; will-change: transform; }
 
 /* ---------- Scenes ---------- */
-.story-sky { background: linear-gradient(180deg, #060606 0%, #1a1c20 52%, #565c66 100%); }
-.story-sea { background: linear-gradient(180deg, #060606 0%, #1a1c20 20%, #565c66 38%, #1d2229 38%, #0d1014 100%); opacity: var(--t1); }
-.story-road { background: linear-gradient(180deg, #060606 0%, #1a1c20 20%, #4f555e 34%, #15171a 34%, #0b0c0e 100%); }
-.story-rail { background: linear-gradient(180deg, #060606 0%, #1a1c20 20%, #4f555e 34%, #17191d 34%, #0b0c0e 100%); }
+.story-sky { background: linear-gradient(180deg, #0b1b33 0%, #17406a 52%, #5fa8c9 100%); }
+.story-sea { background: linear-gradient(180deg, #0b1b33 0%, #17406a 20%, #5fa8c9 38%, #12486f 38%, #0a2a45 100%); opacity: var(--t1); }
+.story-road { background: linear-gradient(180deg, #0b1b33 0%, #17406a 20%, #4c8fb4 34%, #10231f 34%, #0c1917 100%); }
+.story-rail { background: linear-gradient(180deg, #0b1b33 0%, #17406a 20%, #4c8fb4 34%, #131f2b 34%, #0c1620 100%); }
 
 /* ---------- The transitions ---------- */
 .story-road {
@@ -59,8 +59,8 @@
 }
 
 /* ---------- Scenery ---------- */
-.story-sun { position: absolute; right: 12%; top: 9%; width: 84px; height: 84px; border-radius: 50%; background: #f2f2f2; opacity: 0.92; box-shadow: 0 0 0 20px rgba(255, 255, 255, 0.10), 0 0 80px 30px rgba(255, 255, 255, 0.16); }
-.story-cloud { position: absolute; fill: rgba(220, 224, 230, 0.16); }
+.story-sun { position: absolute; right: 12%; top: 9%; width: 84px; height: 84px; border-radius: 50%; background: #d9f3fb; opacity: 0.92; box-shadow: 0 0 0 20px rgba(90, 209, 238, 0.14), 0 0 80px 30px rgba(90, 209, 238, 0.22); }
+.story-cloud { position: absolute; fill: rgba(190, 220, 245, 0.2); }
 .story-hills { top: 20%; height: 18%; }
 .story-hills svg { display: block; width: 110%; height: 100%; }
 
@@ -73,20 +73,20 @@
   background-position-x: calc(var(--p) * var(--wspeed, -1100px));
 }
 
-.story-roadbed { top: 48%; height: 20%; background: #202327; }
-.story-roadbed::before, .story-roadbed::after { content: ""; position: absolute; left: 0; right: 0; height: 5px; background: #8a9099; }
+.story-roadbed { top: 48%; height: 20%; background: #1d2736; }
+.story-roadbed::before, .story-roadbed::after { content: ""; position: absolute; left: 0; right: 0; height: 5px; background: #8fa3b8; }
 .story-roadbed::before { top: 7%; }
 .story-roadbed::after { bottom: 7%; }
 .story-lane {
   position: absolute; left: 0; right: 0; top: 50%; height: 6px; transform: translateY(-50%);
-  background: repeating-linear-gradient(90deg, #f2f2f2 0 64px, transparent 64px 128px);
+  background: repeating-linear-gradient(90deg, #5ad1ee 0 64px, transparent 64px 128px);
   background-position-x: calc(var(--r) * -2600px);
 }
-.story-trees { top: 36%; height: 12%; background-image: radial-gradient(circle at 50% 100%, #25282d 0 46%, transparent 47%); background-size: 70px 100%; opacity: 0.85; background-position-x: calc(var(--r) * -500px); }
+.story-trees { top: 36%; height: 12%; background-image: radial-gradient(circle at 50% 100%, #1b4636 0 46%, transparent 47%); background-size: 70px 100%; opacity: 0.85; background-position-x: calc(var(--r) * -500px); }
 
-.story-ballast { top: 46%; height: 20%; background: #2a2d32; }
-.story-sleepers { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #17191d 0 10px, transparent 10px 26px); background-position-x: calc(var(--k) * -1300px); }
-.story-railline { position: absolute; left: 0; right: 0; height: 6px; background: #a3a8b0; }
+.story-ballast { top: 46%; height: 20%; background: #2e343d; }
+.story-sleepers { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #1c2128 0 10px, transparent 10px 26px); background-position-x: calc(var(--k) * -1300px); }
+.story-railline { position: absolute; left: 0; right: 0; height: 6px; background: #9fb0c4; }
 
 /* ---------- Vehicles ---------- */
 .story-vehicle { position: absolute; left: 0; will-change: transform; }
@@ -122,12 +122,10 @@
   width: min(440px, 92vw);
   padding: 20px;
   border-radius: 6px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.82));
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  backdrop-filter: blur(18px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  color: #0a0a0a;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.97);
+  color: #0f1b2d;
+  border-top: 3px solid #5ad1ee;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
 }
 .story-text-air {
   opacity: calc(1 - clamp(0, calc((var(--p) - 0.17) / 0.07), 1));
@@ -146,7 +144,7 @@
   left: 4vw;
   top: 5vh;
   max-width: min(560px, 92vw);
-  color: #f2f2f2;
+  color: #e6edf5;
   opacity: calc(1 - clamp(0, calc((var(--p) - 0.12) / 0.06), 1));
 }
 
@@ -157,7 +155,7 @@
   top: 0;
   height: 4px;
   width: calc(var(--p) * 100%);
-  background: #ffffff;
+  background: #5ad1ee;
   z-index: 6;
 }
 .story-steps {

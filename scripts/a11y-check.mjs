@@ -43,7 +43,6 @@ await page.goto(`${BASE}/gate?error=wrong`);
 await scan("passcode gate with an error");
 
 console.log("\n[Shipper]");
-await page.goto(`${BASE}/demo`);
 await page.getByRole("button", { name: /Demo Textile Export LLC/ }).click();
 await page.waitForURL("**/shipper/new");
 await scan("new shipment");

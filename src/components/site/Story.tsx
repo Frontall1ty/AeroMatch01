@@ -58,7 +58,7 @@ function Hills({ colors }: { colors: [string, string] }) {
 function Text({ tone, title, children, facts }: { tone: string; title: string; children: React.ReactNode; facts: string[] }) {
   return (
     <div className={`story-text story-text-${tone}`}>
-      <h3 className="h-wide text-[26px] leading-none">{title}</h3>
+      <h3 className="h-wide text-[24px] leading-none">{title}</h3>
       <p className="mt-2 text-base">{children}</p>
       <ul className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
         {facts.map((f) => (
@@ -118,7 +118,7 @@ export function Story() {
 
         {/* 3. Road */}
         <div className="story-scene story-road">
-          <Hills colors={["#1b1d21", "#131518"]} />
+          <Hills colors={["#163a31", "#102a26"]} />
           <div className="story-layer story-trees" />
           <div className="story-layer story-roadbed"><div className="story-lane" /></div>
           <TruckArt className="story-vehicle story-truck" />
@@ -129,7 +129,7 @@ export function Story() {
 
         {/* 4. Rail */}
         <div className="story-scene story-rail">
-          <Hills colors={["#202328", "#16181c"]} />
+          <Hills colors={["#1a2e3f", "#13232f"]} />
           <div className="story-layer story-ballast">
             <div className="story-sleepers" />
             <div className="story-railline" style={{ top: "22%" }} />

@@ -68,7 +68,7 @@ export default function Site() {
   return (
     <>
       {/* Hero: the decision chart is the page's one bold element */}
-      <section className="on-dark aurora grid-dots border-b border-console-rule bg-console text-console-text">
+      <section className="on-dark aurora border-b border-console-rule bg-console text-console-text">
        <div className="mx-auto max-w-[1180px] px-4 pb-14 pt-10 md:pb-20 md:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
           <div>
@@ -260,7 +260,7 @@ export default function Site() {
         </div>
       </Section>
 
-      <section className="on-dark aurora grid-dots border-t border-console-rule bg-console text-console-text">
+      <section className="on-dark aurora border-t border-console-rule bg-console text-console-text">
         <div className="mx-auto max-w-[1180px] px-4 py-14 md:py-20">
           <div className="route-rule mb-6 w-24" aria-hidden />
           <h2 className="display text-[clamp(30px,4vw,52px)]">Try it with a shipment of your own.</h2>

@@ -36,6 +36,34 @@ function scrollToId(id: string, focus?: HTMLElement | null) {
   focus?.focus({ preventScroll: true });
 }
 
+/** The cargo space of one way to ship, filled with the cargo typed so far. Beside the form on a wide screen, inside it on a phone. */
+function HoldPanel({ lane, shown, setTab, cargo, id, className }: { lane: Mode[]; shown: Mode; setTab: (m: Mode) => void; cargo: CargoInput; id: string; className: string }) {
+  return (
+    <aside aria-labelledby={id} className={`hold-panel on-dark rounded-[24px] bg-console p-5 text-console-text ${className}`}>
+      <h3 id={id} className="site-label text-console-muted">Your cargo, inside</h3>
+      {lane.length > 1 && (
+        <div role="group" aria-label="Show inside" className="mt-3 flex flex-wrap gap-2">
+          {lane.map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={shown === m}
+              onClick={() => setTab(m)}
+              className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 text-sm font-semibold transition-colors ${
+                shown === m ? "border-white bg-white text-ink" : "border-white/20 hover:border-white/60"
+              }`}
+            >
+              <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: MODE_HEX_BRIGHT[m] }} />
+              {MODE_LABEL[m]}
+            </button>
+          ))}
+        </div>
+      )}
+      <HoldView mode={shown} cargo={cargo} dark className="mt-4" />
+    </aside>
+  );
+}
+
 /**
  * The new-shipment page: step 1 picks a way to ship (or all four), step 2 is the form, with the cargo space of the
  * chosen way drawn next to it and filled as the shipper types. When editing a shipment, step 1 is skipped.
@@ -113,29 +141,15 @@ export function ShipmentStudio({
         )}
 
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)]">
-          <ShipmentForm defaults={defaults} demo={demo} today={today} preferredMode={preferredOnLane} onChange={setValues} />
-          <aside aria-labelledby="inside-title" className="hold-panel on-dark rounded-[24px] bg-console p-5 text-console-text lg:sticky lg:top-20">
-            <h3 id="inside-title" className="site-label text-console-muted">Your cargo, inside</h3>
-            {lane.length > 1 && (
-              <div role="group" aria-label="Show inside" className="mt-3 flex flex-wrap gap-2">
-                {lane.map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    aria-pressed={shown === m}
-                    onClick={() => setTab(m)}
-                    className={`inline-flex min-h-[40px] items-center gap-2 rounded-full border px-3 text-sm font-semibold transition-colors ${
-                      shown === m ? "border-white bg-white text-ink" : "border-white/20 hover:border-white/60"
-                    }`}
-                  >
-                    <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: MODE_HEX_BRIGHT[m] }} />
-                    {MODE_LABEL[m]}
-                  </button>
-                ))}
-              </div>
-            )}
-            <HoldView mode={shown} cargo={cargo} dark className="mt-4" />
-          </aside>
+          <ShipmentForm
+            defaults={defaults}
+            demo={demo}
+            today={today}
+            preferredMode={preferredOnLane}
+            onChange={setValues}
+            afterCargo={<HoldPanel lane={lane} shown={shown} setTab={setTab} cargo={cargo} id="inside-narrow" className="mt-6 lg:hidden" />}
+          />
+          <HoldPanel lane={lane} shown={shown} setTab={setTab} cargo={cargo} id="inside-wide" className="hidden lg:sticky lg:top-20 lg:block" />
         </div>
       </section>
     </div>

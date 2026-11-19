@@ -2,7 +2,7 @@
 
 ## Photographs on the home page
 
-The "Four ways" block (`src/components/site/home/Modes.tsx`) and the statement (`Statement.tsx`) use four photographs from [Pexels](https://www.pexels.com). The Pexels licence allows free commercial use and does not require credit; the page credits them anyway. They are local files (the site only loads images from itself).
+The "Four ways" block (`src/components/site/home/Modes.tsx`), the statement (`Statement.tsx`) and the first step of the new-shipment page (`src/components/shipper/ModeChooser.tsx`) use four photographs from [Pexels](https://www.pexels.com). The Pexels licence allows free commercial use and does not require credit; the page credits them anyway. They are local files (the site only loads images from itself).
 
 | File in `public/photos/` | Shows | Pexels photo ID | Edits |
 |---|---|---|---|
@@ -27,6 +27,8 @@ Air and Road play short silent loops (`public/videos/`), from [Mixkit](https://m
 Sea and Rail are still photos with a slow camera drift: the free-licence clips found either showed a shipping line's name on the containers or were under the restricted licence. To swap one in: check the licence on the clip's page, look at a frame every second at full size for names and logos, then make the loop with ffmpeg (trim about 9 s, scale to 960×540, `-an`, crossfade the last second into the first, H.264 CRF about 27, `+faststart`), save a poster frame as WebP, and add `video: "<name>"` to the mode in `Modes.tsx`.
 
 The videos load only while on screen, never with sound, and stop with the Pause motion button; with reduced motion they show their poster.
+
+The new-shipment page uses the same two loops on its large card. For sea and rail it blurs the photo and draws a ship (`ShipArt`) or a train (`TrainArt`) travelling in front, until clean clips are found.
 
 ## The rule for any picture
 

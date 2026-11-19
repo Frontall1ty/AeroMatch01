@@ -40,6 +40,7 @@ export function ShipmentForm({
   today,
   preferredMode = null,
   onChange,
+  afterCargo,
 }: {
   defaults: ShipmentDefaults;
   demo: ShipmentDefaults;
@@ -48,6 +49,8 @@ export function ShipmentForm({
   preferredMode?: Mode | null;
   /** Called with the values as they change, for the hold picture next to the form. */
   onChange?: (v: ShipmentDefaults) => void;
+  /** Shown right after the cargo fields, such as the hold picture on a phone. */
+  afterCargo?: React.ReactNode;
 }) {
   const [v, setV] = useState<ShipmentDefaults>(defaults);
   useEffect(() => {
@@ -252,6 +255,8 @@ export function ShipmentForm({
           )}
         </>
       )}
+
+      {afterCargo}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Field id="readyDate" label="Ready on" error={err("readyDate")}>

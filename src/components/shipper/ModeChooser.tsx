@@ -6,7 +6,7 @@ import { HOLDS, type CargoInput } from "@/lib/holds";
 import { DemoBadge } from "@/components/ui";
 import { LoopVideo } from "@/components/media/LoopVideo";
 import { MotionToggle } from "@/components/media/MotionToggle";
-import { PlaneArt } from "@/components/site/Vehicles";
+import { PlaneArt, ShipArt, TrainArt } from "@/components/site/Vehicles";
 import { HoldView } from "./HoldView";
 
 /** What the page knows about each way to ship from the shipper's city. Counts come from the database. */
@@ -114,6 +114,7 @@ export function ModeChooser({
   const c = COPY[featured];
   const label = MODE_LABEL[featured];
   const others = [1, 2, 3].map((s) => after(featured, s));
+  const drawn = featured === "SEA" || featured === "RAIL";
 
   return (
     <section aria-labelledby="step1" className="grid gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-[auto_1fr]">
@@ -130,40 +131,6 @@ export function ModeChooser({
         </h2>
       </div>
 
-      {/* What it is good for, and the two ways forward */}
-      <div className="flex flex-col lg:col-start-1 lg:row-start-2">
-        <div key={featured} className="stage-in">
-          <p className="max-w-[46ch] text-lg leading-relaxed">{c.body}</p>
-          <dl className="mt-6 grid max-w-md grid-cols-3 border-y border-rule text-sm">
-            {[
-              ["Speed", c.speed],
-              ["Price", c.price],
-              ["The hold", holdSize(featured)],
-            ].map(([k, v]) => (
-              <div key={k} className="border-r border-rule py-3 pr-3 last:border-r-0 [&:not(:first-child)]:pl-3">
-                <dt className="text-xs text-muted">{k}</dt>
-                <dd className="mt-1 font-semibold">{v}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className={`mt-5 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold ${i.available ? "border-good/30 bg-good/10 text-[#0F5F2B]" : "border-bad/30 bg-bad/10 text-bad"}`}>
-            <span aria-hidden className={`h-2 w-2 rounded-full ${i.available ? "bg-good" : "bg-bad"}`} />
-            {i.available ? `Offered from ${home}` : i.reason}
-          </p>
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3 lg:mt-auto lg:pt-8">
-          <button type="button" className="btn-bright" disabled={!i.available} onClick={() => onChoose(featured)}>
-            Ship by {label.toLowerCase()} <Arrow className="btn-arrow h-4 w-4" />
-          </button>
-          <button type="button" className="btn-secondary" onClick={() => onChoose(null)}>
-            Compare all four
-          </button>
-        </div>
-        <p className="mt-3 max-w-[48ch] text-xs text-muted">
-          Your pick is where the comparison opens. It still shows every way that can carry your cargo.
-        </p>
-      </div>
-
       {/* The large card and the three others */}
       <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="mode-stage on-dark relative aspect-[4/5] overflow-hidden rounded-[28px] bg-console text-console-text sm:aspect-[16/11] lg:aspect-[5/4]">
@@ -171,7 +138,7 @@ export function ModeChooser({
             {MEDIA[featured].video ? (
               <LoopVideo name={MEDIA[featured].video!} className="h-full w-full object-cover" />
             ) : (
-              <Photo mode={featured} sizes="(min-width: 1024px) 720px, 100vw" className="drift h-full w-full object-cover" />
+              <Photo mode={featured} sizes="(min-width: 1024px) 720px, 100vw" className={`drift h-full w-full object-cover ${drawn ? "stage-blur" : ""}`} />
             )}
           </div>
           <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/40" />
@@ -184,9 +151,29 @@ export function ModeChooser({
               </div>
             </div>
           )}
+          {/* Sea and rail have no clean video yet: the photo goes soft behind, and a drawn ship or train travels in front */}
+          {featured === "RAIL" && (
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[38%]">
+              <div className="roll-across w-[92%]">
+                <TrainArt className="w-full drop-shadow-[0_16px_18px_rgba(0,0,0,0.6)]" />
+              </div>
+              <div className="rail-track" />
+            </div>
+          )}
+          {featured === "SEA" && (
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[24%] h-[44%]">
+              <div className="sea-band absolute inset-x-0 bottom-0 h-[46%]" />
+              <div className="sail-across absolute bottom-[30%] left-0 w-[64%] sm:w-[56%]">
+                <div className="bob">
+                  <ShipArt className="w-full drop-shadow-[0_18px_22px_rgba(0,0,0,0.55)]" />
+                </div>
+              </div>
+            </div>
+          )}
           <div aria-hidden className="absolute inset-0 cursor-zoom-in" onClick={() => !inside && setInside(true)} />
 
-          <div className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-3">
+          {/* While the cutaway is open, what is under it cannot be reached with the keyboard */}
+          <div inert={inside} className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-3">
             <span className="glass-deep rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide">
               <span className="condensed">0{MODE_ORDER.indexOf(featured) + 1}</span>
               <span className="text-console-muted"> / 04</span>
@@ -202,14 +189,14 @@ export function ModeChooser({
           </div>
 
           {/* The glass bar along the bottom */}
-          <div className="glass-deep absolute inset-x-3 bottom-3 flex flex-wrap items-center gap-3 rounded-2xl p-3 sm:inset-x-4 sm:bottom-4 sm:p-4">
+          <div inert={inside} className="glass-deep absolute inset-x-3 bottom-3 flex flex-col gap-3 rounded-2xl p-3 sm:inset-x-4 sm:bottom-4 sm:flex-row sm:items-center sm:p-4">
             <div className="min-w-0 flex-1">
               <p className="font-display text-xl leading-tight sm:text-2xl">{label} shipment</p>
               <p className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-console-muted">
                 {departuresText(i, home)} {i.available && <DemoBadge dark />}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex">
               <button ref={lookRef} type="button" className="btn-ghost !min-h-[44px] !border-white/35" onClick={() => setInside(true)} aria-expanded={inside} aria-controls="hold-inside">
                 Look inside
               </button>
@@ -263,6 +250,40 @@ export function ModeChooser({
           ))}
         </ul>
         <p className="mt-3 text-xs text-muted">Video: Mixkit. Photos: Pexels. Departures are demo data.</p>
+      </div>
+
+      {/* What it is good for, and the two ways forward */}
+      <div className="flex flex-col lg:col-start-1 lg:row-start-2">
+        <div key={featured} className="stage-in">
+          <p className="max-w-[46ch] text-lg leading-relaxed">{c.body}</p>
+          <dl className="mt-6 grid max-w-md grid-cols-3 border-y border-rule text-sm">
+            {[
+              ["Speed", c.speed],
+              ["Price", c.price],
+              ["The hold", holdSize(featured)],
+            ].map(([k, v]) => (
+              <div key={k} className="border-r border-rule py-3 pr-3 last:border-r-0 [&:not(:first-child)]:pl-3">
+                <dt className="text-xs text-muted">{k}</dt>
+                <dd className="mt-1 font-semibold">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className={`mt-5 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold ${i.available ? "border-good/30 bg-good/10 text-[#0F5F2B]" : "border-bad/30 bg-bad/10 text-bad"}`}>
+            <span aria-hidden className={`h-2 w-2 rounded-full ${i.available ? "bg-good" : "bg-bad"}`} />
+            {i.available ? `Offered from ${home}` : i.reason}
+          </p>
+        </div>
+        <div className="mt-8 flex flex-wrap gap-3 lg:mt-auto lg:pt-8">
+          <button type="button" className="btn-bright" disabled={!i.available} onClick={() => onChoose(featured)}>
+            Ship by {label.toLowerCase()} <Arrow className="btn-arrow h-4 w-4" />
+          </button>
+          <button type="button" className="btn-secondary" onClick={() => onChoose(null)}>
+            Compare all four
+          </button>
+        </div>
+        <p className="mt-3 max-w-[48ch] text-xs text-muted">
+          Your pick is where the comparison opens. It still shows every way that can carry your cargo.
+        </p>
       </div>
     </section>
   );

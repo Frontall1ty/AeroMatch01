@@ -7,6 +7,7 @@ import { priceFor } from "@/lib/rules";
 import { requireRole } from "@/lib/session";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { AwbData } from "@/components/AwbData";
+import { PrintButton } from "@/components/PrintButton";
 import { Timeline } from "@/components/Timeline";
 import { DemoBadge, ModeTag, PageTitle, StatusChip, VerifiedBadge } from "@/components/ui";
 
@@ -67,7 +68,10 @@ export default async function BookingDetail({
     <div className="mx-auto max-w-4xl">
       <AutoRefresh />
       <PageTitle title="Booking">
-        <Link href="/shipper/bookings" className="text-sm font-semibold underline underline-offset-2">All bookings</Link>
+        <div className="flex flex-wrap items-center gap-3 print:hidden">
+          <PrintButton />
+          <Link href="/shipper/bookings" className="text-sm font-semibold underline underline-offset-2">All bookings</Link>
+        </div>
       </PageTitle>
 
       {requested && b.status === "REQUESTED" && (

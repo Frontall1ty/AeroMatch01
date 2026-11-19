@@ -151,6 +151,36 @@ check(count >= 33 && count <= 36, `a 13.6 m trailer takes ${count} euro pallets 
 check(await page.locator("svg[aria-label^='Top view']").isVisible(), "top view of the floor is drawn");
 await shot("8-space-calculator");
 
+console.log("\n[My capacity]");
+await asAccount("Demo Air Cargo A", "**/carrier/capacity/new");
+await page.getByRole("link", { name: "My capacity" }).click();
+await page.waitForURL("**/carrier/capacity");
+await page.getByRole("heading", { name: "My capacity" }).waitFor();
+const capRow = page.locator("main li").filter({ hasText: "Departs" }).first();
+const rowText = await capRow.textContent();
+check(/free/.test(rowText) && /booked/.test(rowText), "each listing shows its free space and how much is booked");
+await capRow.getByRole("button", { name: "Close listing" }).click();
+await page.getByRole("link", { name: /^Closed\s*1/ }).waitFor();
+await page.getByRole("link", { name: /^Closed/ }).click();
+await page.waitForURL("**status=closed");
+check((await page.getByRole("button", { name: "Reopen" }).count()) >= 1, "a closed listing can be reopened");
+await page.getByRole("button", { name: "Reopen" }).first().click();
+await page.getByText("Nothing here").waitFor();
+check(true, "reopening it takes it off the closed list");
+await shot("9-my-capacity");
+
+console.log("\n[Print summary]");
+await asAccount("Demo Textile Export LLC", "**/shipper/new");
+await page.goto(`${BASE}/shipper/bookings`);
+const anyBooking = page.locator("main a[href^='/shipper/bookings/']").first();
+if (await anyBooking.count()) {
+  await anyBooking.click();
+  const hasPrint = await page.getByRole("button", { name: "Print summary" }).waitFor({ timeout: 8000 }).then(() => true, () => false);
+  check(hasPrint, "a booking has a Print summary button");
+} else {
+  console.log("   (no booking to open: skipped)");
+}
+
 console.log(`\nTotal: ${((Date.now() - t0) / 1000).toFixed(1)} s`);
 await browser.close();
 if (problems.length) {

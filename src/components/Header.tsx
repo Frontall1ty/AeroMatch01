@@ -22,13 +22,14 @@ export async function Header() {
       : session?.role === "CARRIER"
         ? [
             { href: "/carrier/capacity/new", label: "Add capacity" },
+            { href: "/carrier/capacity", label: "My capacity" },
             { href: "/carrier/requests", label: "Requests", badge: pending },
             { href: "/carrier/bookings", label: "Active bookings" },
           ]
         : [];
 
   return (
-    <header className="on-dark border-b border-console-rule bg-console text-console-text">
+    <header className="on-dark print:hidden border-b border-console-rule bg-console text-console-text">
       <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
         <Brand />
         <nav aria-label="Main" className="flex flex-wrap items-center gap-x-5 gap-y-1">

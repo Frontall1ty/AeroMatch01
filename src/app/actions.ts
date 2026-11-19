@@ -189,6 +189,23 @@ export async function createListing(input: unknown): Promise<ActionResult> {
   redirect("/carrier/capacity/new?published=1");
 }
 
+const listingStatusSchema = z.object({ listingId: z.string().min(1).max(64), status: z.enum(["OPEN", "CLOSED"]) });
+
+/** A carrier takes one of its own listings off the comparison, or puts it back. Other carriers' listings are refused. */
+export async function setOwnListingStatus(input: unknown): Promise<ActionResult> {
+  const session = await sessionFor("CARRIER");
+  if (!session) return WRONG_ROLE;
+  const parsed = listingStatusSchema.safeParse(input);
+  if (!parsed.success) return bookingActionError("Reload the page and try again.");
+
+  const listing = await prisma.capacityListing.findUnique({ where: { id: parsed.data.listingId } });
+  if (!listing || listing.carrierCompanyId !== session.companyId) return bookingActionError("This listing belongs to another carrier.");
+
+  await prisma.capacityListing.update({ where: { id: listing.id }, data: { status: parsed.data.status } });
+  revalidatePath("/carrier/capacity");
+  return { ok: true };
+}
+
 const bookingIdSchema = z.object({ bookingId: z.string().min(1).max(64) });
 
 export async function approveBooking(input: unknown): Promise<ActionResult> {

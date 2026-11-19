@@ -311,3 +311,10 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* On paper: no dark bars, no glass, plain black on white. */
+@media print {
+  body { background: #ffffff !important; }
+  .panel, .panel-dark, .glass, .glass-light { box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #ffffff !important; color: #0f1b2d !important; border-color: #9ca3af !important; }
+  a { text-decoration: none; }
+}

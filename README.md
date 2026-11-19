@@ -50,7 +50,7 @@ Every push to the repository deploys again by itself.
 ## Pages
 
 - `/` the story site. `/register` and `/login` for real accounts. `/demo` has passwordless demo accounts with invented data.
-- `/shipper/...` and `/carrier/...` are the two roles. `/account` is the company profile and, for carriers, the verification status.
+- `/shipper/...` and `/carrier/...` are the two roles. A carrier manages its own listings under **My capacity** (free space, how much is booked, close and reopen). A shipper can print a booking summary from the booking page. `/account` is the company profile and, for carriers, the verification status.
 - The home page has a scroll story (air, sea, road, rail), a shipment board and a race of the four ways, all drawn in code; picture notes are in `PHOTOS.md`. Every offer in the app has a load view: a cutaway of the vehicle with the booked, your and free positions.
 - `/admin` is the admin console. It has its own passcode (`ADMIN_PASSCODE`) and does not depend on any account. Overview, Carriers (verify and suspend by hand), Shippers, Listings (close and reopen), Bookings, Activity (a log of what the admin did), System (settings, database check, CSV export, demo reset).
 

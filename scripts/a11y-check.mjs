@@ -61,6 +61,8 @@ await page.goto(`${BASE}/demo`);
 await page.getByRole("button", { name: /Demo Air Cargo A/ }).click();
 await page.waitForURL("**/carrier/capacity/new");
 await scan("add capacity");
+await page.goto(`${BASE}/carrier/capacity`);
+await scan("my capacity");
 await page.goto(`${BASE}/account`);
 await scan("account");
 

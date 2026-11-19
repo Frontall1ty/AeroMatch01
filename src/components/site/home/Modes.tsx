@@ -2,16 +2,58 @@
 
 import { MODE_HEX_BRIGHT, MODE_LABEL, SAFETY_BY_MODE, type Mode } from "@/lib/constants";
 import { MAX_RAIL_KM, MAX_ROAD_KM } from "@/lib/places";
+import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "../hooks";
+import { MotionToggle } from "./MotionToggle";
 import { useProgress } from "./useProgress";
 
-const MODES: { mode: Mode; photo: string; time: string; priced: string; runs: string }[] = [
-  { mode: "AIR", photo: "sky", time: "1 to 3 days", priced: "Per chargeable kg", runs: "Between any two cities" },
+const MODES: { mode: Mode; photo: string; video?: string; time: string; priced: string; runs: string }[] = [
+  { mode: "AIR", photo: "sky", video: "air", time: "1 to 3 days", priced: "Per chargeable kg", runs: "Between any two cities" },
   { mode: "SEA", photo: "sea", time: "12 to 40 days", priced: "Per container, kg or vehicle", runs: "Port to port only" },
   { mode: "RAIL", photo: "rail", time: "3 to 20 days", priced: "Per m² of wagon floor", runs: `One rail network, up to ${MAX_RAIL_KM.toLocaleString("en-US")} km` },
-  { mode: "ROAD", photo: "road", time: "2 to 15 days", priced: "Whole truck, per m² or per vehicle", runs: `One landmass, up to ${MAX_ROAD_KM.toLocaleString("en-US")} km` },
+  { mode: "ROAD", photo: "road", video: "road", time: "2 to 15 days", priced: "Whole truck, per m² or per vehicle", runs: `One landmass, up to ${MAX_ROAD_KM.toLocaleString("en-US")} km` },
 ];
 
 const WORDS = ["Air", "Sea", "Rail", "Road", "Air", "Sea", "Rail", "Road"];
+
+const MEDIA = "aspect-[4/5] w-full object-cover sm:aspect-[4/3] md:aspect-[16/12]";
+
+/**
+ * A short silent loop. It downloads and plays only while it is on screen, stops with the Pause motion button,
+ * and stays on its still picture with reduced motion.
+ */
+function ModeVideo({ name }: { name: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const paused = () => document.documentElement.dataset.motion === "paused" || (!document.documentElement.dataset.motion && prefersReducedMotion());
+    const io = new IntersectionObserver(([e]) => {
+      v.dataset.visible = String(e.isIntersecting);
+      if (e.isIntersecting && !paused()) v.play().catch(() => {});
+      else v.pause();
+    }, { threshold: 0.2 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <video
+      ref={ref}
+      data-motion=""
+      className={MEDIA}
+      src={`/videos/${name}.mp4`}
+      poster={`/videos/${name}-poster.webp`}
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-hidden
+      tabIndex={-1}
+      width={960}
+      height={540}
+    />
+  );
+}
 
 /** The four ways: a marquee that follows the scroll, then one photograph per mode with its facts on glass. */
 export function Modes() {
@@ -23,6 +65,7 @@ export function Modes() {
           <div>
             <p className="site-label text-console-muted">03 — Four ways</p>
             <h2 id="modes-title" className="sr-only">Four ways to ship</h2>
+            <MotionToggle className="mt-5" />
           </div>
           <p className="max-w-[56ch] text-lg text-console-muted">
             The modes that appear depend on where the cargo starts and where it goes. Sea needs a port at both ends, rail the same network,
@@ -45,8 +88,11 @@ export function Modes() {
         <ul className="grid gap-4 md:grid-cols-2">
           {MODES.map((m) => (
             <li key={m.mode} className="photo-card relative overflow-hidden rounded-lg">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {m.video ? (
+                <ModeVideo name={m.video} />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                 src={`/photos/${m.photo}-1280.webp`}
                 srcSet={`/photos/${m.photo}-1280.webp 1280w, /photos/${m.photo}-1920.webp 1920w`}
                 sizes="(min-width: 768px) 50vw, 100vw"
@@ -54,8 +100,9 @@ export function Modes() {
                 width={1280}
                 height={720}
                 loading="lazy"
-                className="aspect-[4/5] w-full object-cover sm:aspect-[4/3] md:aspect-[16/12]"
+                className={`drift ${MEDIA}`}
               />
+              )}
               <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <div className="glass-deep absolute inset-x-3 bottom-3 rounded-lg p-4 md:inset-x-4 md:bottom-4">
                 <h3 className="font-display flex items-center gap-3 text-[34px] leading-none tracking-[-0.03em]">
@@ -72,7 +119,7 @@ export function Modes() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs text-console-muted">Photos: Pexels. Times are typical ranges, not quotes.</p>
+        <p className="mt-4 text-xs text-console-muted">Video: Mixkit. Photos: Pexels. Times are typical ranges, not quotes.</p>
       </div>
     </section>
   );

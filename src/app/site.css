@@ -113,6 +113,20 @@
 }
 
 /* ---------- Things that move by themselves: the hero traffic and the mode videos ---------- */
+/* Stills that keep moving: a slow push and drift of the camera. */
+.drift {
+  animation: drift 16s ease-in-out infinite alternate;
+  transform-origin: 50% 50%;
+}
+@keyframes drift {
+  from { transform: scale(1.06) translate(-1.5%, -1%); }
+  to { transform: scale(1.16) translate(1.5%, 1%); }
+}
+html[data-motion="paused"] .drift { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="playing"]) .drift { animation: none; }
+}
+
 /* With reduced motion they are not drawn, unless the visitor presses Play motion. */
 @media (prefers-reduced-motion: reduce) {
   html:not([data-motion="playing"]) .route-movers { display: none; }

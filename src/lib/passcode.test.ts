@@ -14,6 +14,10 @@ describe("normalizePasscode", () => {
     expect(normalizePasscode('Ae"ro')).toBe('Ae"ro');
     expect(normalizePasscode("AeRo")).not.toBe("aero");
   });
+  it("drops invisible characters a paste can bring along", () => {
+    expect(normalizePasscode("\u200Baero\u200D2026\uFEFF")).toBe("aero2026");
+    expect(normalizePasscode("aero2026\u00A0")).toBe("aero2026");
+  });
   it("treats a missing value as empty", () => {
     expect(normalizePasscode(undefined)).toBe("");
     expect(normalizePasscode(null)).toBe("");

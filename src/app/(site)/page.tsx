@@ -10,6 +10,7 @@ import { LoadViewDemo } from "@/components/site/LoadViewDemo";
 import { LocalDemo } from "@/components/site/LocalDemo";
 import { PricingDemo } from "@/components/site/PricingDemo";
 import { ModeTag } from "@/components/ui";
+import { COUNTRIES, CITIES } from "@/lib/places";
 
 function Section({
   id,
@@ -48,6 +49,21 @@ const REASONS: { carrier: string; detail: string; mode: "AIR" | "RAIL" | "ROAD";
   { carrier: "Demo Rail Freight", detail: "Covered wagon", mode: "RAIL", reason: "Arrives 1 day after your deadline" },
 ];
 
+const STEPS: { title: string; text: string }[] = [
+  { title: "Enter your cargo once", text: "Say where it starts, where it goes and how many pieces of what size. AeroMatch works out weight, volume and floor space." },
+  { title: "Compare what runs from your city", text: "Air, sea, rail and road appear only where they really run. Each option shows its vehicle, how full it is, when it leaves and what it costs, marked cheaper, faster or safer." },
+  { title: "Request a booking and follow it", text: "The carrier approves, and you follow steps that match the mode, from booked to delivered." },
+];
+
+const FAQ: { q: string; a: React.ReactNode }[] = [
+  { q: "Does AeroMatch take payment?", a: "No. Nothing is paid inside AeroMatch. You and the carrier agree on payment between yourselves, as you do today." },
+  { q: "How do I know a carrier is real?", a: "Shippers only see verified carriers. A carrier is verified by our team once its company profile is complete, or after it has delivered 3 shipments." },
+  { q: "Are the prices real?", a: "Not in this demo. Every price, carrier and capacity is invented and no carrier is connected. Every screen with prices says so." },
+  { q: "Which cities can I ship between?", a: `${CITIES.length} cities in ${COUNTRIES.length} countries. Air runs between any two. Sea needs a port at both ends, rail needs the same rail network, and road needs a road link on the same landmass.` },
+  { q: "Can I try it without signing up?", a: <>Yes. <Link href="/demo" className="font-semibold text-ion underline underline-offset-2">Open a demo account</Link> as a shipper or a carrier. It has invented data and needs no password.</> },
+  { q: "What if my cargo is heavy or dangerous?", a: "Each offer states what it accepts. Options that cannot carry your shipment stay on the list with the reason, so you know what to change: the deadline, the size or the carrier." },
+];
+
 export default function Site() {
   return (
     <>
@@ -76,6 +92,18 @@ export default function Site() {
       </section>
 
       <Story />
+
+      <Section id="how" wide title="From cargo to booking in three steps." lead="No form with fifty fields, and no calls to five carriers.">
+        <ol className="grid gap-4 md:grid-cols-3">
+          {STEPS.map((s, i) => (
+            <li key={s.title} className="panel ticks ticks-light p-5">
+              <p className="condensed text-[40px] font-bold leading-none text-ion" aria-hidden>{i + 1}</p>
+              <h3 className="mt-3 text-xl font-bold">{s.title}</h3>
+              <p className="mt-2 text-muted">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </Section>
 
       <Section
         id="board"
@@ -215,6 +243,20 @@ export default function Site() {
             </div>
           ))}
         </dl>
+      </Section>
+
+      <Section id="faq" title="Questions people ask first." lead="Short answers, and what is and is not real in this demo.">
+        <div className="panel divide-y divide-rule">
+          {FAQ.map((f) => (
+            <details key={f.q} className="group p-4">
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden justify-between gap-4 text-lg font-semibold">
+                {f.q}
+                <span aria-hidden className="text-ion transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p className="mt-2 max-w-[62ch] text-muted">{f.a}</p>
+            </details>
+          ))}
+        </div>
       </Section>
 
       <section className="on-dark grid-dots border-t border-console-rule bg-console text-console-text">

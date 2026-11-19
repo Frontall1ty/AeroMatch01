@@ -144,7 +144,7 @@ export const TD = "p-3 align-top";
 
 export function DataTable({ children, minWidth = 860 }: { children: ReactNode; minWidth?: number }) {
   return (
-    <div className="panel-dark overflow-x-auto">
+    <div className="panel-dark relative overflow-x-auto">
       <table className="w-full text-left text-sm" style={{ minWidth }}>
         {children}
       </table>

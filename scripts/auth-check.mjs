@@ -141,6 +141,14 @@ if (ADMIN) {
     ok(r.status() === 200, `admin page ${tab || "/overview"} opens`);
   }
 
+  console.log("\n[The admin on a phone]");
+  await a.setViewportSize({ width: 390, height: 844 });
+  for (const tab of ["", "/carriers", "/shippers", "/listings", "/bookings", "/activity", "/system"]) {
+    await a.goto(`${BASE}/admin${tab}`);
+    ok((await a.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)) <= 0, `admin ${tab || "/overview"} does not scroll sideways on a phone`);
+  }
+  await a.setViewportSize({ width: 1360, height: 900 });
+
   console.log("\n[Admin removes verification, and the offer disappears again]");
   row = await carrierRow();
   await row.getByRole("button", { name: "Remove verification" }).click();

@@ -203,6 +203,10 @@ describe("visibility: unverified carriers are never shown to shippers", () => {
   it("hides listings of unverified carriers", () => {
     expect(isVisibleToShipper({ ...base, carrierVerified: false }, request)).toBe(false);
   });
+  it("hides listings of suspended carriers", () => {
+    expect(isVisibleToShipper({ ...base, carrierVerified: true, carrierSuspended: true }, request)).toBe(false);
+    expect(isVisibleToShipper({ ...base, carrierVerified: true, carrierSuspended: false }, request)).toBe(true);
+  });
   it("hides FULL and CLOSED listings, other lanes and listings departing before the ready date", () => {
     expect(isVisibleToShipper({ ...base, carrierVerified: true, status: "FULL" }, request)).toBe(false);
     expect(isVisibleToShipper({ ...base, carrierVerified: true, status: "CLOSED" }, request)).toBe(false);
@@ -210,7 +214,7 @@ describe("visibility: unverified carriers are never shown to shippers", () => {
     expect(isVisibleToShipper({ ...base, carrierVerified: true, departureDate: parseDate("2026-11-23") }, request)).toBe(false);
   });
   it("the database query always requires a verified carrier", () => {
-    expect(visibleListingsWhere(request).carrier).toEqual({ verified: true });
+    expect(visibleListingsWhere(request).carrier).toEqual({ verified: true, suspendedAt: null });
     expect(visibleListingsWhere(request).status).toBe("OPEN");
   });
 });

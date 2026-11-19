@@ -92,25 +92,60 @@ if (ADMIN) {
   await a.getByLabel("Admin passcode").fill(ADMIN);
   await a.getByRole("button", { name: "Open admin" }).click();
   await a.waitForURL("**/admin");
-  const row = a.locator("tr", { hasText: carrier.company });
+  const carrierRow = async () => {
+    await a.goto(`${BASE}/admin/carriers?q=${stamp}`);
+    return a.locator("tr", { hasText: carrier.company });
+  };
+  const hidden = async () => { await s.goto(compareUrl); await s.getByText("Recommended:").waitFor(); return !(await s.locator("body").textContent()).includes(carrier.company); };
+
+  let row = await carrierRow();
   ok(await row.getByText("Not yet").isVisible(), "the new carrier shows as not yet qualified");
   await row.getByRole("button", { name: "Verify" }).click();
   await row.getByText("Verified", { exact: true }).waitFor();
   ok(true, "the admin verifies the carrier");
 
   console.log("\n[Shipper sees the verified carrier]");
-  await s.goto(compareUrl);
-  await s.getByText("Recommended:").waitFor();
-  ok((await s.locator("body").textContent()).includes(carrier.company), "after verification the carrier's offer appears");
+  ok(!(await hidden()), "after verification the carrier's offer appears");
+
+  console.log("\n[Admin suspends the carrier, and the offer disappears]");
+  row = await carrierRow();
+  await row.getByRole("button", { name: "Suspend", exact: true }).click();
+  await row.getByRole("button", { name: /Suspend\? Click again/ }).click();
+  await row.getByRole("button", { name: "Reinstate" }).waitFor();
+  ok(await hidden(), "a suspended carrier's offer is hidden from shippers");
+  row = await carrierRow();
+  await row.getByRole("button", { name: "Reinstate" }).click();
+  await row.getByRole("button", { name: "Suspend", exact: true }).waitFor();
+  ok(!(await hidden()), "reinstated, the offer is back");
+
+  console.log("\n[Admin closes a listing, and the offer disappears]");
+  await a.goto(`${BASE}/admin/listings?q=${stamp}`);
+  await a.getByRole("button", { name: "Close", exact: true }).first().click();
+  await a.getByRole("button", { name: "Reopen" }).first().waitFor();
+  ok(await hidden(), "a closed listing is off the comparison");
+  await a.goto(`${BASE}/admin/listings?q=${stamp}`);
+  await a.getByRole("button", { name: "Reopen" }).first().click();
+  await a.getByRole("button", { name: "Close", exact: true }).first().waitFor();
+  ok(!(await hidden()), "reopened, it is back");
+
+  console.log("\n[The activity log and the exports]");
+  await a.goto(`${BASE}/admin/activity`);
+  const log = await a.locator("body").textContent();
+  ok(["Verified carrier", "Suspended carrier", "Reinstated carrier", "Closed listing", "Reopened listing"].every((t) => log.includes(t)), "every admin action is in the activity log");
+  const csv = await a.request.get(`${BASE}/admin/export/companies`);
+  ok(csv.status() === 200 && (csv.headers()["content-type"] ?? "").includes("text/csv") && (await csv.text()).includes(carrier.company), "the admin can download the companies as CSV");
+  const nope = await anon.request.get(`${BASE}/admin/export/companies`);
+  ok(nope.status() === 401, "the export refuses someone who is not the admin");
+  for (const tab of ["", "/carriers", "/shippers", "/listings", "/bookings", "/activity", "/system"]) {
+    const r = await a.goto(`${BASE}/admin${tab}`);
+    ok(r.status() === 200, `admin page ${tab || "/overview"} opens`);
+  }
 
   console.log("\n[Admin removes verification, and the offer disappears again]");
-  await a.goto(`${BASE}/admin`);
-  const row2 = a.locator("tr", { hasText: carrier.company });
-  await row2.getByRole("button", { name: "Remove verification" }).click();
-  await row2.getByRole("button", { name: "Verify" }).waitFor();
-  await s.goto(compareUrl);
-  await s.getByText("Recommended:").waitFor();
-  ok(!(await s.locator("body").textContent()).includes(carrier.company), "after removing verification the offer is hidden again (and this test leaves no verified carrier behind)");
+  row = await carrierRow();
+  await row.getByRole("button", { name: "Remove verification" }).click();
+  await row.getByRole("button", { name: "Verify", exact: true }).waitFor();
+  ok(await hidden(), "after removing verification the offer is hidden again (and this test leaves no verified carrier behind)");
 } else {
   console.log("\n(ADMIN_PASSCODE not set: skipped the admin steps)");
 }

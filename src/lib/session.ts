@@ -22,6 +22,7 @@ export type Session = {
   companyName: string;
   city: string | null;
   verified: boolean;
+  suspended: boolean;
   isDemo: boolean;
 };
 
@@ -73,6 +74,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
     companyName: user.company.name,
     city: user.company.city,
     verified: user.company.verified,
+    suspended: user.company.suspendedAt !== null,
     isDemo: isDemoEmail(user.email),
   };
 });

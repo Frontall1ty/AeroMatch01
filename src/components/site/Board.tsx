@@ -9,7 +9,7 @@ import { prefersReducedMotion, useInView } from "./hooks";
 
 const NAMES: Record<string, string> = Object.fromEntries(CITIES.map((c) => [c.code, c.name.toUpperCase()]));
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const TONE = { warn: "text-[#92400E] bg-[#FEF3C7]", done: "text-[#1E40AF] bg-[#DBEAFE]", go: "text-[#14532D] bg-[#DCFCE7]", none: "text-ink bg-[#EEF2F7]" } as const;
+const TONE = { warn: "text-[#FCD34D] bg-[#3A2D0B]", done: "text-[#93C5FD] bg-[#14284A]", go: "text-[#86EFAC] bg-[#0F2F22]", none: "text-console-text bg-[#1A3050]" } as const;
 
 /** Split-flap text: each tile flips through letters, then settles. Plain text for screen readers and reduced motion. */
 function Flap({ text, len, tone = "none", go }: { text: string; len: number; tone?: keyof typeof TONE; go: boolean }) {
@@ -47,15 +47,15 @@ export function Board() {
   const rows = useMemo(() => BOARD_ROWS.filter((r) => filter === "ALL" || r.mode === filter).slice(0, 6), [filter]);
 
   return (
-    <div ref={ref}>
-      <div className="panel p-4 md:p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule pb-4">
-          <p className="text-sm font-bold tracking-widest text-muted"><span aria-hidden className="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-good" />SAMPLE SHIPMENTS · INVENTED DATA</p>
-          <div role="group" aria-label="Filter by mode" className="flex flex-wrap overflow-hidden rounded border border-rule">
+    <div ref={ref} className="on-dark text-console-text">
+      <div className="panel-dark ticks p-4 md:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-console-rule pb-4">
+          <p className="text-sm font-bold tracking-widest text-console-muted"><span aria-hidden className="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-ion-bright" />SAMPLE SHIPMENTS · INVENTED DATA</p>
+          <div role="group" aria-label="Filter by mode" className="flex flex-wrap overflow-hidden rounded border border-console-rule">
             {FILTERS.map((f) => (
               <button
                 key={f} type="button" aria-pressed={filter === f} onClick={() => setFilter(f)}
-                className={`min-h-[44px] px-3 text-sm font-bold ${filter === f ? "bg-ink text-white" : "bg-panel hover:bg-paper"}`}
+                className={`min-h-[44px] px-3 text-sm font-bold ${filter === f ? "bg-ion-bright text-console" : "bg-console hover:bg-console-raised"}`}
               >
                 {f === "ALL" ? "All" : MODE_LABEL[f]}
               </button>
@@ -63,18 +63,18 @@ export function Board() {
           </div>
         </div>
 
-        <div className="mt-3 hidden grid-cols-[170px_minmax(0,1fr)_minmax(0,1fr)_92px_110px_minmax(0,230px)] gap-3 px-3 text-xs font-bold tracking-widest text-muted md:grid" aria-hidden>
+        <div className="mt-3 hidden grid-cols-[170px_minmax(0,1fr)_minmax(0,1fr)_92px_110px_minmax(0,230px)] gap-3 px-3 text-xs font-bold tracking-widest md:grid text-console-muted" aria-hidden>
           <span>SHIPMENT</span><span>FROM</span><span>TO</span><span>MODE</span><span>ETA</span><span>STATUS</span>
         </div>
 
         <ul className="mt-2 space-y-2" aria-live="polite">
           {rows.map((r) => (
-            <li key={r.id} className="rounded border border-rule bg-white px-3 py-2.5">
+            <li key={r.id} className="rounded border border-console-rule bg-console px-3 py-2.5">
               {/* phones: plain text */}
               <div className="md:hidden">
                 <p className="flex items-center justify-between font-mono text-sm font-bold"><span>{r.id}</span><ModeTag mode={r.mode} /></p>
                 <p className="mt-1 text-base font-semibold">{NAMES[r.from]} → {NAMES[r.to]}</p>
-                <p className="text-sm text-muted">ETA {r.eta} · {r.status}</p>
+                <p className="text-sm text-console-muted">ETA {r.eta} · {r.status}</p>
               </div>
               {/* larger screens: flip tiles */}
               <div className="hidden grid-cols-[170px_minmax(0,1fr)_minmax(0,1fr)_92px_110px_minmax(0,230px)] items-center gap-3 md:grid">
@@ -88,7 +88,7 @@ export function Board() {
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-muted">Demo data. Nothing here is a real shipment, carrier or schedule.</p>
+        <p className="mt-3 text-xs text-console-muted">Demo data. Nothing here is a real shipment, carrier or schedule.</p>
       </div>
 
       <dl className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -97,9 +97,9 @@ export function Board() {
           [String(COUNTRIES.length), "countries"],
           ["4", "ways to ship: air, sea, rail, road"],
         ].map(([n, label]) => (
-          <div key={label} className="panel p-4">
+          <div key={label} className="panel-dark p-4">
             <dd className="condensed text-[44px] font-bold leading-none">{n}</dd>
-            <dt className="mt-1 text-sm text-muted">{label}</dt>
+            <dt className="mt-1 text-sm text-console-muted">{label}</dt>
           </div>
         ))}
       </dl>

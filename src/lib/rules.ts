@@ -221,15 +221,18 @@ export type VisibilityInput = {
   status: "OPEN" | "FULL" | "CLOSED";
   departureDate: Date;
   carrierVerified: boolean;
+  /** True when the admin has suspended the carrier. */
+  carrierSuspended?: boolean;
 };
 
-/** Same origin and destination, OPEN, carrier verified, departs on or after the ready date. */
+/** Same origin and destination, OPEN, carrier verified and not suspended, departs on or after the ready date. */
 export function isVisibleToShipper(
   listing: VisibilityInput,
   request: { origin: string; destination: string; readyDate: Date },
 ): boolean {
   return (
     listing.carrierVerified === true &&
+    listing.carrierSuspended !== true &&
     listing.status === "OPEN" &&
     listing.origin === request.origin &&
     listing.destination === request.destination &&
@@ -237,14 +240,14 @@ export function isVisibleToShipper(
   );
 }
 
-/** Prisma `where` that mirrors `isVisibleToShipper`. Never loosen the `verified` condition. */
+/** Prisma `where` that mirrors `isVisibleToShipper`. Never loosen the `verified` or `suspendedAt` conditions. */
 export function visibleListingsWhere(request: { origin: string; destination: string; readyDate: Date }) {
   return {
     origin: request.origin,
     destination: request.destination,
     status: "OPEN" as const,
     departureDate: { gte: request.readyDate },
-    carrier: { verified: true },
+    carrier: { verified: true, suspendedAt: null },
   };
 }
 

@@ -10,6 +10,7 @@ import { DEMO_EMAIL_SUFFIX, isDemoEmail, loginSchema, profileSchema, registerSch
 import { dummyHash, hashPassword, verifyPassword } from "@/lib/auth";
 import { cityByCode } from "@/lib/constants";
 import { allow } from "@/lib/rateLimit";
+import { logAdmin } from "@/lib/adminLog";
 import { normalizePasscode } from "@/lib/passcode";
 import {
   adminEnabled,
@@ -170,6 +171,12 @@ export async function setCompanyVerified(input: { companyId: string; verified: b
     where: { id: company.id },
     data: { verified: parsed.data.verified, verifiedAt: parsed.data.verified ? new Date() : null },
   });
-  revalidatePath("/admin");
+  await logAdmin({
+    action: parsed.data.verified ? "Verified carrier" : "Removed verification",
+    targetType: "Company",
+    targetId: company.id,
+    targetName: company.name,
+  });
+  revalidatePath("/admin", "layout");
   return { ok: true };
 }

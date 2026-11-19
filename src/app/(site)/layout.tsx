@@ -1,5 +1,6 @@
 import Link from "next/link";
 import "@/app/story.css";
+import { Brand } from "@/components/Brand";
 import { DemoBadge } from "@/components/ui";
 import { getSession, homeFor } from "@/lib/session";
 
@@ -23,36 +24,34 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-30 border-b border-rule bg-paper/95 backdrop-blur-sm">
+      <header className="on-dark sticky top-0 z-30 border-b border-console-rule bg-console/95 text-console-text backdrop-blur-sm">
         <div className="mx-auto flex max-w-[1180px] items-center gap-6 px-4 py-2.5">
-          <Link href="/" className="condensed text-xl font-bold tracking-tight">
-            AeroMatch
-          </Link>
+          <Brand />
           <nav aria-label="Sections" className="hidden items-center gap-5 md:flex">
             {NAV.map((n) => (
-              <a key={n.href} href={n.href} className="py-1.5 text-sm font-semibold text-ink hover:underline">
+              <a key={n.href} href={n.href} className="py-1.5 text-sm font-semibold text-console-text hover:text-ion-bright">
                 {n.label}
               </a>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            <span className="hidden lg:block"><DemoBadge /></span>
+            <span className="hidden lg:block"><DemoBadge dark /></span>
             {session ? (
-              <Link href={homeFor(session.role)} className="btn !min-h-[40px]">Open the app</Link>
+              <Link href={homeFor(session.role)} className="btn-bright !min-h-[40px]">Open the app</Link>
             ) : (
               <>
-                <Link href="/login" className="btn-secondary !min-h-[40px] !px-3 sm:!px-4">Log in</Link>
-                <Link href="/register" className="btn !min-h-[40px] !px-3 sm:!px-4">Sign up</Link>
+                <Link href="/login" className="btn-ghost !min-h-[40px] !px-3 sm:!px-4">Log in</Link>
+                <Link href="/register" className="btn-bright !min-h-[40px] !px-3 sm:!px-4">Sign up</Link>
               </>
             )}
           </div>
         </div>
       </header>
       <main id="main">{children}</main>
-      <footer className="border-t border-rule bg-panel">
-        <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 px-4 py-5 text-sm text-muted">
+      <footer className="on-dark border-t border-console-rule bg-console text-console-muted">
+        <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 px-4 py-5 text-sm">
           <p>AeroMatch demo. All prices, carriers and capacities are invented. No carrier is connected.</p>
-          <Link href="/demo" className="font-semibold text-ink underline underline-offset-2 hover:no-underline">
+          <Link href="/demo" className="font-semibold text-console-text underline underline-offset-2 hover:text-ion-bright">
             Try a demo account
           </Link>
         </div>

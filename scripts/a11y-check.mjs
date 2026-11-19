@@ -1,5 +1,5 @@
 // Accessibility scan (WCAG 2.1 A and AA) with axe-core on the main screens.
-// Usage: BASE_URL=http://localhost:3000 node scripts/a11y-check.mjs   (reseed first)
+// Usage: BASE_URL=http://localhost:3000 [ADMIN_PASSCODE=...] node scripts/a11y-check.mjs   (reseed first; the server needs the same ADMIN_PASSCODE to scan the admin)
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
@@ -58,6 +58,21 @@ await page.waitForURL("**/carrier/capacity/new");
 await scan("add capacity");
 await page.goto(`${BASE}/account`);
 await scan("account");
+
+if (process.env.ADMIN_PASSCODE) {
+  console.log("\n[Admin console]");
+  await page.goto(`${BASE}/admin/login`);
+  await scan("admin login");
+  await page.getByLabel("Admin passcode").fill(process.env.ADMIN_PASSCODE);
+  await page.getByRole("button", { name: "Open admin" }).click();
+  await page.waitForURL("**/admin");
+  for (const [name, path] of [["overview", ""], ["carriers", "/carriers"], ["shippers", "/shippers"], ["listings", "/listings?source=demo"], ["bookings", "/bookings"], ["activity", "/activity"], ["system", "/system"]]) {
+    await page.goto(`${BASE}/admin${path}`);
+    await scan(`admin ${name}`);
+  }
+} else {
+  console.log("\n(ADMIN_PASSCODE not set: skipped the admin screens)");
+}
 
 await b.close();
 if (failures.length) {

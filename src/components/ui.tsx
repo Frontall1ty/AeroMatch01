@@ -18,11 +18,11 @@ export function ModeTag({ mode }: { mode: Mode }) {
   );
 }
 
-export function DemoBadge({ className = "" }: { className?: string }) {
+export function DemoBadge({ className = "", dark = false }: { className?: string; dark?: boolean }) {
   return (
     <abbr
       title="All prices, carriers and capacities are invented demo data. They are not real quotes."
-      className={`inline-block whitespace-nowrap rounded border border-rule px-1.5 py-0.5 text-xs font-semibold normal-case text-muted underline decoration-dotted underline-offset-2 ${className}`}
+      className={`inline-block whitespace-nowrap rounded border px-1.5 py-0.5 text-xs font-semibold normal-case underline decoration-dotted underline-offset-2 ${dark ? "border-console-rule text-console-muted" : "border-rule text-muted"} ${className}`}
     >
       Demo data
     </abbr>

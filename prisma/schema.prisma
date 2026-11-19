@@ -58,6 +58,8 @@ model Company {
   type        CompanyType
   verified    Boolean     @default(false)
   verifiedAt  DateTime?
+  /// Set by the admin: the carrier's offers are hidden from shippers and it cannot add capacity.
+  suspendedAt DateTime?
   country     String
   city        String?
   phone       String?
@@ -161,6 +163,19 @@ model Booking {
 
   @@index([listingId])
   @@index([shipmentRequestId])
+}
+
+/// What the admin did: verified, suspended, closed a listing, reset the demo data. Newest first in the admin.
+model AdminAction {
+  id         String   @id @default(cuid())
+  at         DateTime @default(now())
+  action     String
+  targetType String
+  targetId   String
+  targetName String
+  detail     String   @default("")
+
+  @@index([at])
 }
 
 model BookingEvent {

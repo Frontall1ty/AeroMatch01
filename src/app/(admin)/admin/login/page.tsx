@@ -8,11 +8,11 @@ export default async function AdminLogin() {
   if (await isAdmin()) redirect("/admin");
   return (
     <div className="mx-auto max-w-sm">
-      <h1 className="mb-4 text-2xl font-bold">Admin</h1>
+      <h1 className="h-wide mb-4 text-[26px]">Admin console</h1>
       {adminEnabled() ? (
         <AdminLoginForm />
       ) : (
-        <p className="rounded border border-rule bg-panel p-4 text-sm text-muted">
+        <p className="panel-dark p-4 text-sm text-console-muted">
           Admin is switched off. Set <code>ADMIN_PASSCODE</code> in the environment variables and redeploy to turn it on.
         </p>
       )}

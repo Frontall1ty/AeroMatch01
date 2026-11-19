@@ -1,4 +1,5 @@
 import { useId, type CSSProperties } from "react";
+import { MODE_HEX } from "@/lib/constants";
 
 /**
  * Side-view vehicles, all facing right, drawn in code with soft shading so they stay sharp at any size.
@@ -39,7 +40,7 @@ function Wheel({ x, y, r = 10 }: { x: number; y: number; r?: number }) {
   );
 }
 
-export function TruckArt({ className, style, color = "#2563EB" }: P & { color?: string }) {
+export function TruckArt({ className, style, color = "#2F55E0" }: P & { color?: string }) {
   const id = useIds();
   return (
     <svg viewBox="0 0 300 100" className={className} style={style} aria-hidden fill="none">
@@ -106,7 +107,7 @@ function Box({ x, y, w, h, i }: { x: number; y: number; w: number; h: number; i:
   );
 }
 
-export function TrainArt({ className, style, color = "#0F766E" }: P & { color?: string }) {
+export function TrainArt({ className, style, color = MODE_HEX.RAIL }: P & { color?: string }) {
   const id = useIds();
   return (
     <svg viewBox="0 0 540 92" className={className} style={style} aria-hidden fill="none">
@@ -147,7 +148,7 @@ export function TrainArt({ className, style, color = "#0F766E" }: P & { color?: 
 
 const STACKS = [3, 4, 4, 3, 4, 4, 4, 3, 3, 2, 2, 1];
 
-export function ShipArt({ className, style, containers = true, color = "#6D28D9" }: P & { containers?: boolean; color?: string }) {
+export function ShipArt({ className, style, containers = true, color = MODE_HEX.SEA }: P & { containers?: boolean; color?: string }) {
   const id = useIds();
   return (
     <svg viewBox="0 0 470 132" className={className} style={style} aria-hidden fill="none">
@@ -179,7 +180,7 @@ export function ShipArt({ className, style, containers = true, color = "#6D28D9"
 }
 
 /** A twin-engine airliner seen from the side, nose to the right. */
-export function PlaneArt({ className, style, color = "#1D4ED8" }: P & { color?: string }) {
+export function PlaneArt({ className, style, color = MODE_HEX.AIR }: P & { color?: string }) {
   const id = useIds();
   return (
     <svg viewBox="0 0 600 190" className={className} style={style} aria-hidden fill="none">

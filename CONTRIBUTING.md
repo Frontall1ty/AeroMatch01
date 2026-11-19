@@ -62,13 +62,16 @@ Need a change outside your area? Open an issue or ask the owner.
 
 ## The look: keep these
 
-The site and the app share one look. If you change it, change it in `tailwind.config.ts` and `src/app/globals.css` so both follow.
+The site, the app and the admin share one look: a calm dispatch console. The top and bottom of the site, the scroll story, the shipment board and the whole admin are dark; the screens where people read numbers and fill forms (compare, new shipment, bookings) are light. Change the look in `tailwind.config.ts` and `src/app/globals.css` so everything follows.
 
-- **Colors:** Paper `#F4F6F9`, Panel `#FFFFFF`, Ink `#111827`, Rule `#D3D9E2`. Mode colors only mean a mode: Air `#1D4ED8`, Rail `#0F766E`, Road `#B45309`, Sea `#6D28D9`. Good `#15803D`, Bad `#B91C1C`. Do not use a mode color as decoration.
-- **Type:** Archivo (variable). Condensed width (`.condensed`, `.display`) for airport codes, big numbers and headlines, normal width for text. Numbers use tabular figures.
-- **Pictures:** the site is drawn in code, and the load view lays positions over vehicle pictures (`PHOTOS.md`). A new picture must not show any real company name, logo, livery or readable registration.
-- **Shape:** one 6 px radius. No gradients. No decorative shadows.
+- **Colors (tokens in `tailwind.config.ts`):** light surfaces Paper `#F2F5F8`, Panel `#FFFFFF`, Ink `#0F1B2D`, Rule `#D6DEE8`. Dark surfaces `console` `#0B1626`, `console-raised` `#12233A`, `console-rule` `#25405E`, text `#E6EDF5` and `#9FB0C4`. One signal color, Ion: `#0B7A9B` on light, `#5AD1EE` on dark (`ion-bright`). Use Ion for primary buttons, links, focus and the route line.
+- **Mode colors only identify a mode** and are never decoration: Air `#2F4FD0`, Sea `#6D3FD0`, Rail `#2B8A3E`, Road `#C2410C`. They live in `tailwind.config.ts` and in `MODE_HEX` in `src/lib/constants.ts`; change both together. `MODE_HEX_BRIGHT` is the same set for the dark charts.
+- **Type:** Archivo (variable). Headlines use the wide cut (`.display`, `.h-wide`, `font-stretch: 125%`). Numbers and airport codes use the condensed cut (`.condensed`) and tabular figures. Body text is 16 px or larger, at AA contrast.
+- **Dark areas:** put `on-dark` on the wrapper (it brightens the focus ring and the form labels). Put `on-light` on a light panel placed inside a dark area. Buttons on dark are `btn-bright` and `btn-ghost`; panels are `panel-dark`.
+- **Signature details, used sparingly:** corner marks (`ticks`) on the key panels, the thin route line (`route-rule`) above the big headlines, the dot grid (`grid-dots`) on dark surfaces.
+- **Shape:** 4 px radius. No decorative shadows.
 - **Motion:** respect `prefers-reduced-motion`. Nothing loops forever.
+- **Header height:** the scroll story sticks under the header (`--story-top: 61px` in `src/app/story.css`). If you change the header height, change that number too, and run the story check.
 - **Words:** plain English, sentence case, the same name for the same action everywhere ("Request booking", "Approve", "Add capacity"). Never write "AI-powered". Never write a real airline, carrier or company name, and never imply a real integration.
 
 ## Honesty rules for the content
@@ -83,7 +86,7 @@ The site and the app share one look. If you change it, change it in `tailwind.co
 npm test                 # unit tests for the rules
 npm run build            # the production build
 npm run demo:check       # the whole demo script in a browser (needs the app running, and Playwright)
-node scripts/a11y-check.mjs   # accessibility scan (axe) of the main screens
+node scripts/a11y-check.mjs   # accessibility scan (axe) of the main screens; with ADMIN_PASSCODE set on the server and in the shell it scans the admin too
 node scripts/story-check.mjs  # the scroll story: transitions, photos, reduced motion, phone
 ```
 

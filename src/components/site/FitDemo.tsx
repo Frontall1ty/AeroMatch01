@@ -72,7 +72,7 @@ export function FitDemo() {
                   width={Math.max(1, fit.placedLengthCm * scale - 2)}
                   height={Math.max(1, fit.placedWidthCm * scale - 2)}
                   rx={2}
-                  fill="#B45309"
+                  fill="#C2410C"
                   fillOpacity={0.8}
                   style={{ animationDelay: `${Math.min(idx * 14, 600)}ms`, transformBox: "fill-box", transformOrigin: "center" }}
                 />

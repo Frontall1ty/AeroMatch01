@@ -101,7 +101,7 @@ export async function requestBooking(input: { shipmentId: string; listingId: str
     where: { id: String(input.listingId) },
     include: { carrier: true },
   });
-  if (!listing || !isVisibleToShipper({ ...listing, carrierVerified: listing.carrier.verified }, shipment)) {
+  if (!listing || !isVisibleToShipper({ ...listing, carrierVerified: listing.carrier.verified, carrierSuspended: Boolean(listing.carrier.suspendedAt) }, shipment)) {
     return bookingActionError("This offer is no longer available. Go back to the comparison and pick another.");
   }
 
@@ -151,6 +151,9 @@ export async function createListing(input: unknown): Promise<ActionResult> {
   const parsed = listingSchema.safeParse(input);
   if (!parsed.success) return fieldErrorsFrom(parsed.error);
   const v = parsed.data;
+
+  const company = await prisma.company.findUnique({ where: { id: session.companyId }, select: { suspendedAt: true } });
+  if (company?.suspendedAt) return bookingActionError("This account is suspended, so it cannot add capacity. Contact the AeroMatch team.");
 
   await prisma.capacityListing.create({
     data: {

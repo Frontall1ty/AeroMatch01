@@ -28,11 +28,11 @@ function Section({
   wide?: boolean;
 }) {
   return (
-    <section id={id} className={`scroll-mt-14 ${dark ? "bg-ink text-white" : "border-t border-rule"}`}>
+    <section id={id} className={`scroll-mt-14 ${dark ? "on-dark bg-console text-console-text" : "border-t border-rule"}`}>
       <div className={`mx-auto grid max-w-[1180px] gap-8 px-4 py-14 md:py-20 lg:gap-14 ${wide ? "" : "lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]"}`}>
         <div className={wide ? "" : "lg:sticky lg:top-24 lg:self-start"}>
-          <h2 className="text-[32px] font-bold leading-[1.05] md:text-[44px]">{title}</h2>
-          <div className={`mt-4 max-w-[46ch] text-lg ${dark ? "text-white/80" : "text-muted"}`}>{lead}</div>
+          <h2 className="h-wide text-[28px] md:text-[38px]">{title}</h2>
+          <div className={`mt-4 max-w-[46ch] text-lg ${dark ? "text-console-muted" : "text-muted"}`}>{lead}</div>
         </div>
         <div className="min-w-0">{children}</div>
       </div>
@@ -52,24 +52,27 @@ export default function Site() {
   return (
     <>
       {/* Hero: the decision chart is the page's one bold element */}
-      <section className="mx-auto max-w-[1180px] px-4 pb-14 pt-10 md:pb-20 md:pt-16">
+      <section className="on-dark grid-dots border-b border-console-rule bg-console text-console-text">
+       <div className="mx-auto max-w-[1180px] px-4 pb-14 pt-10 md:pb-20 md:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
           <div>
-            <h1 className="display text-[clamp(60px,8.4vw,104px)]">Compare every way to ship. Book the one that fits.</h1>
-            <p className="mt-6 max-w-[44ch] text-xl">
+            <div className="route-rule mb-6 w-24" aria-hidden />
+            <h1 className="display text-[clamp(32px,4.2vw,56px)]">Compare every way to ship. Book the one that fits.</h1>
+            <p className="mt-6 max-w-[44ch] text-xl text-console-muted">
               Enter your cargo once. See air, rail and road side by side, which ones meet your deadline, and what each
               would cost. Then request a booking.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/register" className="btn !min-h-[52px] px-6 text-base">Sign up</Link>
-              <a href="#who" className="btn-secondary !min-h-[52px] px-6 text-base">See how it works</a>
+              <Link href="/register" className="btn-bright !min-h-[52px] px-6 text-base">Sign up</Link>
+              <a href="#who" className="btn-ghost !min-h-[52px] px-6 text-base">See how it works</a>
             </div>
-            <p className="mt-4 max-w-[48ch] text-sm text-muted">
+            <p className="mt-4 max-w-[48ch] text-sm text-console-muted">
               Pilot lane: Tashkent to Istanbul, Dubai and Almaty. Everything you see is demo data.
             </p>
           </div>
-          <HeroLanes />
+          <div className="on-light ticks text-ink"><HeroLanes /></div>
         </div>
+       </div>
       </section>
 
       <Story />
@@ -214,17 +217,18 @@ export default function Site() {
         </dl>
       </Section>
 
-      <section className="border-t border-rule bg-panel">
+      <section className="on-dark grid-dots border-t border-console-rule bg-console text-console-text">
         <div className="mx-auto max-w-[1180px] px-4 py-14 md:py-20">
-          <h2 className="display text-[clamp(44px,6vw,76px)]">Try it with a shipment of your own.</h2>
+          <div className="route-rule mb-6 w-24" aria-hidden />
+          <h2 className="display text-[clamp(30px,4vw,52px)]">Try it with a shipment of your own.</h2>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/register" className="btn !min-h-[56px] px-8 text-base">Sign up</Link>
-            <Link href="/login" className="btn-secondary !min-h-[56px] px-8 text-base">Log in</Link>
+            <Link href="/register" className="btn-bright !min-h-[56px] px-8 text-base">Sign up</Link>
+            <Link href="/login" className="btn-ghost !min-h-[56px] px-8 text-base">Log in</Link>
           </div>
-          <p className="mt-4 text-sm text-muted">
-            Just looking? <Link href="/demo" className="font-semibold text-ink underline underline-offset-2">Use a demo account</Link>, no sign-up needed.
+          <p className="mt-4 text-sm text-console-muted">
+            Just looking? <Link href="/demo" className="font-semibold text-console-text underline underline-offset-2 hover:text-ion-bright">Use a demo account</Link>, no sign-up needed.
           </p>
-          <p className="mt-6 max-w-[60ch] text-sm text-muted">
+          <p className="mt-6 max-w-[60ch] text-sm text-console-muted">
             Accounts are real, but every price, carrier and capacity shown here is invented demo data, and no carrier is connected.
           </p>
         </div>

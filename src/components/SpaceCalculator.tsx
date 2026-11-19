@@ -124,7 +124,7 @@ export function SpaceCalculator({ onUse }: Props) {
                     y={r * fit.placedWidthCm * scale + 1}
                     width={fit.placedLengthCm * scale - 2}
                     height={fit.placedWidthCm * scale - 2}
-                    fill="#1D4ED8"
+                    fill="#2F4FD0"
                     fillOpacity={0.75}
                     rx={2}
                   />

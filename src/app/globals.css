@@ -20,9 +20,22 @@
     letter-spacing: 0.01em;
   }
   :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 2px solid #1d4ed8;
+    outline: 2px solid #0b7a9b;
     outline-offset: 2px;
   }
+  .on-dark :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline-color: #5ad1ee;
+  }
+  .on-light :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline-color: #0b7a9b;
+  }
+  /* labels and messages on the dark surfaces, and back to normal inside a light panel placed on them */
+  .on-dark .field-label { color: #e6edf5; }
+  .on-dark .field-hint { color: #9fb0c4; }
+  .on-dark .field-error { color: #fca5a5; }
+  .on-light .field-label { color: #0f1b2d; }
+  .on-light .field-hint { color: #475569; }
+  .on-light .field-error { color: #b91c1c; }
   select,
   input,
   textarea {
@@ -31,7 +44,7 @@
   }
   input[type="checkbox"] {
     @apply h-5 w-5 min-h-0 w-5;
-    accent-color: #111827;
+    accent-color: #0b7a9b;
   }
   input::placeholder,
   textarea::placeholder {
@@ -44,16 +57,58 @@
 
 @layer components {
   .btn {
-    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-ink bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-[#1f2937] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-ion bg-ion px-4 py-2 text-sm font-semibold text-white transition-colors hover:border-ion-dark hover:bg-ion-dark disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-secondary {
-    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-rule bg-panel px-4 py-2 text-sm font-semibold text-ink hover:border-ink disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-rule bg-panel px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-ion disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  /* buttons on the dark surfaces */
+  .btn-bright {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-ion-bright bg-ion-bright px-4 py-2 text-sm font-semibold text-console transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-console-rule bg-transparent px-4 py-2 text-sm font-semibold text-console-text transition-colors hover:border-ion-bright hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-danger {
     @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-bad bg-panel px-4 py-2 text-sm font-semibold text-bad hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .panel {
     @apply rounded border border-rule bg-panel;
+  }
+  /* a dark panel for the console look: the admin, the board */
+  .panel-dark {
+    @apply rounded border border-console-rule bg-console-raised text-console-text;
+  }
+  /* Registration marks in the corners, like a drawing. Put on a positioned panel. */
+  .ticks {
+    position: relative;
+  }
+  .ticks::before,
+  .ticks::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    border-color: #5ad1ee;
+    border-style: solid;
+    border-width: 0;
+  }
+  .ticks::before {
+    top: -1px;
+    left: -1px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+  }
+  .ticks::after {
+    right: -1px;
+    bottom: -1px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+  }
+  .ticks-light::before,
+  .ticks-light::after {
+    border-color: #0b7a9b;
   }
   .field-label {
     @apply mb-1 block text-sm font-semibold text-ink;
@@ -108,10 +163,27 @@
 
 /* Site: headline type and the hero chart's one orchestrated entrance. */
 .display {
-  font-stretch: 62%;
-  font-weight: 800;
-  line-height: 0.92;
-  letter-spacing: -0.01em;
+  font-stretch: 125%;
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+/* Section headlines: the same wide, even cut at a smaller size. */
+.h-wide {
+  font-stretch: 125%;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+}
+/* A fine dot grid for the dark surfaces. */
+.grid-dots {
+  background-image: radial-gradient(rgba(143, 176, 214, 0.16) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+/* The route: a thin line with a node at each end. */
+.route-rule {
+  height: 1px;
+  background: linear-gradient(90deg, #5ad1ee, rgba(90, 209, 238, 0.15) 70%, transparent);
 }
 
 @keyframes bar-grow {

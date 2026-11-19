@@ -61,6 +61,14 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 - **The site has a shipment board and a race.** The board is a split-flap departures board with invented shipments; each pair of cities really has that mode in the app (a test checks it). The race moves a distance slider and an "ocean" switch over four lanes. It uses invented per-tonne figures, the same road and rail distance limits as the app, and the same Fastest, Cheapest and Safest weights as the comparison, so the winner is decided by the real rule.
 - **The load view is a cutaway drawing** of a truck, aircraft, wagon, container or ship. It shows other bookings (invented references), your cargo and the free space, with "% loaded". It is a picture of how full the vehicle is, not a loading plan.
 
+## Design and admin (Nov 2026)
+
+- **A dispatch-console look.** Futuristic and minimal, tuned for readers aged 30 to 50: dark console surfaces for the site's top and bottom, the story, the board and the admin; light surfaces for forms and comparison; one signal color (Ion) that is not a mode color. Rail changed from teal to green so it does not look like the signal color. Tokens are in `CONTRIBUTING.md`. This replaces the earlier "paper, ink, no gradients" look.
+- **The admin is a console, not one table.** Overview (what needs a decision, charts), Carriers (queue with filters and search), Shippers, Listings (close and reopen), Bookings, Activity (a record of every admin action), System (settings as on and off, database check, CSV export, demo reset). Passcodes and secrets are never shown.
+- **Suspending a carrier** hides its offers from shippers and stops it adding capacity. It is enforced in `visibleListingsWhere` and `isVisibleToShipper` and when a booking is requested, not only on screen. The schema change is additive (`Company.suspendedAt`, the `AdminAction` table).
+- **Every admin server action and the CSV routes check the admin session themselves.**
+- **Passcodes are compared after trimming spaces, line breaks and one pair of wrapping quotes,** on both the typed value and the environment value, so a stray character pasted into Vercel does not lock people out. The gate field has a Show button.
+
 ## Implementation choices
 
 - **Dates are date-only, UTC.** Seed dates are relative to the day the seed runs (`DEMO_READY_OFFSET_DAYS`, default 3). Re-run the seed or use Reset demo data before the demo.

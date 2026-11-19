@@ -58,7 +58,7 @@ function Hills({ colors }: { colors: [string, string] }) {
 function Text({ tone, title, children, facts }: { tone: string; title: string; children: React.ReactNode; facts: string[] }) {
   return (
     <div className={`story-text story-text-${tone}`}>
-      <h3 className="text-[28px] font-bold leading-none">{title}</h3>
+      <h3 className="h-wide text-[24px] leading-none">{title}</h3>
       <p className="mt-2 text-base">{children}</p>
       <ul className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
         {facts.map((f) => (
@@ -97,8 +97,8 @@ export function Story() {
           <Cloud className="w-[34vw] max-w-[420px]" style={{ left: "72%", top: "62%", transform: "translateX(calc(var(--p) * -90vw))" }} />
           <PlaneArt className="story-vehicle story-plane" />
           <div className="story-intro">
-            <h2 className="text-[34px] font-bold leading-[1.05] md:text-[48px]">Four ways to move cargo. One place to compare them.</h2>
-            <p className="mt-3 text-lg">Scroll to follow a shipment from the sky to the sea, onto the road and onto the rails.</p>
+            <h2 className="h-wide text-[28px] md:text-[40px]">Four ways to move cargo. One place to compare them.</h2>
+            <p className="mt-3 text-lg text-console-text">Scroll to follow a shipment from the sky to the sea, onto the road and onto the rails.</p>
           </div>
           <Text tone="air" title="Air" facts={["1 to 3 days", "Safety 5 of 5 (demo estimate)", "Priced per chargeable kg"]}>
             The fastest way, and the gentlest on cargo. Freighters and the belly of passenger flights. You see how full each hold is and how much space your cargo takes.
@@ -118,7 +118,7 @@ export function Story() {
 
         {/* 3. Road */}
         <div className="story-scene story-road">
-          <Hills colors={["#bcdca0", "#9ec97f"]} />
+          <Hills colors={["#163a31", "#102a26"]} />
           <div className="story-layer story-trees" />
           <div className="story-layer story-roadbed"><div className="story-lane" /></div>
           <TruckArt className="story-vehicle story-truck" />
@@ -129,7 +129,7 @@ export function Story() {
 
         {/* 4. Rail */}
         <div className="story-scene story-rail">
-          <Hills colors={["#c3dfa9", "#a8cf8a"]} />
+          <Hills colors={["#1a2e3f", "#13232f"]} />
           <div className="story-layer story-ballast">
             <div className="story-sleepers" />
             <div className="story-railline" style={{ top: "22%" }} />

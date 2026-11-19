@@ -53,7 +53,7 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 ## The site
 
 - **`/` is the public site, `/demo` is the role chooser.** The site explains the product with working parts instead of feature cards: the hero chart runs the real decision rules, and each section has a small tool (cargo totals, pricing units, how many pieces fit, documents and milestones).
-- **Motion:** one entrance (the hero chart draws in, the deadline line drops). The rest answers a click. Reduced motion is respected and nothing loops.
+- **Motion:** the owner asked for a living hero and pictures that keep moving, so the hero map carries traffic that never stops. The rule became: anything that moves by itself has a Pause motion button and starts paused with reduced motion.
 - **The site never names a real company or product.** The integration section says "your cargo system", marks the sample data as illustrative and uses an invented flight number.
 - **Pilot lane is stated plainly.** Tashkent is the only origin with data. The site says so and lists the next lanes as plans, not as features.
 

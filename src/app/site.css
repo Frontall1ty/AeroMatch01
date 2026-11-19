@@ -1,8 +1,9 @@
 /*
  * The public site. Layout grammar: thin column lines, a sticky left column with rows on the right,
  * large Cal Sans headlines, full-bleed photo blocks with glass, one signal-orange accent.
- * Motion: one entrance (the route map draws in), and two things that follow the scroll (the word reveal
- * and the mode marquee). Nothing loops. With reduced motion or without JavaScript everything is shown as is.
+ * Motion: the route map draws in once, then traffic keeps moving on it; the mode photos are short looping videos;
+ * the word reveal and the marquee follow the scroll. A Pause motion button stops what moves by itself, and with reduced
+ * motion it starts paused (the traffic is not drawn). Without JavaScript the text is shown finished.
  */
 
 /* ---------- Section label: a small orange mark and a numbered name ---------- */
@@ -70,7 +71,55 @@
   transform: scale(1.04);
 }
 
+/* ---------- Links and cards that answer the pointer ---------- */
+.nav-link {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.2s ease;
+}
+.nav-link:hover,
+.nav-link:focus-visible {
+  background-size: 100% 1px;
+}
+.lift {
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 44px -24px rgba(14, 14, 16, 0.45);
+  }
+  .on-dark .lift:hover,
+  .lift.on-dark:hover {
+    box-shadow: 0 22px 44px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 91, 31, 0.35);
+  }
+}
+.photo-card .glass-deep {
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.3s ease;
+}
+@media (hover: hover) {
+  .photo-card:hover .glass-deep {
+    transform: translateY(-6px);
+  }
+}
+.faq-row summary {
+  transition: color 0.2s ease;
+}
+.faq-row summary:hover {
+  color: #56565c;
+}
+.faq-row[open] summary > span:last-child {
+  background: #ff5b1f;
+  border-color: #ff5b1f;
+}
+
+/* ---------- Things that move by themselves: the hero traffic and the mode videos ---------- */
+/* With reduced motion they are not drawn, unless the visitor presses Play motion. */
 @media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="playing"]) .route-movers { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift, .lift:hover, .photo-card .glass-deep { transform: none !important; transition: none; }
   .route-arc { animation: none; stroke-dashoffset: 0; }
   .route-node { animation: none; opacity: 1; }
   .reveal-word[data-on="false"] { color: inherit; }

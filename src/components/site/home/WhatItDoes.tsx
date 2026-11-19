@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Arrow } from "./Arrow";
 import type { ReactNode } from "react";
 import { CargoDemo } from "../CargoDemo";
 import { HeroLanes } from "../HeroLanes";
@@ -60,10 +61,10 @@ export function WhatItDoes() {
           <p className="mt-6 max-w-[38ch] text-lg text-muted">Five things that replace the phone calls. Every panel on the right is the real logic, running on invented demo data.</p>
           <ul className="mt-6 space-y-1.5 text-sm">
             {ROWS.map((r, i) => (
-              <li key={r.id}><a href={`#${r.id}`} className="font-semibold hover:underline"><span className="condensed mr-2 text-muted">0{i + 1}</span>{r.kicker}</a></li>
+              <li key={r.id}><a href={`#${r.id}`} className="nav-link font-semibold"><span className="condensed mr-2 text-muted">0{i + 1}</span>{r.kicker}</a></li>
             ))}
           </ul>
-          <Link href="/register" className="btn mt-8 !min-h-[52px] px-6 text-base">Compare a shipment</Link>
+          <Link href="/register" className="btn mt-8 !min-h-[52px] px-6 text-base">Compare a shipment<Arrow /></Link>
         </div>
 
         <ol className="min-w-0">

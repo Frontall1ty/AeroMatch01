@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BOARD_ROWS } from "@/components/site/boardData";
+import { MOVERS } from "@/components/site/home/heroLanes";
 import { modesBetween } from "./places";
 import { formatDays, raceLanes } from "./race";
 import { recommend } from "./decision";
@@ -7,6 +8,12 @@ import { recommend } from "./decision";
 describe("sample shipments on the site board", () => {
   it("only use a mode that really runs between the two cities", () => {
     for (const r of BOARD_ROWS) expect(modesBetween(r.from, r.to), `${r.id} ${r.from}-${r.to}`).toContain(r.mode);
+  });
+});
+
+describe("vehicles on the hero map", () => {
+  it("only travel by a mode that really runs between the two cities", () => {
+    for (const m of MOVERS) expect(modesBetween(m.from, m.to), `${m.mode} ${m.from}-${m.to}`).toContain(m.mode);
   });
 });
 

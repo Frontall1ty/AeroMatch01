@@ -28,7 +28,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <Brand />
           <nav aria-label="Sections" className="hidden items-center gap-6 lg:flex">
             {NAV.map((n) => (
-              <a key={n.href} href={n.href} className="py-1.5 text-sm font-medium text-console-text hover:text-ion-bright">
+              <a key={n.href} href={n.href} className="nav-link py-1.5 text-sm font-medium text-console-text hover:text-ion-bright">
                 {n.label}
               </a>
             ))}
@@ -58,16 +58,16 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
               <p className="site-label text-console-muted">On this page</p>
               <ul className="mt-3 space-y-2">
                 {NAV.map((n) => (
-                  <li key={n.href}><a href={n.href} className="hover:text-ion-bright">{n.label}</a></li>
+                  <li key={n.href}><a href={n.href} className="nav-link hover:text-ion-bright">{n.label}</a></li>
                 ))}
               </ul>
             </nav>
             <nav aria-label="Account">
               <p className="site-label text-console-muted">Get started</p>
               <ul className="mt-3 space-y-2">
-                <li><Link href="/register" className="hover:text-ion-bright">Sign up</Link></li>
-                <li><Link href="/login" className="hover:text-ion-bright">Log in</Link></li>
-                <li><Link href="/demo" className="hover:text-ion-bright">Try a demo account</Link></li>
+                <li><Link href="/register" className="nav-link hover:text-ion-bright">Sign up</Link></li>
+                <li><Link href="/login" className="nav-link hover:text-ion-bright">Log in</Link></li>
+                <li><Link href="/demo" className="nav-link hover:text-ion-bright">Try a demo account</Link></li>
               </ul>
             </nav>
             <div>

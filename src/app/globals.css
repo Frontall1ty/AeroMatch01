@@ -65,11 +65,67 @@
   }
   /* buttons on the dark surfaces */
   .btn-bright {
-    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-ion-bright bg-ion-bright px-4 py-2 text-sm font-semibold text-console transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-ion-bright bg-ion-bright px-4 py-2 text-sm font-semibold text-console transition-colors hover:border-[#FF7A47] hover:bg-[#FF7A47] disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-ghost {
     @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-console-rule bg-transparent px-4 py-2 text-sm font-semibold text-console-text transition-colors hover:border-ion-bright hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
   }
+  /* Shared motion for every button: a small lift, a soft shadow, a light sweeping across, the arrow sliding.
+     Only on devices that hover, and the same on keyboard focus. Labels and heights stay as they are. */
+  .btn,
+  .btn-secondary,
+  .btn-bright,
+  .btn-ghost,
+  .btn-danger {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .btn::after,
+  .btn-bright::after,
+  .btn-ghost::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -70%;
+    width: 45%;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .btn-bright::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  }
+  .btn-arrow {
+    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  @media (hover: hover) {
+    .btn:hover,
+    .btn-bright:hover,
+    .btn-secondary:hover,
+    .btn-ghost:hover,
+    .btn-danger:hover {
+      transform: translateY(-2px);
+    }
+    .btn:hover { box-shadow: 0 10px 24px -10px rgba(14, 14, 16, 0.55); }
+    .btn-bright:hover { box-shadow: 0 12px 30px -10px rgba(255, 91, 31, 0.7); }
+    .btn-secondary:hover { box-shadow: 0 8px 20px -12px rgba(14, 14, 16, 0.35); }
+    .btn:hover::after,
+    .btn-bright:hover::after,
+    .btn-ghost:hover::after { left: 130%; }
+    :is(.btn, .btn-bright, .btn-ghost, .btn-secondary):hover .btn-arrow { transform: translateX(4px); }
+  }
+  :is(.btn, .btn-bright, .btn-ghost, .btn-secondary, .btn-danger):focus-visible { transform: translateY(-2px); }
+  :is(.btn, .btn-bright, .btn-ghost, .btn-secondary):focus-visible .btn-arrow { transform: translateX(4px); }
+  :is(.btn, .btn-bright, .btn-ghost, .btn-secondary, .btn-danger):active { transform: translateY(0) scale(0.98); box-shadow: none; }
+  .btn:disabled,
+  .btn-bright:disabled,
+  .btn-secondary:disabled,
+  .btn-ghost:disabled { transform: none; box-shadow: none; }
   .btn-danger {
     @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-bad bg-panel px-4 py-2 text-sm font-semibold text-bad hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50;
   }
@@ -330,6 +386,11 @@
   animation: travel 2.4s ease-in-out 3;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  :is(.btn, .btn-bright, .btn-ghost, .btn-secondary, .btn-danger),
+  :is(.btn, .btn-bright, .btn-ghost, .btn-secondary, .btn-danger):hover { transform: none !important; }
+  :is(.btn, .btn-bright, .btn-ghost)::after { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .bar-grow,
   .line-drop,

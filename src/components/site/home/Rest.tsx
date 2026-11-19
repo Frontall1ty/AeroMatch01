@@ -4,6 +4,7 @@ import { Board } from "../Board";
 import { FitDemo } from "../FitDemo";
 import { Integration } from "../Integration";
 import { Race } from "../Race";
+import { Arrow } from "./Arrow";
 import { Band, SectionHead } from "./Parts";
 
 export function RaceBand() {
@@ -41,7 +42,7 @@ export function Steps() {
           {STEPS.map((s, i) => {
             const dark = i === 1;
             return (
-              <li key={s.title} className={`flex min-h-[280px] flex-col rounded-lg border p-5 ${dark ? "on-dark border-console bg-console text-console-text" : "border-rule bg-panel"}`}>
+              <li key={s.title} className={`lift flex min-h-[280px] flex-col rounded-lg border p-5 ${dark ? "on-dark border-console bg-console text-console-text" : "border-rule bg-panel"}`}>
                 <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.08em]">
                   <span className={`grid h-8 w-8 place-items-center rounded-md text-sm normal-case tracking-normal ${dark ? "bg-signal text-ink" : "border border-rule"}`}>0{i + 1}</span>
                   <span className={dark ? "text-console-muted" : "text-muted"}>{s.tag}</span>
@@ -105,7 +106,7 @@ export function Carriers() {
         lead="Airlines, trucking companies, rail operators and forwarders put free space in front of shippers on the lanes they run, at their own price."
       />
       <div className="mt-12 grid gap-4 md:grid-cols-3">
-        <div className="on-dark flex flex-col rounded-lg bg-console p-6 text-console-text md:col-span-2">
+        <div className="lift on-dark flex flex-col rounded-lg bg-console p-6 text-console-text md:col-span-2">
           <p className="site-label text-console-muted">Capacity</p>
           <h3 className="h-wide mt-6 text-[clamp(28px,3vw,40px)]">Capacity in about a minute.</h3>
           <ul className="mt-5 grid gap-2 text-console-muted sm:grid-cols-2">
@@ -113,15 +114,15 @@ export function Carriers() {
               <li key={t} className="flex gap-2"><span aria-hidden className="text-ion-bright">✓</span>{t}</li>
             ))}
           </ul>
-          <Link href="/register" className="btn-bright mt-8 self-start">Add your capacity</Link>
+          <Link href="/register" className="btn-bright mt-8 self-start">Add your capacity<Arrow /></Link>
         </div>
-        <div className="flex flex-col rounded-lg bg-signal p-6 text-ink">
+        <div className="lift flex flex-col rounded-lg bg-signal p-6 text-ink">
           <p className="site-label site-label-ink">Trust</p>
           <p className="font-display mt-auto pt-8 text-[96px] leading-[0.85] tracking-[-0.04em]">3</p>
           <h3 className="mt-3 text-xl font-semibold">Verified by hand.</h3>
           <p className="mt-2">A carrier is shown to shippers once our team has checked it: a complete company profile, or 3 delivered shipments.</p>
         </div>
-        <div className="rounded-lg border border-rule bg-paper p-6">
+        <div className="lift rounded-lg border border-rule bg-paper p-6">
           <p className="site-label text-muted">Pricing</p>
           <h3 className="h-wide mt-6 text-[28px]">Your price, your unit.</h3>
           <ul className="mt-5 flex flex-wrap gap-2" aria-label="Price units">
@@ -197,11 +198,11 @@ export function Faq() {
           <p className="site-label text-muted">09 — Questions</p>
           <h2 id="faq-title" className="display mt-6 text-[clamp(44px,5.6vw,88px)]">Quick answers.</h2>
           <p className="mt-6 max-w-[36ch] text-lg text-muted">What people ask first, and what is and is not real in this demo.</p>
-          <Link href="/demo" className="btn mt-8">Try a demo account</Link>
+          <Link href="/demo" className="btn mt-8">Try a demo account<Arrow /></Link>
         </div>
         <div className="divide-y divide-rule border-y border-rule">
           {FAQ.map((f, i) => (
-            <details key={f.q} className="group py-2" open={i === 0}>
+            <details key={f.q} className="faq-row group py-2" open={i === 0}>
               <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
                 <span><span className="condensed mr-3 text-base text-muted">0{i + 1}.</span>{f.q}</span>
                 <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-rule text-xl transition-transform group-open:rotate-45">+</span>
@@ -222,7 +223,7 @@ export function FinalCta() {
         <p className="site-label text-console-muted">10 — Start</p>
         <h2 id="cta-title" className="display mt-6 max-w-[14ch] text-[clamp(52px,7.4vw,120px)]">Try it with a shipment of your own.</h2>
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link href="/register" className="btn-bright !min-h-[56px] px-8 text-base">Sign up</Link>
+          <Link href="/register" className="btn-bright !min-h-[56px] px-8 text-base">Sign up<Arrow /></Link>
           <Link href="/login" className="btn-ghost !min-h-[56px] px-8 text-base">Log in</Link>
         </div>
         <p className="mt-5 text-console-muted">

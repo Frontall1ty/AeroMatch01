@@ -5,6 +5,8 @@ import { labelOffers } from "@/lib/decision";
 import { money } from "@/lib/format";
 import { MAX_RAIL_KM, MAX_ROAD_KM } from "@/lib/places";
 import { HERO_OFFERS } from "../siteData";
+import { Arrow } from "./Arrow";
+import { MotionToggle } from "./MotionToggle";
 import { RouteMap } from "./RouteMap";
 
 const LABEL = { CHEAPEST: "Cheapest", FASTEST: "Fastest", SAFEST: "Safest" } as const;
@@ -15,13 +17,13 @@ export function Hero() {
   const labels = labelOffers(shown);
   return (
     <section className="on-dark aurora relative overflow-hidden bg-console text-console-text" aria-labelledby="hero-title">
-      <RouteMap className="pointer-events-none absolute inset-x-0 top-[4%] h-[62%] w-full opacity-40 md:opacity-90" />
+      <RouteMap className="pointer-events-none absolute inset-x-0 top-[5%] h-[60%] w-full opacity-45 md:opacity-95" />
       <div className="col-lines relative mx-auto max-w-[1320px] px-4 pb-10 pt-8 md:px-6 md:pb-14">
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-console-muted">
           <p className="site-label">Freight comparison, 2026 pilot</p>
           <p className="hidden md:block">Air, sea, rail and road</p>
           <p className="hidden md:block">Pilot origin: Tashkent</p>
-          <DemoBadge dark />
+          <span className="flex items-center gap-2"><MotionToggle /><DemoBadge dark /></span>
         </div>
 
         <h1 id="hero-title" className="display mt-12 max-w-[14ch] text-[clamp(52px,8vw,124px)] md:mt-16">
@@ -35,8 +37,8 @@ export function Hero() {
               arrives and what it costs. Pick one and request a booking.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/register" className="btn-bright !min-h-[52px] px-6 text-base">Compare a shipment</Link>
-              <Link href="/demo" className="btn-ghost !min-h-[52px] px-6 text-base">Try a demo account</Link>
+              <Link href="/register" className="btn-bright !min-h-[52px] px-6 text-base">Compare a shipment<Arrow /></Link>
+              <Link href="/demo" className="btn-ghost !min-h-[52px] px-6 text-base">Try a demo account<Arrow /></Link>
             </div>
           </div>
 
@@ -47,7 +49,7 @@ export function Hero() {
             </div>
             <ul className="mt-3 divide-y divide-white/10">
               {shown.map((o) => (
-                <li key={o.id} className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-3 py-2.5">
+                <li key={o.id} className="-mx-2 grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-white/[0.06]">
                   <span className="flex items-center gap-2 text-sm font-semibold">
                     <span aria-hidden className="h-2.5 w-2.5 rounded-sm" style={{ background: MODE_HEX_BRIGHT[o.mode] }} />
                     {MODE_LABEL[o.mode]}

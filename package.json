@@ -15,14 +15,15 @@
     "check:capacity": "node scripts/capacity-check.mjs",
     "check:auth": "node scripts/auth-check.mjs",
     "check:lanes": "node scripts/lanes-check.mjs",
-    "check:a11y": "node scripts/a11y-check.mjs",
-    "check:story": "node scripts/story-check.mjs"
+    "check:a11y": "node scripts/a11y-check.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource/cal-sans": "^5.3.0",
     "@prisma/client": "^6.19.3",
     "next": "^15.5.29",
     "react": "^19.3.1",

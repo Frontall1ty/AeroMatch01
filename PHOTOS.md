@@ -1,10 +1,23 @@
 # Pictures
 
-The home page uses **no photographs** any more. The scroll story, the race and the shipment board are drawn in code (`src/components/site/Vehicles.tsx`, `Story.tsx`, `Race.tsx`, `Board.tsx`, `src/app/story.css`). The first version of the story used four Pexels photographs; it was replaced because flat drawings in one style looked better with the rest of the site.
+## Photographs on the home page
+
+The "Four ways" block (`src/components/site/home/Modes.tsx`) and the statement (`Statement.tsx`) use four photographs from [Pexels](https://www.pexels.com). The Pexels licence allows free commercial use and does not require credit; the page credits them anyway. They are local files (the site only loads images from itself).
+
+| File in `public/photos/` | Shows | Pexels photo ID | Edits |
+|---|---|---|---|
+| `sky-*.webp` | Wing over the clouds | 18813721 | Cropped to 16:9 |
+| `sea-*.webp` | Container ship from above | 12530458 | Cropped to 16:9 |
+| `road-*.webp` | Truck from above | 9195241 | Rotated to level the road, cropped, two small company marks on the trailer painted over |
+| `rail-*.webp` | Rail yard at dusk | 13876842 | Cropped to 16:9 |
+
+Each exists at 1280 and 1920 pixels wide; the page picks one with `srcset`. The address of a photo is `https://www.pexels.com/photo/<ID>/`.
+
+The design follows the layout of a studio template the owner chose (column lines, sticky left column, large type). Nothing was copied from it: no images, text or files. Do not put files from the template's site into `public/`.
 
 ## The rule for any picture
 
-**No picture may show a real company's name, logo or livery, and no readable aircraft registration.** This is the same rule as for the rest of the site: no real airline, carrier or forwarder, and no implied integration. The vehicles in `Vehicles.tsx` are generic on purpose, and their containers carry colors only, no logos.
+**No picture may show a real company's name, logo or livery, and no readable aircraft registration.** This is the same rule as for the rest of the site: no real airline, carrier or forwarder, and no implied integration. The vehicles in `Vehicles.tsx` (used by the race and the load view) are generic on purpose, and their containers carry colors only, no logos.
 
 Pictures that were supplied or found and not used because of this rule: container-ship side views with real shipping lines' logos, a company name and a stock-site watermark, an airliner with an airline livery and registration, and a wagon drawing with a CAD site's watermark and real railway markings.
 

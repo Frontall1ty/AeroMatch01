@@ -16,25 +16,26 @@
   }
   /* Condensed width for airport codes and big numbers. */
   .condensed {
+    font-family: "Archivo Variable", Archivo, system-ui, sans-serif;
     font-stretch: 62%;
     letter-spacing: 0.01em;
   }
   :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 2px solid #0a7391;
+    outline: 2px solid #0e0e10;
     outline-offset: 2px;
   }
   .on-dark :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline-color: #5ad1ee;
+    outline-color: #ff5b1f;
   }
   .on-light :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline-color: #0a7391;
+    outline-color: #0e0e10;
   }
   /* labels and messages on the dark surfaces, and back to normal inside a light panel placed on them */
-  .on-dark .field-label { color: #e6edf5; }
-  .on-dark .field-hint { color: #9fb0c4; }
+  .on-dark .field-label { color: #f4f4f2; }
+  .on-dark .field-hint { color: #a1a1a8; }
   .on-dark .field-error { color: #fca5a5; }
-  .on-light .field-label { color: #0f1b2d; }
-  .on-light .field-hint { color: #475569; }
+  .on-light .field-label { color: #0e0e10; }
+  .on-light .field-hint { color: #56565c; }
   .on-light .field-error { color: #b91c1c; }
   select,
   input,
@@ -44,7 +45,7 @@
   }
   input[type="checkbox"] {
     @apply h-5 w-5 min-h-0 w-5;
-    accent-color: #0a7391;
+    accent-color: #0e0e10;
   }
   input::placeholder,
   textarea::placeholder {
@@ -78,11 +79,11 @@
   /* a dark panel for the console look: the admin, the board */
   .panel-dark {
     @apply rounded text-console-text;
-    background: linear-gradient(135deg, rgba(150, 215, 255, 0.13), rgba(150, 215, 255, 0.04));
-    border: 1px solid rgba(160, 225, 255, 0.22);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
-    box-shadow: 0 8px 30px rgba(2, 8, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
   /* Registration marks in the corners, like a drawing. Put on a positioned panel. */
   .ticks {
@@ -95,7 +96,7 @@
     width: 14px;
     height: 14px;
     pointer-events: none;
-    border-color: #5ad1ee;
+    border-color: #ff5b1f;
     border-style: solid;
     border-width: 0;
   }
@@ -113,7 +114,7 @@
   }
   .ticks-light::before,
   .ticks-light::after {
-    border-color: #0a7391;
+    border-color: #0e0e10;
   }
   .field-label {
     @apply mb-1 block text-sm font-semibold text-ink;
@@ -167,54 +168,90 @@
 }
 
 /* Site: headline type and the hero chart's one orchestrated entrance. */
-.display {
-  font-stretch: 125%;
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.02em;
+/* Cal Sans makes spaces and punctuation tabular too when tabular figures are on, so headlines turn them off. */
+.display,
+.h-wide,
+.font-display {
+  font-variant-numeric: normal;
 }
-/* Section headlines: the same wide, even cut at a smaller size. */
+/* Display type: Cal Sans, large and tight. Used for the site's headlines and the admin page titles. */
+.display {
+  font-family: "Cal Sans", "DM Sans Variable", system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.022em;
+  word-spacing: 0.08em;
+}
 .h-wide {
-  font-stretch: 125%;
-  font-weight: 700;
-  line-height: 1.08;
+  font-family: "Cal Sans", "DM Sans Variable", system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.06;
   letter-spacing: -0.015em;
+  word-spacing: 0.06em;
 }
 /* A fine dot grid for the dark surfaces. */
 .grid-dots {
-  background-image: radial-gradient(rgba(143, 176, 214, 0.16) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
   background-size: 22px 22px;
 }
-/* Soft colored light behind the glass, so the blur has something to blur. */
+/* A soft light behind the glass, so the blur has something to blur. Use alone: it sets background-image. */
 .aurora {
   background-image:
-    radial-gradient(55% 50% at 10% 5%, rgba(90, 209, 238, 0.26), transparent 70%),
-    radial-gradient(45% 50% at 92% 18%, rgba(124, 108, 255, 0.24), transparent 70%),
-    radial-gradient(60% 40% at 55% 105%, rgba(34, 197, 160, 0.16), transparent 70%);
+    radial-gradient(50% 45% at 85% 0%, rgba(255, 91, 31, 0.22), transparent 70%),
+    radial-gradient(55% 50% at 5% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
+    radial-gradient(60% 40% at 50% 110%, rgba(255, 91, 31, 0.1), transparent 70%);
 }
-/* Glass: a frosted, see-through panel with a cool tint. Works where something sits behind it. */
+/* Glass: a frosted, see-through panel. Works where something sits behind it. */
 .glass {
-  background: linear-gradient(135deg, rgba(150, 215, 255, 0.14), rgba(150, 215, 255, 0.04));
-  border: 1px solid rgba(160, 225, 255, 0.24);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  backdrop-filter: blur(22px) saturate(160%);
-  box-shadow: 0 10px 40px rgba(2, 8, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 .glass-light {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(238, 248, 255, 0.82));
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
-  backdrop-filter: blur(18px) saturate(170%);
-  box-shadow: 0 12px 44px rgba(2, 8, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.84));
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+/* Darker glass for text over photographs. */
+.glass-deep {
+  background: linear-gradient(135deg, rgba(14, 14, 16, 0.62), rgba(14, 14, 16, 0.42));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass { background: #12233a; }
+  .glass-deep { background: rgba(14, 14, 16, 0.85); }
+  .glass { background: #18181b; }
   .glass-light { background: #ffffff; }
 }
-/* The route: a thin line with a node at each end. */
+/* The route: a thin line that fades out. */
 .route-rule {
   height: 1px;
-  background: linear-gradient(90deg, #5ad1ee, rgba(90, 209, 238, 0.15) 70%, transparent);
+  background: linear-gradient(90deg, #ff5b1f, rgba(255, 91, 31, 0.15) 70%, transparent);
+}
+/* The page grid: thin vertical lines in four columns, behind the content of a relative wrapper. */
+.col-lines {
+  position: relative;
+  isolation: isolate;
+}
+.col-lines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(90deg, var(--line, rgba(14, 14, 16, 0.08)) 1px, transparent 1px);
+  background-size: 25% 100%;
+  border-right: 1px solid var(--line, rgba(14, 14, 16, 0.08));
+}
+.on-dark .col-lines { --line: rgba(255, 255, 255, 0.07); }
+@media (max-width: 767px) {
+  .col-lines::before { background-size: 50% 100%; }
 }
 
 @keyframes bar-grow {

@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { MODE_LABEL, type Mode } from "@/lib/constants";
-import { COUNTRIES, CITIES } from "@/lib/places";
+import { CITIES } from "@/lib/places";
 import { ModeTag } from "@/components/ui";
 import { BOARD_ROWS } from "./boardData";
 import { prefersReducedMotion, useInView } from "./hooks";
 
 const NAMES: Record<string, string> = Object.fromEntries(CITIES.map((c) => [c.code, c.name.toUpperCase()]));
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const TONE = { warn: "text-[#FCD34D] bg-[#3A2D0B]", done: "text-[#93C5FD] bg-[#14284A]", go: "text-[#86EFAC] bg-[#0F2F22]", none: "text-console-text bg-[#1A3050]" } as const;
+const TONE = { warn: "text-[#FCD34D] bg-[#3A2D0B]", done: "text-[#A9C4FF] bg-[#1E2230]", go: "text-[#86EFAC] bg-[#0F2F22]", none: "text-console-text bg-[#26262A]" } as const;
 
 /** Split-flap text: each tile flips through letters, then settles. Plain text for screen readers and reduced motion. */
 function Flap({ text, len, tone = "none", go }: { text: string; len: number; tone?: keyof typeof TONE; go: boolean }) {
@@ -91,18 +91,6 @@ export function Board() {
         <p className="mt-3 text-xs text-console-muted">Demo data. Nothing here is a real shipment, carrier or schedule.</p>
       </div>
 
-      <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-        {[
-          [String(CITIES.length), "cities to ship from and to"],
-          [String(COUNTRIES.length), "countries"],
-          ["4", "ways to ship: air, sea, rail, road"],
-        ].map(([n, label]) => (
-          <div key={label} className="panel-dark p-4">
-            <dd className="condensed text-[44px] font-bold leading-none">{n}</dd>
-            <dt className="mt-1 text-sm text-console-muted">{label}</dt>
-          </div>
-        ))}
-      </dl>
     </div>
   );
 }

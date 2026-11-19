@@ -5,24 +5,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "#F2F5F8",
+        paper: "#F3F3F1",
         panel: "#FFFFFF",
-        ink: "#0F1B2D",
-        muted: "#475569",
-        rule: "#D6DEE8",
+        ink: "#0E0E10",
+        muted: "#56565C",
+        rule: "#DCDCD6",
         // modes: they only ever identify a mode
         air: "#2F4FD0",
-        road: "#C2410C",
+        road: "#8A5A00",
         rail: "#237A35",
         sea: "#6D3FD0",
         good: "#15803D",
         bad: "#B91C1C",
-        // the signal color: links, primary actions, focus, the route line
-        ion: { DEFAULT: "#0A7391", bright: "#5AD1EE", dark: "#085F78" },
+        // actions: ink on light surfaces; the signal orange on dark ones (always with ink text on it)
+        ion: { DEFAULT: "#0E0E10", bright: "#FF5B1F", dark: "#2A2A2E" },
+        // the one accent: marks, featured actions, the stats band. Never as text on a light surface.
+        signal: "#FF5B1F",
         // dark surfaces: the site's top and bottom, and the admin console
-        console: { DEFAULT: "#0B1626", raised: "#12233A", rule: "#25405E", text: "#E6EDF5", muted: "#9FB0C4" },
+        console: { DEFAULT: "#0E0E10", raised: "#18181B", rule: "#2C2C30", text: "#F4F4F2", muted: "#A1A1A8" },
       },
-      fontFamily: { sans: ['"Archivo Variable"', "Archivo", "system-ui", "sans-serif"] },
+      fontFamily: {
+        sans: ['"DM Sans Variable"', "DM Sans", "system-ui", "sans-serif"],
+        display: ['"Cal Sans"', '"DM Sans Variable"', "system-ui", "sans-serif"],
+      },
       fontSize: { xs: "12px", sm: "14px", base: "16px", xl: "20px", "2xl": "28px", "5xl": "56px" },
       borderRadius: { DEFAULT: "4px" },
       boxShadow: { drawer: "-8px 0 24px rgba(17,24,39,0.18)" },

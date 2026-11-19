@@ -62,18 +62,17 @@ Need a change outside your area? Open an issue or ask the owner.
 
 ## The look: keep these
 
-The site, the app and the admin share one look: a calm dispatch console. The top and bottom of the site, the scroll story, the shipment board and the whole admin are dark; the screens where people read numbers and fill forms (compare, new shipment, bookings) are light. Change the look in `tailwind.config.ts` and `src/app/globals.css` so everything follows.
+The site follows the layout grammar of a studio template the owner chose: thin column lines, a sticky title column on the left with rows on the right, large display type, full-bleed photographs with glass, a numbered label on every section, and a big wordmark in the footer. Light sections (white and warm grey) alternate with graphite ones; the app screens are light, the admin is graphite. Change the look in `tailwind.config.ts` and `src/app/globals.css` so everything follows; site-only rules are in `src/app/site.css`.
 
-- **Colors (tokens in `tailwind.config.ts`):** light surfaces Paper `#F2F5F8`, Panel `#FFFFFF`, Ink `#0F1B2D`, Rule `#D6DEE8`. Dark surfaces `console` `#0B1626`, `console-raised` `#12233A`, `console-rule` `#25405E`, text `#E6EDF5` and `#9FB0C4`. One signal color, Ion: `#0A7391` on light, `#5AD1EE` on dark (`ion-bright`). Use Ion for primary buttons, links, focus and the route line.
-- **Mode colors only identify a mode** and are never decoration: Air `#2F4FD0`, Sea `#6D3FD0`, Rail `#237A35`, Road `#C2410C`. They live in `tailwind.config.ts` and in `MODE_HEX` in `src/lib/constants.ts`; change both together. `MODE_HEX_BRIGHT` is the same set for the dark charts.
-- **Type:** Archivo (variable). Headlines use the wide cut (`.display`, `.h-wide`, `font-stretch: 125%`). Numbers and airport codes use the condensed cut (`.condensed`) and tabular figures. Body text is 16 px or larger, at AA contrast.
-- **Glass:** `.glass` and `.panel-dark` (dark, cool-tinted, frosted) and `.glass-light` (light, frosted). Glass only works where something sits behind it, so dark areas have `.aurora` (soft cyan, indigo and teal light) and the story has its scenery. Keep enough opacity that text stays AA: the scan (`a11y-check`) catches a header that is too see-through.
-- **Dark areas:** put `on-dark` on the wrapper (it brightens the focus ring and the form labels). Put `on-light` on a light panel placed inside a dark area. Buttons on dark are `btn-bright` and `btn-ghost`; panels are `panel-dark`.
-- **Signature details, used sparingly:** corner marks (`ticks`) on the key panels, the thin route line (`route-rule`) above the big headlines, the dot grid (`grid-dots`) on dark surfaces.
-- **Shape:** 4 px radius. No decorative shadows.
-- **Motion:** respect `prefers-reduced-motion`. Nothing loops forever.
-- **Header height:** the scroll story sticks under the header (`--story-top: 61px` in `src/app/story.css`). If you change the header height, change that number too, and run the story check.
-- **Words:** plain English, sentence case, the same name for the same action everywhere ("Request booking", "Approve", "Add capacity"). Never write "AI-powered". Never write a real airline, carrier or company name, and never imply a real integration.
+- **Colors (tokens in `tailwind.config.ts`):** Paper `#F3F3F1`, Panel `#FFFFFF`, Ink `#0E0E10`, Muted `#56565C`, Rule `#DCDCD6`. Graphite surfaces `console` `#0E0E10`, `console-raised` `#18181B`, `console-rule` `#2C2C30`, text `#F4F4F2` and `#A1A1A8`.
+- **One accent, Signal orange `#FF5B1F`** (`signal`, and `ion-bright` on dark). Marks, featured buttons, the stats band, highlighted cards. Text on it is always Ink (white fails contrast). Never use it as text on a light surface. Primary buttons on light surfaces are Ink (`btn`); on dark they are Signal (`btn-bright`).
+- **Mode colors only identify a mode:** Air `#2F4FD0`, Sea `#6D3FD0`, Rail `#237A35`, Road `#8A5A00` (ochre, so it never reads as the accent). They live in `tailwind.config.ts`, `MODE_HEX` and `MODE_HEX_BRIGHT` (for dark surfaces) in `src/lib/constants.ts`; change them together and keep them AA on white and on Paper.
+- **Type:** Cal Sans for display (`.display`, `.h-wide`, `font-display`), DM Sans for text, condensed Archivo for numbers and airport codes (`.condensed`). Body text is 16 px or larger. Headlines turn tabular figures off, because Cal Sans would otherwise widen spaces and commas.
+- **Glass:** `.glass` (dark, frosted), `.glass-deep` (darker, for text over photographs), `.glass-light`, and `.panel-dark` in the admin. Glass needs something behind it: the route map, a photograph, or `.aurora` (a soft orange light). Use `.aurora` on its own, never together with `.grid-dots`, which sets the same background.
+- **Labels and grid:** `site-label` (orange mark and a numbered name), `col-lines` (four column lines on a relative wrapper), `route-rule`.
+- **Motion:** one entrance (the route map draws in), and two scroll-driven effects (the statement's words darken, the mode marquee moves). Nothing loops. With reduced motion or without JavaScript everything is shown finished.
+- **Shape:** 4 px radius for controls, 8 px for cards and photos.
+- **Words:** plain English, sentence case, the same name for the same action everywhere ("Request booking", "Approve", "Add capacity"). Never write "AI-powered". Never write a real airline, carrier or company name, never imply a real integration, and no invented testimonials, ratings, client logos or prices for AeroMatch itself.
 
 ## Honesty rules for the content
 
@@ -88,7 +87,6 @@ npm test                 # unit tests for the rules
 npm run build            # the production build
 npm run demo:check       # the whole demo script in a browser (needs the app running, and Playwright)
 node scripts/a11y-check.mjs   # accessibility scan (axe) of the main screens; with ADMIN_PASSCODE set on the server and in the shell it scans the admin too
-node scripts/story-check.mjs  # the scroll story: transitions, photos, reduced motion, phone
 ```
 
 For the browser scripts, start the app with `npm run build && npm start` and run them with `BASE_URL=http://localhost:3000`. Reseed (`npm run db:seed`) before each one.

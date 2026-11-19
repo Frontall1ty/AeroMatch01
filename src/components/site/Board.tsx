@@ -9,7 +9,7 @@ import { prefersReducedMotion, useInView } from "./hooks";
 
 const NAMES: Record<string, string> = Object.fromEntries(CITIES.map((c) => [c.code, c.name.toUpperCase()]));
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const TONE = { warn: "text-[#FCD34D] bg-[#3A2D0B]", done: "text-[#93C5FD] bg-[#14284A]", go: "text-[#86EFAC] bg-[#0F2F22]", none: "text-console-text bg-[#1A3050]" } as const;
+const TONE = { warn: "text-[#FCD34D] bg-[#3A2D0B]", done: "text-[#93C5FD] bg-[#14284A]", go: "text-[#86EFAC] bg-[#0F2F22]", none: "text-console-text bg-[#262626]" } as const;
 
 /** Split-flap text: each tile flips through letters, then settles. Plain text for screen readers and reduced motion. */
 function Flap({ text, len, tone = "none", go }: { text: string; len: number; tone?: keyof typeof TONE; go: boolean }) {

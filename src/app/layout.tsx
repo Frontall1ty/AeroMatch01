@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import "@fontsource-variable/dm-sans/index.css";
 import "@fontsource-variable/archivo/wdth.css";
 import "./globals.css";
 

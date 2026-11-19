@@ -5,11 +5,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "#F2F5F8",
+        paper: "#F1F1F1",
         panel: "#FFFFFF",
-        ink: "#0F1B2D",
-        muted: "#475569",
-        rule: "#D6DEE8",
+        ink: "#0A0A0A",
+        muted: "#525252",
+        rule: "#D9D9D9",
         // modes: they only ever identify a mode
         air: "#2F4FD0",
         road: "#C2410C",
@@ -17,12 +17,12 @@ const config: Config = {
         sea: "#6D3FD0",
         good: "#15803D",
         bad: "#B91C1C",
-        // the signal color: links, primary actions, focus, the route line
-        ion: { DEFAULT: "#0A7391", bright: "#5AD1EE", dark: "#085F78" },
+        // the action color: black on light surfaces, white on dark ones (the template is monochrome)
+        ion: { DEFAULT: "#0A0A0A", bright: "#FFFFFF", dark: "#262626" },
         // dark surfaces: the site's top and bottom, and the admin console
-        console: { DEFAULT: "#0B1626", raised: "#12233A", rule: "#25405E", text: "#E6EDF5", muted: "#9FB0C4" },
+        console: { DEFAULT: "#0A0A0A", raised: "#161616", rule: "#2E2E2E", text: "#F2F2F2", muted: "#A3A3A3" },
       },
-      fontFamily: { sans: ['"Archivo Variable"', "Archivo", "system-ui", "sans-serif"] },
+      fontFamily: { sans: ['"DM Sans Variable"', "DM Sans", "system-ui", "sans-serif"], numeric: ['"Archivo Variable"', "Archivo", "system-ui", "sans-serif"] },
       fontSize: { xs: "12px", sm: "14px", base: "16px", xl: "20px", "2xl": "28px", "5xl": "56px" },
       borderRadius: { DEFAULT: "4px" },
       boxShadow: { drawer: "-8px 0 24px rgba(17,24,39,0.18)" },

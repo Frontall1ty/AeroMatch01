@@ -47,6 +47,13 @@ await page.goto(`${BASE}/demo`);
 await page.getByRole("button", { name: /Demo Textile Export LLC/ }).click();
 await page.waitForURL("**/shipper/new");
 await scan("new shipment");
+await scan("new shipment, inside the plane", () => page.getByRole("button", { name: "Look inside" }).click());
+await page.getByRole("button", { name: /Back to the/ }).click();
+await scan("new shipment, sea (not offered here)", () => page.getByRole("button", { name: /Next way to ship/ }).click());
+await scan("new shipment, step 2 with a preference", async () => {
+  await page.getByRole("button", { name: /Next way to ship/ }).click();
+  await page.getByRole("button", { name: "Ship by rail" }).click();
+});
 await page.getByRole("button", { name: "Load demo shipment" }).click();
 await page.getByRole("button", { name: "Compare options" }).click();
 await page.waitForURL("**/shipper/compare/**");

@@ -9,9 +9,10 @@ import { MODE_ORDER, type Mode } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-export default async function Compare({ params }: { params: Promise<{ id: string }> }) {
+export default async function Compare({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ mode?: string }> }) {
   const session = await requireRole("SHIPPER");
   const { id } = await params;
+  const { mode } = await searchParams;
 
   const shipment = await prisma.shipmentRequest.findUnique({ where: { id } });
   if (!shipment || shipment.shipperCompanyId !== session.companyId) notFound();
@@ -56,6 +57,7 @@ export default async function Compare({ params }: { params: Promise<{ id: string
         offers={offers}
         breakdown={breakdown}
         deadlineDay={daysBetween(shipment.readyDate, shipment.deliverBy)}
+        initialMode={(MODE_ORDER as readonly string[]).includes(mode ?? "") ? (mode as Mode) : null}
       /></div>
     </div>
   );

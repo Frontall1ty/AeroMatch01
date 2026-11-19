@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { prefersReducedMotion } from "../hooks";
+import { prefersReducedMotion } from "@/components/site/hooks";
 
 const KEY = "am-motion";
 
@@ -16,7 +16,7 @@ function apply(paused: boolean) {
   window.dispatchEvent(new CustomEvent("am-motion", { detail: { paused } }));
 }
 
-export function MotionToggle({ className = "" }: { className?: string }) {
+export function MotionToggle({ className = "", light = false }: { className?: string; light?: boolean }) {
   const [paused, setPaused] = useState(false);
   useEffect(() => {
     let saved: string | null = null;
@@ -47,7 +47,7 @@ export function MotionToggle({ className = "" }: { className?: string }) {
           // not remembered, still applied
         }
       }}
-      className={`inline-flex min-h-[32px] items-center gap-2 rounded border border-white/20 px-2.5 text-xs font-semibold text-console-text transition-colors hover:border-ion-bright hover:text-white ${className}`}
+      className={`inline-flex min-h-[32px] items-center gap-2 rounded border px-2.5 text-xs font-semibold transition-colors ${light ? "border-rule bg-panel text-ink hover:border-ink" : "border-white/20 text-console-text hover:border-ion-bright hover:text-white"} ${className}`}
     >
       <span aria-hidden className="inline-flex h-3 w-3 items-center justify-center">
         {paused ? (

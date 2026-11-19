@@ -416,3 +416,159 @@
   .panel, .panel-dark, .glass, .glass-light { box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #ffffff !important; color: #0f1b2d !important; border-color: #9ca3af !important; }
   a { text-decoration: none; }
 }
+
+/* ---------- Shared by the site and the app: links, cards, things that move by themselves ---------- */
+/* ---------- Links and cards that answer the pointer ---------- */
+.nav-link {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.2s ease;
+}
+.nav-link:hover,
+.nav-link:focus-visible {
+  background-size: 100% 1px;
+}
+.lift {
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 44px -24px rgba(14, 14, 16, 0.45);
+  }
+  .on-dark .lift:hover,
+  .lift.on-dark:hover {
+    box-shadow: 0 22px 44px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 91, 31, 0.35);
+  }
+}
+.photo-card .glass-deep {
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.3s ease;
+}
+@media (hover: hover) {
+  .photo-card:hover .glass-deep {
+    transform: translateY(-6px);
+  }
+}
+.faq-row summary {
+  transition: color 0.2s ease;
+}
+.faq-row summary:hover {
+  color: #56565c;
+}
+.faq-row[open] summary > span:last-child {
+  background: #ff5b1f;
+  border-color: #ff5b1f;
+}
+
+/* ---------- Things that move by themselves: the hero traffic and the mode videos ---------- */
+/* Stills that keep moving: a slow push and drift of the camera. */
+.drift {
+  animation: drift 16s ease-in-out infinite alternate;
+  transform-origin: 50% 50%;
+}
+@keyframes drift {
+  from { transform: scale(1.06) translate(-1.5%, -1%); }
+  to { transform: scale(1.16) translate(1.5%, 1%); }
+}
+html[data-motion="paused"] .drift { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="playing"]) .drift { animation: none; }
+}
+
+/* With reduced motion they are not drawn, unless the visitor presses Play motion. */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="playing"]) .route-movers { display: none; }
+}
+
+
+/* The cargo boxes in the hold picture drop in, and lift when pointed at. */
+.iso-box {
+  animation: iso-drop 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
+  transition: filter 0.15s ease, translate 0.2s ease;
+  cursor: default;
+}
+.iso-box.is-active,
+.iso-box:hover {
+  filter: brightness(1.12) drop-shadow(0 4px 5px rgba(0, 0, 0, 0.3));
+  translate: 0 -3px;
+}
+@keyframes iso-drop {
+  from { opacity: 0; transform: translateY(-28px); }
+  to { opacity: 1; transform: none; }
+}
+/* The plane that crosses the air card. */
+.fly-across {
+  animation: fly-across 14s linear infinite;
+}
+@keyframes fly-across {
+  0% { transform: translate(-30%, 12%) rotate(-3deg); }
+  50% { transform: translate(55%, -4%) rotate(-5deg); }
+  100% { transform: translate(140%, -18%) rotate(-3deg); }
+}
+html[data-motion="paused"] .fly-across { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .iso-box { animation: none; }
+  .lift, .lift:hover, .photo-card .glass-deep { transform: none !important; transition: none; }
+  html:not([data-motion="playing"]) .fly-across { animation: none; transform: translate(30%, 0); }
+}
+
+/* ---------- The new-shipment showroom ---------- */
+/* The large card: a deep shadow, and the media fades in when another way is shown. */
+.mode-stage {
+  box-shadow: 0 40px 80px -36px rgba(14, 14, 16, 0.6), 0 12px 28px -18px rgba(14, 14, 16, 0.5);
+}
+.stage-in {
+  animation: stage-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes stage-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+/* Look inside: the cutaway opens from the middle of the card, like a roof lifting off. */
+.stage-reveal {
+  animation: stage-reveal 0.65s cubic-bezier(0.3, 0.1, 0.2, 1) both;
+}
+@keyframes stage-reveal {
+  from { clip-path: circle(0% at 50% 50%); }
+  to { clip-path: circle(150% at 50% 50%); }
+}
+.stage-next {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0e0e10;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), background-color 0.2s ease;
+}
+.stage-next:hover,
+.stage-next:focus-visible {
+  background: #ff5b1f;
+  transform: scale(1.06);
+}
+.stage-next svg { transition: transform 0.25s ease; }
+.stage-next:hover svg,
+.stage-next:focus-visible svg { transform: translateX(3px); }
+/* The three small cards lift with a longer shadow, and an arrow turns towards you. */
+.mode-mini {
+  box-shadow: 0 14px 30px -20px rgba(14, 14, 16, 0.55);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.35s ease;
+}
+.mini-arrow {
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.mode-mini:focus-visible .mini-arrow { opacity: 1; transform: none; }
+@media (hover: hover) {
+  .mode-mini:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 44px -22px rgba(14, 14, 16, 0.7), 0 0 0 1px rgba(255, 91, 31, 0.45);
+  }
+  .mode-mini:hover .mini-arrow { opacity: 1; transform: none; }
+}
+/* The hold picture next to the form follows the page while you type. */
+.hold-panel {
+  box-shadow: 0 30px 60px -34px rgba(14, 14, 16, 0.55);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-in, .stage-reveal { animation: none; }
+  .mode-mini, .mode-mini:hover, .stage-next, .stage-next:hover { transform: none; transition: none; }
+}

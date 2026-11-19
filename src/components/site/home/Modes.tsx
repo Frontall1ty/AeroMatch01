@@ -2,9 +2,8 @@
 
 import { MODE_HEX_BRIGHT, MODE_LABEL, SAFETY_BY_MODE, type Mode } from "@/lib/constants";
 import { MAX_RAIL_KM, MAX_ROAD_KM } from "@/lib/places";
-import { useEffect, useRef } from "react";
-import { prefersReducedMotion } from "../hooks";
-import { MotionToggle } from "./MotionToggle";
+import { LoopVideo } from "@/components/media/LoopVideo";
+import { MotionToggle } from "@/components/media/MotionToggle";
 import { useProgress } from "./useProgress";
 
 const MODES: { mode: Mode; photo: string; video?: string; time: string; priced: string; runs: string }[] = [
@@ -18,44 +17,6 @@ const WORDS = ["Air", "Sea", "Rail", "Road", "Air", "Sea", "Rail", "Road"];
 
 const MEDIA = "aspect-[4/5] w-full object-cover sm:aspect-[4/3] md:aspect-[16/12]";
 
-/**
- * A short silent loop. It downloads and plays only while it is on screen, stops with the Pause motion button,
- * and stays on its still picture with reduced motion.
- */
-function ModeVideo({ name }: { name: string }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    const paused = () => document.documentElement.dataset.motion === "paused" || (!document.documentElement.dataset.motion && prefersReducedMotion());
-    const io = new IntersectionObserver(([e]) => {
-      v.dataset.visible = String(e.isIntersecting);
-      if (e.isIntersecting && !paused()) v.play().catch(() => {});
-      else v.pause();
-    }, { threshold: 0.2 });
-    io.observe(v);
-    return () => io.disconnect();
-  }, []);
-  return (
-    <video
-      ref={ref}
-      data-motion=""
-      className={MEDIA}
-      src={`/videos/${name}.mp4`}
-      poster={`/videos/${name}-poster.webp`}
-      muted
-      loop
-      playsInline
-      preload="none"
-      aria-hidden
-      tabIndex={-1}
-      width={960}
-      height={540}
-    />
-  );
-}
-
-/** The four ways: a marquee that follows the scroll, then one photograph per mode with its facts on glass. */
 export function Modes() {
   const [ref, p] = useProgress<HTMLDivElement>(1, -0.2);
   return (
@@ -89,7 +50,7 @@ export function Modes() {
           {MODES.map((m) => (
             <li key={m.mode} className="photo-card relative overflow-hidden rounded-lg">
               {m.video ? (
-                <ModeVideo name={m.video} />
+                <LoopVideo name={m.video} className={MEDIA} />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img

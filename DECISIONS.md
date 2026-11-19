@@ -68,6 +68,8 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 - **Suspending a carrier** hides its offers from shippers and stops it adding capacity. It is enforced in `visibleListingsWhere` and `isVisibleToShipper` and when a booking is requested, not only on screen. The schema change is additive (`Company.suspendedAt`, the `AdminAction` table).
 - **Every admin server action and the CSV routes check the admin session themselves.**
 - **Passcodes are compared after trimming spaces, line breaks and one pair of wrapping quotes,** on both the typed value and the environment value, so a stray character pasted into Vercel does not lock people out. The gate field has a Show button.
+- **The way to ship picked first is a preference, not a filter (Nov 2026).** The new-shipment page starts with the four ways. Choosing one only decides which tile the comparison opens on (`?mode=`, validated on the server and again on the page). The comparison still builds every offer, and if no offer of the chosen way fits, it says so and shows all. **Compare all four** skips the choice. A way that does not exist from the shipper's city (sea from Tashkent: no sea port) is shown with the reason and cannot be chosen. Editing a shipment skips the choice.
+- **Departure counts on the new-shipment page are real counts from the demo database**, with the comparison's conditions (open, departing on or after the ready date, verified carrier, not suspended), from the shipper's own city. No rounded marketing numbers.
 
 ## Implementation choices
 

@@ -85,7 +85,7 @@ The plan, in the order it can be added:
 
 0. Open `/`, read the site, then go to `/demo` and choose the demo carrier **Demo Air Cargo A**.
 1. Carrier: **Add capacity**. Click **Duplicate last listing**, pick **In 3 days**, click **Add capacity**.
-2. Shipper: **New shipment**, **Load demo shipment** (25 crates; totals appear by themselves), **Compare options**. Point out the lane chart, the Recommended line with its reason, and the reasons under **Not available**.
+2. Shipper: **New shipment** opens on the four ways to ship. Show **Look inside** on Air (the cargo space with the roof cut away), then **Next** through Sea (not offered from Tashkent, with the reason), Rail and Road. Choose **Ship by road** (or **Compare all four**), **Load demo shipment** (25 crates; totals appear by themselves, and the trailer beside the form fills up), **Compare options**. Point out the lane chart, the Recommended line with its reason, and the reasons under **Not available**.
 3. Switch priority to **Fastest** (air), **Cheapest** (rail, priced per m²), then **Balanced** (road, flat truck price). Point at the price column: every offer shows how it is calculated.
 4. **Request booking** on an air offer. Show the document checklist, then confirm.
 5. Carrier: **Requests**, **Approve**. Then **Active bookings**, **Mark as ...** until Delivered.

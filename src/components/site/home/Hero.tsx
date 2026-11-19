@@ -6,7 +6,7 @@ import { money } from "@/lib/format";
 import { MAX_RAIL_KM, MAX_ROAD_KM } from "@/lib/places";
 import { HERO_OFFERS } from "../siteData";
 import { Arrow } from "./Arrow";
-import { MotionToggle } from "./MotionToggle";
+import { MotionToggle } from "@/components/media/MotionToggle";
 import { RouteMap } from "./RouteMap";
 
 const LABEL = { CHEAPEST: "Cheapest", FASTEST: "Fastest", SAFEST: "Safest" } as const;

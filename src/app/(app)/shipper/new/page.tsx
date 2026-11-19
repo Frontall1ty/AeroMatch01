@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/db";
-import { cityByCode, destinationsFrom } from "@/lib/constants";
+import { MODE_ORDER, cityByCode, cityName, destinationsFrom, modesBetween, type Mode } from "@/lib/constants";
 import { addDays, toInputDate, todayUtc } from "@/lib/dates";
 import { getDemoReadyDate } from "@/lib/queries";
 import { requireRole } from "@/lib/session";
-import { ShipmentForm, type ShipmentDefaults } from "@/components/ShipmentForm";
-import { PageTitle } from "@/components/ui";
+import { type ShipmentDefaults } from "@/components/ShipmentForm";
+import { ShipmentStudio } from "@/components/shipper/ShipmentStudio";
+import type { ModeInfo } from "@/components/shipper/ModeChooser";
 
 export const dynamic = "force-dynamic";
 
@@ -81,10 +82,41 @@ export default async function NewShipment({ searchParams }: { searchParams: Prom
     }
   }
 
+  // What each way to ship looks like from the shipper's city: whether it exists at all, and how many departures are
+  // open now. The count uses the same conditions as the comparison: open, not yet gone, verified carrier, not suspended.
+  const reachable = new Set(destinationsFrom(home).flatMap((c) => modesBetween(home, c.code)));
+  const counts = await prisma.capacityListing.groupBy({
+    by: ["mode"],
+    where: { origin: home, status: "OPEN", departureDate: { gte: ready }, carrier: { verified: true, suspendedAt: null } },
+    _count: { _all: true },
+  });
+  const homeName = cityName(home);
+  const REASON: Record<Mode, string> = {
+    AIR: `No air lane from ${homeName}`,
+    SEA: `${homeName} has no sea port`,
+    RAIL: `No rail lane from ${homeName}`,
+    ROAD: `No road lane from ${homeName}`,
+  };
+  const info = Object.fromEntries(
+    MODE_ORDER.map((m) => [
+      m,
+      {
+        available: reachable.has(m),
+        reason: reachable.has(m) ? "" : REASON[m],
+        departures: counts.find((c) => c.mode === m)?._count._all ?? 0,
+      },
+    ]),
+  ) as Record<Mode, ModeInfo>;
+
   return (
-    <div className="mx-auto max-w-3xl">
-      <PageTitle title="New shipment" />
-      <ShipmentForm defaults={defaults} demo={demo} today={toInputDate(todayUtc())} />
-    </div>
+    <ShipmentStudio
+      key={edit ?? "new"}
+      defaults={defaults}
+      demo={demo}
+      today={toInputDate(todayUtc())}
+      info={info}
+      home={homeName}
+      chooser={!edit}
+    />
   );
 }

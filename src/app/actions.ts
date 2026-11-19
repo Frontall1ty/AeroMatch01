@@ -85,7 +85,9 @@ export async function createShipment(input: unknown): Promise<ActionResult> {
       notes: v.notes,
     },
   });
-  redirect(`/shipper/compare/${created.id}`);
+  // The way the shipper picked first only decides which mode the comparison opens on.
+  const preferred = z.enum(["AIR", "SEA", "RAIL", "ROAD"]).safeParse((input as { preferredMode?: unknown } | null)?.preferredMode);
+  redirect(`/shipper/compare/${created.id}${preferred.success ? `?mode=${preferred.data}` : ""}`);
 }
 
 export async function requestBooking(input: { shipmentId: string; listingId: string }): Promise<ActionResult> {

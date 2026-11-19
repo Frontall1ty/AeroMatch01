@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { createShipment } from "@/app/actions";
-import { CARGO_TYPES, STACK_HEIGHT_M, VEHICLE_ESTIMATE, destinationsFrom, type CargoKind } from "@/lib/constants";
+import { CARGO_TYPES, STACK_HEIGHT_M, VEHICLE_ESTIMATE, destinationsFrom, type CargoKind, type Mode } from "@/lib/constants";
 import { CitySelect } from "./CitySelect";
 import { DestinationPicker } from "./DestinationPicker";
 import { addDays, parseDate, toInputDate } from "@/lib/dates";
@@ -38,12 +38,21 @@ export function ShipmentForm({
   defaults,
   demo,
   today,
+  preferredMode = null,
+  onChange,
 }: {
   defaults: ShipmentDefaults;
   demo: ShipmentDefaults;
   today: string;
+  /** The way the shipper picked first. Only decides which mode the comparison opens on. */
+  preferredMode?: Mode | null;
+  /** Called with the values as they change, for the hold picture next to the form. */
+  onChange?: (v: ShipmentDefaults) => void;
 }) {
   const [v, setV] = useState<ShipmentDefaults>(defaults);
+  useEffect(() => {
+    onChange?.(v);
+  }, [v, onChange]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
   const [pending, start] = useTransition();
@@ -76,6 +85,7 @@ export function ShipmentForm({
     setFormError("");
     start(async () => {
       const result = await createShipment({
+        preferredMode,
         origin: v.origin,
         destination: v.destination,
         cargoKind: v.cargoKind,

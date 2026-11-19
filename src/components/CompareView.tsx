@@ -67,14 +67,18 @@ export function CompareView({
   offers,
   breakdown,
   deadlineDay,
+  initialMode = null,
 }: {
   shipment: ShipmentSummary;
   offers: OfferView[];
   breakdown: Breakdown;
   deadlineDay: number;
+  /** The way the shipper picked before entering the cargo. Opens on it only if one of its offers fits. */
+  initialMode?: Mode | null;
 }) {
+  const preferredFits = initialMode !== null && offers.some((o) => o.mode === initialMode && o.status === "OK");
   const [priority, setPriority] = useState<Priority>("BALANCED");
-  const [modeFilter, setModeFilter] = useState<Mode | null>(null);
+  const [modeFilter, setModeFilter] = useState<Mode | null>(preferredFits ? initialMode : null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
 
@@ -189,6 +193,11 @@ export function CompareView({
             );
           })}
         </div>
+        {initialMode && !preferredFits && (
+          <p role="status" className="mt-3 rounded border border-rule bg-panel px-3 py-2 text-sm">
+            You picked {MODE_LABEL[initialMode].toLowerCase()}, but no {MODE_LABEL[initialMode].toLowerCase()} option fits this shipment, so every way that does is shown.
+          </p>
+        )}
         <p className="mt-2 text-xs text-muted">{SAFETY_NOTE} Prices are demo data.</p>
       </section>
 

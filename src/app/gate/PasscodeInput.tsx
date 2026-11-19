@@ -17,8 +17,9 @@ export function PasscodeInput({ invalid }: { invalid: boolean }) {
         spellCheck={false}
         required
         aria-invalid={invalid}
+        className="!border-console-rule !bg-console !text-console-text"
       />
-      <button type="button" className="btn-secondary shrink-0" aria-pressed={shown} onClick={() => setShown((v) => !v)}>
+      <button type="button" className="btn-ghost shrink-0" aria-pressed={shown} onClick={() => setShown((v) => !v)}>
         {shown ? "Hide" : "Show"}
       </button>
     </div>

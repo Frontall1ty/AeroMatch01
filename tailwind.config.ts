@@ -13,12 +13,12 @@ const config: Config = {
         // modes: they only ever identify a mode
         air: "#2F4FD0",
         road: "#C2410C",
-        rail: "#2B8A3E",
+        rail: "#237A35",
         sea: "#6D3FD0",
         good: "#15803D",
         bad: "#B91C1C",
         // the signal color: links, primary actions, focus, the route line
-        ion: { DEFAULT: "#0B7A9B", bright: "#5AD1EE", dark: "#096683" },
+        ion: { DEFAULT: "#0A7391", bright: "#5AD1EE", dark: "#085F78" },
         // dark surfaces: the site's top and bottom, and the admin console
         console: { DEFAULT: "#0B1626", raised: "#12233A", rule: "#25405E", text: "#E6EDF5", muted: "#9FB0C4" },
       },

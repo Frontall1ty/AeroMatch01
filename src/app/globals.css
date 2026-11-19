@@ -20,14 +20,14 @@
     letter-spacing: 0.01em;
   }
   :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 2px solid #0b7a9b;
+    outline: 2px solid #0a7391;
     outline-offset: 2px;
   }
   .on-dark :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
     outline-color: #5ad1ee;
   }
   .on-light :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline-color: #0b7a9b;
+    outline-color: #0a7391;
   }
   /* labels and messages on the dark surfaces, and back to normal inside a light panel placed on them */
   .on-dark .field-label { color: #e6edf5; }
@@ -44,7 +44,7 @@
   }
   input[type="checkbox"] {
     @apply h-5 w-5 min-h-0 w-5;
-    accent-color: #0b7a9b;
+    accent-color: #0a7391;
   }
   input::placeholder,
   textarea::placeholder {
@@ -108,7 +108,7 @@
   }
   .ticks-light::before,
   .ticks-light::after {
-    border-color: #0b7a9b;
+    border-color: #0a7391;
   }
   .field-label {
     @apply mb-1 block text-sm font-semibold text-ink;

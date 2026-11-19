@@ -29,6 +29,12 @@ export default async function Account({ searchParams }: { searchParams: Promise<
         </p>
       )}
 
+      {carrier && session.suspended && (
+        <p role="status" className="mb-4 rounded border border-bad px-3 py-2 text-sm font-medium text-bad">
+          This account is suspended. Shippers do not see your offers and you cannot add capacity. Contact the AeroMatch team to find out why and how to restore it.
+        </p>
+      )}
+
       {carrier && (
         <section className="panel mb-6 p-5" aria-labelledby="verification">
           <div className="flex flex-wrap items-center justify-between gap-3">

@@ -63,7 +63,7 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 
 ## Design and admin (Nov 2026)
 
-- **A dispatch-console look.** Futuristic and minimal, tuned for readers aged 30 to 50: dark console surfaces for the site's top and bottom, the story, the board and the admin; light surfaces for forms and comparison; one signal color (Ion) that is not a mode color. Rail changed from teal to green so it does not look like the signal color. Tokens are in `CONTRIBUTING.md`. This replaces the earlier "paper, ink, no gradients" look.
+- **A dispatch-console look.** Futuristic and minimal, tuned for readers aged 30 to 50: dark console surfaces for the site's top and bottom, the story, the board and the admin; light surfaces for forms and comparison; one signal color (Ion) that is not a mode color. Rail changed from teal to a darker green (AA contrast as text) so it does not look like the signal color. Tokens are in `CONTRIBUTING.md`. This replaces the earlier "paper, ink, no gradients" look.
 - **The admin is a console, not one table.** Overview (what needs a decision, charts), Carriers (queue with filters and search), Shippers, Listings (close and reopen), Bookings, Activity (a record of every admin action), System (settings as on and off, database check, CSV export, demo reset). Passcodes and secrets are never shown.
 - **Suspending a carrier** hides its offers from shippers and stops it adding capacity. It is enforced in `visibleListingsWhere` and `isVisibleToShipper` and when a booking is requested, not only on screen. The schema change is additive (`Company.suspendedAt`, the `AdminAction` table).
 - **Every admin server action and the CSV routes check the admin session themselves.**

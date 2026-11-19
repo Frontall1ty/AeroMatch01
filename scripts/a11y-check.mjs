@@ -37,6 +37,10 @@ await page.goto(`${BASE}/login`);
 await scan("log in");
 await page.goto(`${BASE}/demo`);
 await scan("demo accounts");
+await page.goto(`${BASE}/gate`);
+await scan("passcode gate");
+await page.goto(`${BASE}/gate?error=wrong`);
+await scan("passcode gate with an error");
 
 console.log("\n[Shipper]");
 await page.getByRole("button", { name: /Demo Textile Export LLC/ }).click();

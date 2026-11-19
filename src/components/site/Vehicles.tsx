@@ -40,7 +40,7 @@ function Wheel({ x, y, r = 10 }: { x: number; y: number; r?: number }) {
   );
 }
 
-export function TruckArt({ className, style, color = "#2F55E0" }: P & { color?: string }) {
+export function TruckArt({ className, style, color = MODE_HEX.ROAD }: P & { color?: string }) {
   const id = useIds();
   return (
     <svg viewBox="0 0 300 100" className={className} style={style} aria-hidden fill="none">

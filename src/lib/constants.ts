@@ -12,7 +12,7 @@ export const SAFETY_BY_MODE: Record<Mode, number> = { AIR: 5, RAIL: 4, SEA: 3, R
 export const SAFETY_NOTE = "Handling safety is a demo estimate, not measured data.";
 
 /** The color that stands for each mode in drawings. The same hex values as the air, sea, rail and road colors in tailwind.config.ts. */
-export const MODE_HEX: Record<Mode, string> = { AIR: "#2F4FD0", SEA: "#6D3FD0", RAIL: "#2B8A3E", ROAD: "#C2410C" };
+export const MODE_HEX: Record<Mode, string> = { AIR: "#2F4FD0", SEA: "#6D3FD0", RAIL: "#237A35", ROAD: "#C2410C" };
 /** The same four colors, brightened to read on the dark surfaces (the admin charts). */
 export const MODE_HEX_BRIGHT: Record<Mode, string> = { AIR: "#8FA6FF", SEA: "#B79BFF", RAIL: "#6FD79A", ROAD: "#FB9A5A" };
 

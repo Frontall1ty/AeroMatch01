@@ -2,6 +2,7 @@ import Link from "next/link";
 import { adminLogout } from "@/app/auth-actions";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { Brand } from "@/components/Brand";
+import { DemoBadge } from "@/components/ui";
 import { waitingCarrierCount } from "@/lib/adminData";
 import { isAdmin } from "@/lib/session";
 
@@ -18,6 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="mx-auto flex max-w-[1280px] items-center gap-4 px-4 py-2.5">
           <Brand href={admin ? "/admin" : "/"} />
           <span className="rounded border border-console-rule px-2 py-0.5 text-sm font-semibold text-console-muted">Admin console</span>
+          <DemoBadge dark className="hidden sm:inline-block" />
           <div className="ml-auto flex items-center gap-3">
             <Link href="/" className="hidden text-sm font-semibold text-console-muted hover:text-white sm:block">View site</Link>
             {admin && (

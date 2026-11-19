@@ -116,7 +116,7 @@ export function Carriers() {
           <Link href="/register" className="btn-bright mt-8 self-start">Add your capacity</Link>
         </div>
         <div className="flex flex-col rounded-lg bg-signal p-6 text-ink">
-          <p className="site-label">Trust</p>
+          <p className="site-label site-label-ink">Trust</p>
           <p className="font-display mt-auto pt-8 text-[96px] leading-[0.85] tracking-[-0.04em]">3</p>
           <h3 className="mt-3 text-xl font-semibold">Verified by hand.</h3>
           <p className="mt-2">A carrier is shown to shippers once our team has checked it: a complete company profile, or 3 delivered shipments.</p>

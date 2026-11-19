@@ -23,6 +23,10 @@
   background: repeating-linear-gradient(90deg, #ff5b1f 0 4px, transparent 4px 7px);
 }
 
+.site-label-ink::before {
+  background: repeating-linear-gradient(90deg, #0e0e10 0 4px, transparent 4px 7px);
+}
+
 /* ---------- Hero: the route map draws in once ---------- */
 .route-arc {
   stroke-dasharray: 1;

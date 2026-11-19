@@ -21,7 +21,7 @@ const OTHER: [string, string][] = [
   ["IKA", "IST"], ["TBS", "GYD"], ["ASB", "IKA"], ["NQZ", "SVO"], ["FRU", "ALA"], ["DYU", "TAS"], ["SKD", "TAS"],
   ["TAS", "SVO"], ["TAS", "PEK"], ["TAS", "DEL"], ["TAS", "FRA"], ["ESB", "IST"], ["HAM", "RTM"], ["DEL", "BOM"],
 ];
-const LABELS = ["TAS", "IST", "DXB", "ALA", "PVG", "RTM", "JFK", "LAX", "DEL", "CAI", "SVO"];
+const LABELS = ["TAS", "IST", "DXB", "ALA", "PVG", "RTM", "SVO", "DEL"];
 
 function arc(a: string, b: string): string | null {
   const p = cityByCode(a);

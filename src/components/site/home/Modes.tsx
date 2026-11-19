@@ -54,7 +54,7 @@ export function Modes() {
                 width={1280}
                 height={720}
                 loading="lazy"
-                className="aspect-[4/3] w-full object-cover md:aspect-[16/12]"
+                className="aspect-[4/5] w-full object-cover sm:aspect-[4/3] md:aspect-[16/12]"
               />
               <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <div className="glass-deep absolute inset-x-3 bottom-3 rounded-lg p-4 md:inset-x-4 md:bottom-4">
@@ -63,10 +63,10 @@ export function Modes() {
                   {MODE_LABEL[m.mode]}
                 </h3>
                 <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
-                  <div><dt className="text-xs text-console-muted">Typical time</dt><dd className="font-semibold">{m.time}</dd></div>
-                  <div><dt className="text-xs text-console-muted">Priced</dt><dd className="font-semibold">{m.priced}</dd></div>
-                  <div><dt className="text-xs text-console-muted">Runs</dt><dd className="font-semibold">{m.runs}</dd></div>
-                  <div><dt className="text-xs text-console-muted">Safety</dt><dd className="font-semibold">{SAFETY_BY_MODE[m.mode]} of 5 <span className="font-normal text-console-muted">(demo estimate)</span></dd></div>
+                  <div><dt className="text-xs text-[#C9C9CF]">Typical time</dt><dd className="font-semibold">{m.time}</dd></div>
+                  <div><dt className="text-xs text-[#C9C9CF]">Priced</dt><dd className="font-semibold">{m.priced}</dd></div>
+                  <div><dt className="text-xs text-[#C9C9CF]">Runs</dt><dd className="font-semibold">{m.runs}</dd></div>
+                  <div><dt className="text-xs text-[#C9C9CF]">Safety</dt><dd className="font-semibold">{SAFETY_BY_MODE[m.mode]} of 5 <span className="font-normal text-console-muted">(demo estimate)</span></dd></div>
                 </dl>
               </div>
             </li>

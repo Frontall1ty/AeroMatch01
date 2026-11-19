@@ -15,7 +15,7 @@ export function Hero() {
   const labels = labelOffers(shown);
   return (
     <section className="on-dark aurora relative overflow-hidden bg-console text-console-text" aria-labelledby="hero-title">
-      <RouteMap className="pointer-events-none absolute inset-x-0 bottom-0 h-[78%] w-full opacity-40 md:opacity-90" />
+      <RouteMap className="pointer-events-none absolute inset-x-0 top-[4%] h-[62%] w-full opacity-40 md:opacity-90" />
       <div className="col-lines relative mx-auto max-w-[1320px] px-4 pb-10 pt-8 md:px-6 md:pb-14">
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-console-muted">
           <p className="site-label">Freight comparison, 2026 pilot</p>

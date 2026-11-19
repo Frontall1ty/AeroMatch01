@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { normalizePasscode } from "@/lib/passcode";
 
 /** Optional passcode gate for shared demo links. Off unless DEMO_PASSCODE is set. */
 export const GATE_COOKIE = "am_gate";
@@ -12,7 +13,7 @@ async function gateToken(passcode: string, secret: string): Promise<string> {
 }
 
 export async function middleware(req: NextRequest) {
-  const passcode = process.env.DEMO_PASSCODE;
+  const passcode = normalizePasscode(process.env.DEMO_PASSCODE);
   if (!passcode) return NextResponse.next();
 
   const { pathname } = req.nextUrl;

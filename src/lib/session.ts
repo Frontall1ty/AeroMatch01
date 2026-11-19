@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./db";
 import { isDemoEmail } from "./accountSchemas";
+import { normalizePasscode } from "./passcode";
 
 /**
  * The cookie holds only a signed user id. Role and company are read from the database on every
@@ -101,10 +102,10 @@ export async function sessionFor(role: SessionRole): Promise<Session | null> {
 /* ---------- Admin: a separate passcode, not an account ---------- */
 
 /** Admin is switched on by setting ADMIN_PASSCODE. It never depends on who registered. */
-export const adminEnabled = () => Boolean(process.env.ADMIN_PASSCODE);
+export const adminEnabled = () => Boolean(normalizePasscode(process.env.ADMIN_PASSCODE));
 
 const adminToken = () =>
-  createHash("sha256").update(`admin:${process.env.ADMIN_PASSCODE ?? ""}:${secret()}`).digest("hex");
+  createHash("sha256").update(`admin:${normalizePasscode(process.env.ADMIN_PASSCODE)}:${secret()}`).digest("hex");
 
 export async function startAdminSession(): Promise<void> {
   (await cookies()).set(ADMIN_COOKIE, adminToken(), cookieOptions(60 * 60 * 8));

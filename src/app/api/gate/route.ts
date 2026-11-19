@@ -1,5 +1,6 @@
 import { createHash, timingSafeEqual } from "crypto";
 import { NextResponse, type NextRequest } from "next/server";
+import { normalizePasscode } from "@/lib/passcode";
 
 // Simple in-memory throttle: 8 attempts per minute per IP (per server instance).
 const attempts = new Map<string, { count: number; resetAt: number }>();
@@ -16,7 +17,7 @@ function tooMany(ip: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
-  const passcode = process.env.DEMO_PASSCODE;
+  const passcode = normalizePasscode(process.env.DEMO_PASSCODE);
   const back = (query: string) => NextResponse.redirect(new URL(`/gate${query}`, req.url), 303);
   if (!passcode) return NextResponse.redirect(new URL("/", req.url), 303);
 
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
   if (tooMany(ip)) return back("?error=wait");
 
   const form = await req.formData();
-  const given = String(form.get("passcode") ?? "");
+  const given = normalizePasscode(String(form.get("passcode") ?? ""));
   const a = createHash("sha256").update(given).digest();
   const b = createHash("sha256").update(passcode).digest();
   if (!timingSafeEqual(a, b)) return back("?error=wrong");

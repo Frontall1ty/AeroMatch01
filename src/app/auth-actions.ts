@@ -10,6 +10,7 @@ import { DEMO_EMAIL_SUFFIX, isDemoEmail, loginSchema, profileSchema, registerSch
 import { dummyHash, hashPassword, verifyPassword } from "@/lib/auth";
 import { cityByCode } from "@/lib/constants";
 import { allow } from "@/lib/rateLimit";
+import { normalizePasscode } from "@/lib/passcode";
 import {
   adminEnabled,
   endAdminSession,
@@ -145,7 +146,7 @@ export async function adminLogin(input: unknown): Promise<ActionResult> {
   if (!parsed.success) return fieldErrorsFrom(parsed.error);
 
   if (!allow(`admin:${await clientIp()}`, 8, 10 * 60 * 1000)) return fail("Too many attempts. Wait a few minutes and try again.");
-  const ok = timingSafeEqual(hash(parsed.data.passcode), hash(process.env.ADMIN_PASSCODE ?? ""));
+  const ok = timingSafeEqual(hash(normalizePasscode(parsed.data.passcode)), hash(normalizePasscode(process.env.ADMIN_PASSCODE)));
   if (!ok) return fail("That passcode is not correct.");
 
   await startAdminSession();

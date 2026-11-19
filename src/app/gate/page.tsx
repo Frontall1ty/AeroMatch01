@@ -1,3 +1,5 @@
+import { PasscodeInput } from "./PasscodeInput";
+
 export const dynamic = "force-dynamic";
 
 export default async function Gate({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
@@ -10,8 +12,8 @@ export default async function Gate({ searchParams }: { searchParams: Promise<{ e
         <label htmlFor="passcode" className="field-label">
           Passcode
         </label>
-        <input id="passcode" name="passcode" type="password" autoComplete="off" required aria-invalid={!!error} />
-        {error === "wrong" && <p className="field-error">That passcode is not correct. Check it and try again.</p>}
+        <PasscodeInput invalid={!!error} />
+        {error === "wrong" && <p className="field-error">That passcode is not correct. Check it and try again. Use the Show button to see what you typed.</p>}
         {error === "wait" && <p className="field-error">Too many attempts. Wait a minute and try again.</p>}
         <button className="btn mt-4 w-full">Open demo</button>
       </form>

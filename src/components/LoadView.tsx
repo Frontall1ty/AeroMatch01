@@ -1,5 +1,5 @@
 import { MODE_HEX, type Mode } from "@/lib/constants";
-import { ShipArt, TruckArt } from "@/components/site/Vehicles";
+import { ContainerFlatArt, FreighterArt, ShipArt, TruckArt, WagonArt } from "@/components/site/Vehicles";
 import { LOAD_CELLS, LOAD_NAME, cellState, fakeRef, loadKind, loadLayout, type CellState, type LoadKind } from "@/lib/load";
 
 /**
@@ -150,16 +150,16 @@ function areaFor(kind: LoadKind): Area {
 }
 
 /**
- * Vehicles that have a photograph. The area is where the cargo space is, in pixels of that photograph.
- * Photos: see PHOTOS.md. The ship is drawn in code.
+ * The drawn vehicles (src/components/site/Vehicles.tsx). The area is where the cargo space is, in units of that
+ * drawing's viewBox. All are drawn in code: no photographs, nothing to license.
  */
-type Photo = { src: string; w: number; h: number; area: Area; art?: "ship" | "truck" };
+type Photo = { w: number; h: number; area: Area; Art: (p: { className?: string }) => React.ReactElement };
 const PHOTOS: Partial<Record<LoadKind, Photo>> = {
-  truck: { src: "", art: "truck", w: 300, h: 100, area: { x: 12, y: 12, w: 190, h: 50 } },
-  plane: { src: "/vehicles/plane.webp", w: 960, h: 262, area: { x: 118, y: 150, w: 624, h: 68 } },
-  ship: { src: "", art: "ship", w: 470, h: 132, area: { x: 96, y: 18, w: 336, h: 54 } },
-  wagon: { src: "/vehicles/wagon.webp", w: 625, h: 235, area: { x: 26, y: 28, w: 550, h: 138 } },
-  container: { src: "/vehicles/container.webp", w: 920, h: 410, area: { x: 122, y: 64, w: 684, h: 280 } },
+  truck: { Art: TruckArt, w: 300, h: 100, area: { x: 12, y: 12, w: 190, h: 50 } },
+  plane: { Art: FreighterArt, w: 640, h: 166, area: { x: 133, y: 73, w: 370, h: 34 } },
+  ship: { Art: (p) => <ShipArt containers={false} {...p} />, w: 470, h: 132, area: { x: 96, y: 18, w: 336, h: 54 } },
+  wagon: { Art: WagonArt, w: 600, h: 210, area: { x: 76, y: 54, w: 448, h: 88 } },
+  container: { Art: ContainerFlatArt, w: 600, h: 220, area: { x: 82, y: 50, w: 436, h: 98 } },
 };
 function photoFor(kind: LoadKind): Photo | undefined {
   return PHOTOS[kind];
@@ -198,14 +198,7 @@ export function LoadView({
   if (photo) {
     return (
       <div className={`relative ${className}`} style={{ aspectRatio: `${photo.w} / ${photo.h}` }} role="img" aria-label={label}>
-        {photo.art === "ship" ? (
-          <ShipArt containers={false} className="absolute inset-0 h-full w-full" />
-        ) : photo.art === "truck" ? (
-          <TruckArt className="absolute inset-0 h-full w-full" />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo.src} alt="" width={photo.w} height={photo.h} className="absolute inset-0 h-full w-full" loading="lazy" decoding="async" />
-        )}
+        <photo.Art className="absolute inset-0 h-full w-full" />
         <svg viewBox={`0 0 ${photo.w} ${photo.h}`} className="absolute inset-0 h-full w-full" aria-hidden fill="none">
           <Cells area={photo.area} cols={cols} rows={rows} layout={layout} mode={mode} seed={seed} text={text} kg={unit === "kg" ? perCell : 0} k={photo.w / 400} photo />
         </svg>

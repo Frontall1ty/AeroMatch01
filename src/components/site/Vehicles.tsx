@@ -240,3 +240,138 @@ export function PlaneArt({ className, style, color = MODE_HEX.AIR }: P & { color
 }
 
 export const VEHICLE_ART = { ROAD: TruckArt, RAIL: TrainArt, SEA: ShipArt, AIR: PlaneArt } as const;
+
+/* ---------- Cutaways for the load view: the side is open, so the positions sit inside the space ---------- */
+
+function Bogie({ x, y, r = 15 }: { x: number; y: number; r?: number }) {
+  return (
+    <g>
+      <rect x={x - r * 2.5} y={y - r * 0.5} width={r * 5} height={r * 0.62} rx={r * 0.25} fill="#1E293B" />
+      <rect x={x - r * 0.55} y={y - r * 1.15} width={r * 1.1} height={r * 0.7} rx={r * 0.2} fill={STEEL} />
+      <Wheel x={x - r * 1.3} y={y} r={r} />
+      <Wheel x={x + r * 1.3} y={y} r={r} />
+    </g>
+  );
+}
+
+/**
+ * An open box seen from the side: back wall, floor, ceiling and the two ends drawn in perspective,
+ * so the cargo positions laid over the back wall read as standing inside.
+ */
+function OpenBox({ x, y, w, h, d, wall, floor, ribs, id }: { x: number; y: number; w: number; h: number; d: number; wall: string; floor: string; ribs: number; id: string }) {
+  const bx = x + d, by = y + d * 0.45, bw = w - d * 2, bh = h - d * 0.9;
+  return (
+    <g>
+      <linearGradient id={`${id}bw`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor={wall} />
+        <stop offset="1" stopColor={wall} stopOpacity="0.82" />
+      </linearGradient>
+      <rect x={x} y={y} width={w} height={h} fill="#94A3B8" />
+      <path d={`M${x} ${y} H${x + w} L${bx + bw} ${by} H${bx} Z`} fill="#000" opacity="0.28" />
+      <path d={`M${x} ${y + h} H${x + w} L${bx + bw} ${by + bh} H${bx} Z`} fill={floor} />
+      {Array.from({ length: 9 }).map((_, i) => {
+        const t = (i + 1) / 10;
+        return <path key={i} d={`M${x + w * t} ${y + h} L${bx + bw * t} ${by + bh}`} stroke="#000" strokeOpacity="0.08" />;
+      })}
+      <path d={`M${x} ${y} L${bx} ${by} V${by + bh} L${x} ${y + h} Z`} fill={wall} />
+      <path d={`M${x} ${y} L${bx} ${by} V${by + bh} L${x} ${y + h} Z`} fill="#000" opacity="0.16" />
+      <path d={`M${x + w} ${y} L${bx + bw} ${by} V${by + bh} L${x + w} ${y + h} Z`} fill={wall} />
+      <path d={`M${x + w} ${y} L${bx + bw} ${by} V${by + bh} L${x + w} ${y + h} Z`} fill="#000" opacity="0.1" />
+      <rect x={bx} y={by} width={bw} height={bh} fill={`url(#${id}bw)`} />
+      {Array.from({ length: ribs }).map((_, i) => <rect key={i} x={bx + ((i + 0.5) * bw) / ribs} y={by} width="1.2" height={bh} fill="#000" opacity="0.07" />)}
+    </g>
+  );
+}
+
+/** A freighter with its main deck cut open, nose to the right. No windows but the cockpit's, no livery. */
+export function FreighterArt({ className, style }: P) {
+  const id = useIds();
+  return (
+    <svg viewBox="0 0 640 166" className={className} style={style} aria-hidden fill="none">
+      <defs>
+        <Grad id={`${id}f`} from="#FFFFFF" mid="#EEF2F7" midAt={0.45} to="#AEBACB" />
+        <Grad id={`${id}t`} from="#F1F5F9" to="#A3B0C2" dir="h" />
+        <Grad id={`${id}w`} from="#F1F5F9" to="#8E9CB0" />
+        <Grad id={`${id}e`} from="#F8FAFC" to="#8D9BAF" />
+        <Grad id={`${id}g`} from="#31445F" to="#0F1B2D" />
+        <Grad id={`${id}i`} from="#E6EBF1" to="#C3CCD8" />
+      </defs>
+      <ellipse cx="330" cy="160" rx="290" ry="3.5" fill="#0F172A" opacity="0.13" />
+      {/* far tailplane, fin: plain, no livery */}
+      <path d="M86 88 L40 78 H64 L120 86 Z" fill="#A3B0C2" />
+      <path d="M52 80 L20 4 H52 L136 68 Z" fill={`url(#${id}t)`} />
+      <path d="M30 14 H50 L64 30 H36 Z" fill="#fff" opacity="0.35" />
+      {/* fuselage: long and slim, tail swept up, pointed nose */}
+      <path d="M24 84 C32 76 66 68 120 66 L526 66 C584 66 616 78 632 92 C616 104 584 114 526 114 L150 114 C100 114 58 108 32 98 Z" fill={`url(#${id}f)`} />
+      <path d="M150 112 L524 112" stroke="#94A3B8" strokeWidth="1" opacity="0.5" />
+      {/* the main deck, cut open */}
+      <rect x="128" y="70" width="380" height="40" rx="8" fill={`url(#${id}i)`} stroke="#7C8BA0" strokeWidth="1.3" />
+      {Array.from({ length: 18 }).map((_, i) => <rect key={i} x={146 + i * 20} y="73" width="1" height="34" fill="#64748B" opacity="0.28" />)}
+      <rect x="132" y="105" width="372" height="2.5" rx="1.2" fill="#64748B" opacity="0.5" />
+      {/* cockpit and the nose cargo door line */}
+      <path d="M574 74 L598 74 L612 83 L574 83 Z" fill={`url(#${id}g)`} />
+      <path d="M578 76 L588 76 L584 81 L578 81 Z" fill="#fff" opacity="0.25" />
+      <path d="M548 66 C556 82 556 98 548 114" stroke="#94A3B8" strokeWidth="1.1" opacity="0.8" />
+      {/* low wing, thin and swept, with its engine tucked under the root */}
+      <path d="M446 110 L238 148 H210 L334 110 Z" fill={`url(#${id}w)`} />
+      <path d="M446 110 L334 110" stroke="#fff" strokeWidth="1.5" opacity="0.7" />
+      <rect x="380" y="116" width="8" height="6" fill="#9AA8BA" />
+      <ellipse cx="386" cy="128" rx="32" ry="9.5" fill={`url(#${id}e)`} />
+      <ellipse cx="416" cy="128" rx="5" ry="8.5" fill="#475569" />
+      <ellipse cx="416" cy="128" rx="2.5" ry="4.5" fill="#1E293B" />
+      <path d="M358 124 H404" stroke="#fff" strokeWidth="1.5" opacity="0.6" />
+    </svg>
+  );
+}
+
+/** A covered goods wagon with its side open. */
+export function WagonArt({ className, style }: P) {
+  const id = useIds();
+  return (
+    <svg viewBox="0 0 600 210" className={className} style={style} aria-hidden fill="none">
+      <defs>
+        <Grad id={`${id}b`} from="#7B8A9E" mid="#5B6B7F" midAt={0.5} to="#3E4A5A" />
+        <Grad id={`${id}r`} from="#B7C1CD" to="#6B7A8F" />
+      </defs>
+      <path d="M0 204 H600" stroke="#94A3B8" strokeWidth="3" />
+      <ellipse cx="300" cy="202" rx="280" ry="3" fill="#0F172A" opacity="0.14" />
+      <path d="M36 26 Q300 6 564 26 V32 H36 Z" fill={`url(#${id}r)`} />
+      <rect x="30" y="30" width="540" height="134" rx="4" fill={`url(#${id}b)`} />
+      <rect x="30" y="30" width="540" height="2.5" fill="#fff" opacity="0.4" />
+      <OpenBox id={id} x={44} y={40} w={512} h={114} d={30} wall="#E9E1D2" floor="#C9B79A" ribs={24} />
+      <rect x="30" y="156" width="540" height="10" fill="#1E293B" />
+      <rect x="14" y="150" width="16" height="9" rx="2" fill={STEEL} /><rect x="570" y="150" width="16" height="9" rx="2" fill={STEEL} />
+      <circle cx="12" cy="154.5" r="5" fill="#475569" /><circle cx="588" cy="154.5" r="5" fill="#475569" />
+      <Bogie x={118} y={184} r={16} />
+      <Bogie x={482} y={184} r={16} />
+    </svg>
+  );
+}
+
+/** A 40 ft container with its side open, on a flat rail wagon. */
+export function ContainerFlatArt({ className, style }: P) {
+  const id = useIds();
+  return (
+    <svg viewBox="0 0 600 220" className={className} style={style} aria-hidden fill="none">
+      <defs>
+        <Grad id={`${id}c`} from="#D2604F" mid="#B44A3B" midAt={0.5} to="#7E2E25" />
+        <Grad id={`${id}p`} from="#64748B" to="#334155" />
+      </defs>
+      <path d="M0 214 H600" stroke="#94A3B8" strokeWidth="3" />
+      <ellipse cx="300" cy="212" rx="280" ry="3" fill="#0F172A" opacity="0.14" />
+      {/* the frame: rails along the top and bottom, corner posts and corner castings */}
+      <rect x="32" y="22" width="536" height="150" rx="2" fill={`url(#${id}c)`} />
+      {Array.from({ length: 45 }).map((_, i) => <rect key={i} x={36 + i * 12} y="22" width="5" height="150" fill="#000" opacity="0.07" />)}
+      <rect x="32" y="22" width="536" height="2.5" fill="#fff" opacity="0.4" />
+      <OpenBox id={id} x={48} y={34} w={504} h={126} d={32} wall="#E8ECF1" floor="#B9A387" ribs={30} />
+      <rect x="32" y="22" width="16" height="150" fill="#000" opacity="0.14" />
+      <rect x="552" y="22" width="16" height="150" fill="#000" opacity="0.14" />
+      {[34, 556].map((x) => [24, 162].map((y) => <rect key={`${x}${y}`} x={x} y={y} width="10" height="9" rx="1.5" fill="#3F1A15" opacity="0.75" />))}
+      {/* the flat wagon */}
+      <rect x="16" y="172" width="568" height="10" rx="2" fill={`url(#${id}p)`} />
+      <rect x="2" y="173" width="14" height="7" rx="2" fill={STEEL} /><rect x="584" y="173" width="14" height="7" rx="2" fill={STEEL} />
+      <Bogie x={108} y={197} r={14} />
+      <Bogie x={492} y={197} r={14} />
+    </svg>
+  );
+}

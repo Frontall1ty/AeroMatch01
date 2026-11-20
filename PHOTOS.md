@@ -38,14 +38,8 @@ Pictures that were supplied or found and not used because of this rule: containe
 
 ## Vehicle pictures in the load view
 
-The truck and the ship are drawn in code (`TruckArt`, `ShipArt` in `src/components/site/Vehicles.tsx`), so they stay sharp at any size. The aircraft, the wagon and the container are still pictures:
+All five vehicles in the load view are drawn in code in `src/components/site/Vehicles.tsx`, so they stay sharp at any size and there is nothing to license: `TruckArt`, `ShipArt`, `FreighterArt` (a freighter with its main deck cut open), `WagonArt` (a covered wagon with its side open) and `ContainerFlatArt` (a 40 ft container with its side open, on a flat wagon). The wagon and the container show the inside in perspective (back wall, floor, ends), so the positions read as standing inside.
 
-`public/vehicles/` holds the pictures the load view lays its positions over. They were supplied by the project owner as **placeholders for the demo** and are **not cleared for public or commercial use**. Replace them before the site is shown publicly or sold.
+To change where the positions go, edit the `area` of that vehicle in `PHOTOS` at the top of `src/components/LoadView.tsx` (in units of the drawing's viewBox).
 
-| File | Shows | Where it came from | What was done |
-|---|---|---|---|
-| `plane.webp` | Freighter, side view, plain white | A free-to-view aircraft illustration from a blog | Upper drawing cropped, the second drawing cut away, background made transparent |
-| `container.webp` | Open red container, side cutaway | A 3D render without watermark, supplied by the project owner | Cropped, background made transparent |
-| `wagon.webp` | Box wagon, side view, line drawing | A line drawing supplied by the project owner | The upper wagon cropped, background made transparent |
-
-Open points before going public: the licence of each picture and whether the truck cab resembles a real manufacturer's model closely enough to matter. The ship in the load view is drawn in code (`ShipArt`) (`src/components/LoadView.tsx`). To change a picture, replace the file and update its entry in `PHOTOS` at the top of that component (the box where positions go, in pixels of the picture).
+Until November 2026 the aircraft, the wagon and the container were pictures supplied by the project owner as placeholders, not cleared for public use. They were replaced by the drawings and removed from `public/vehicles/`. Open point that remains: whether the drawn truck cab resembles a real manufacturer's model closely enough to matter.

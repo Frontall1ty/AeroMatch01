@@ -1,12 +1,10 @@
 import * as THREE from "three";
 import { SHIP_SLOTS } from "@/lib/holds";
 import type { Materials } from "./materials";
+import { CH, CL, CW, openContainer } from "./container";
 import { box, mesh, span, type Vehicle } from "./parts";
 import { ribs, rng } from "./textures";
 
-const CL = 12.19; // 40 ft container, outside
-const CW = 2.44;
-const CH = 2.59;
 const BAY = 12.8;
 const ROW = 2.62;
 const DECK = 3.5; // top of the hatch covers
@@ -19,8 +17,13 @@ const FLEET = [0x2f5d8a, 0x8e3b2b, 0x2b7a78, 0x7d848c, 0xb49a6a, 0x3f6b45, 0x5a4
  * roof and near side cut away, with the cargo inside. No line's colours or names, no hull markings.
  * The ship's bow points to +X; the near side is +Z. The open container's doors face -X.
  */
-export function buildShip(M: Materials, hold: { L: number; W: number; H: number }, mine: number): Vehicle & { dispose: () => void } {
-  const { L, W, H } = hold;
+export function buildShip(
+  M: Materials,
+  hold: { L: number; W: number; H: number },
+  mine: number,
+  opts: { open?: boolean; tiers?: number } = {},
+): Vehicle & { dispose: () => void; stacks: THREE.Box3 } {
+  const open = opts.open ?? true;
   const g = new THREE.Group();
   const r = rng(41);
   const tex = ribs("#BDBDBD", 10);
@@ -104,7 +107,7 @@ export function buildShip(M: Materials, hold: { L: number; W: number; H: number 
   const slots: { b: number; row: number }[] = [];
   const bayOrder = Array.from({ length: bays }, (_, i) => i).sort((a, b) => Math.abs(a - 4.2) - Math.abs(b - 4.2));
   for (const b of bayOrder) for (let row = rows - 1; row >= 0; row--) slots.push({ b, row });
-  const count = Math.max(1, Math.min(mine, slots.length));
+  const count = open ? Math.max(1, Math.min(mine, slots.length)) : Math.min(mine, slots.length);
   const yours = new Set(slots.slice(0, count).map((s) => `${s.b}-${s.row}`));
   const zOf = (row: number) => -rows * ROW / 2 + ROW / 2 + row * ROW;
   const xOf = (b: number) => b * BAY + BAY / 2;
@@ -113,14 +116,14 @@ export function buildShip(M: Materials, hold: { L: number; W: number; H: number 
     for (let row = 0; row < rows; row++) {
       const key = `${b}-${row}`;
       const mineHere = yours.has(key);
-      const below = mineHere ? 1 : 1 + Math.floor(r() * 3);
+      const below = opts.tiers ?? (mineHere ? 1 : 1 + Math.floor(r() * 3));
       for (let tier = 0; tier < below; tier++) {
         const c = box(CL, CH - 0.04, CW, fleet[Math.floor(r() * fleet.length)], xOf(b), DECK + tier * CH + CH / 2, zOf(row), 0.03);
         g.add(c);
       }
       if (!mineHere) continue;
       const y = DECK + below * CH;
-      if (!openAt) {
+      if (!openAt && open) {
         openAt = new THREE.Vector3(xOf(b), y, zOf(row));
         continue;
       }
@@ -129,26 +132,9 @@ export function buildShip(M: Materials, hold: { L: number; W: number; H: number 
   }
 
   /* ---------- the open container ---------- */
-  const o = openAt!;
-  const t = (CW - W) / 2;
-  const x0 = o.x - CL / 2;
-  const x1 = o.x + CL / 2;
-  const zf = o.z - CW / 2;
-  const zn = o.z + CW / 2;
-  const fy = o.y + 0.16;
-  const cutH = 0.035;
-  const nearH = 0.5;
-  g.add(span(x0, o.y, zf, x1, fy, zn, M.steel)); // base frame
-  g.add(span(x0 + 0.1, fy - 0.01, zf + t, x1 - 0.1, fy, zn - t, M.floor));
-  g.add(span(x0, fy, zf, x1, fy + H, zf + t, orange)); // far side
-  g.add(span(x0 - 0.005, fy + H, zf - 0.005, x1 + 0.005, fy + H + cutH, zf + t + 0.005, M.cut));
-  g.add(span(x1 - t, fy, zf, x1, fy + H, zn, orange)); // front end
-  g.add(span(x1 - t - 0.005, fy + H, zf - 0.005, x1 + 0.005, fy + H + cutH, zn + 0.005, M.cut));
-  g.add(span(x0, fy, zn - t, x1, fy + nearH, zn, orange)); // near side, cut low
-  g.add(span(x0 - 0.005, fy + nearH, zn - t - 0.005, x1 + 0.005, fy + nearH + cutH, zn + 0.005, M.cut));
-  g.add(span(x0, fy, zf, x0 + t, fy + nearH, zn, orange)); // door end, cut low
-  g.add(span(x0 - 0.005, fy + nearH, zf - 0.005, x0 + t + 0.005, fy + nearH + cutH, zn + 0.005, M.cut));
-  for (const [x, z] of [[x0, zf], [x1, zf], [x0, zn], [x1, zn]]) g.add(box(0.18, 0.16, 0.18, M.steel, x + (x === x0 ? 0.09 : -0.09), o.y + 0.08, z + (z === zf ? 0.09 : -0.09)));
+  const o = openAt as THREE.Vector3 | null;
+  const origin = o ? openContainer(g, M, orange, o.x, o.y, o.z, hold) : null;
+  const centre = o ?? new THREE.Vector3(deckL / 2, DECK + CH, 0);
 
   g.traverse((m) => {
     if ((m as THREE.Mesh).isMesh) {
@@ -158,9 +144,10 @@ export function buildShip(M: Materials, hold: { L: number; W: number; H: number 
   });
   return {
     group: g,
-    holdOrigin: new THREE.Vector3(x0 + t + (CL - 2 * t - L) / 2, fy, zf + t),
-    focus: new THREE.Vector3(o.x, o.y + 1.2, o.z),
-    frame: new THREE.Box3(new THREE.Vector3(o.x - 15, 1, -beam / 2), new THREE.Vector3(o.x + 15, o.y + 3, beam / 2)),
+    holdOrigin: origin ?? new THREE.Vector3(),
+    focus: new THREE.Vector3(centre.x, centre.y + 1.2, centre.z),
+    frame: new THREE.Box3(new THREE.Vector3(centre.x - 15, 1, -beam / 2), new THREE.Vector3(centre.x + 15, centre.y + 3, beam / 2)),
+    stacks: new THREE.Box3(new THREE.Vector3(0, DECK, rows * ROW / 2), new THREE.Vector3(deckL, DECK + (opts.tiers ?? 3) * CH, rows * ROW / 2)),
     water: true,
     dispose() {
       owned.forEach((m) => m.dispose());

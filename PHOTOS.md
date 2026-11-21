@@ -32,7 +32,7 @@ The new-shipment page uses the same two loops on its large card. For sea and rai
 
 ## The rule for any picture
 
-**No picture may show a real company's name, logo or livery, and no readable aircraft registration.** This is the same rule as for the rest of the site: no real airline, carrier or forwarder, and no implied integration. The vehicles in `Vehicles.tsx` (used by the race and the load view) are generic on purpose, and their containers carry colors only, no logos.
+**No picture may show a real company's name, logo or livery, and no readable aircraft registration.** This is the same rule as for the rest of the site: no real airline, carrier or forwarder, and no implied integration. The drawn vehicles in `Vehicles.tsx` (used by the race and the board) and the 3D models in `src/three/` are generic on purpose, and their containers carry colors only, no logos.
 
 Pictures that were supplied or found and not used because of this rule: container-ship side views with real shipping lines' logos, a company name and a stock-site watermark, an airliner with an airline livery and registration, and a wagon drawing with a CAD site's watermark and real railway markings.
 
@@ -46,8 +46,6 @@ They are not photographs. For a photoreal look, licensed model files (GLB) can r
 
 ## Vehicle pictures in the load view
 
-All five vehicles in the load view are drawn in code in `src/components/site/Vehicles.tsx`, so they stay sharp at any size and there is nothing to license: `TruckArt`, `ShipArt`, `FreighterArt` (a freighter with its main deck cut open), `WagonArt` (a covered wagon with its side open) and `ContainerFlatArt` (a 40 ft container with its side open, on a flat wagon). The wagon and the container show the inside in perspective (back wall, floor, ends), so the positions read as standing inside.
+The load view (compare rows, the booking drawer, the home page) shows each vehicle from the side with the positions laid over its cargo space. The pictures in `public/vehicles/` (`truck`, `plane`, `wagon`, `container`, `ship`, WebP) are rendered from the same 3D models as the new-shipment page, by `node scripts/render-stills.mjs`. The script also writes `src/lib/loadStills.ts`: each picture's size and the rectangle of its cargo space's back wall, in pixels, where the positions go. Run it again after changing a model. A page of offers cannot hold a live 3D view per row (browsers limit how many run at once), so these are still pictures.
 
-To change where the positions go, edit the `area` of that vehicle in `PHOTOS` at the top of `src/components/LoadView.tsx` (in units of the drawing's viewBox).
-
-Until November 2026 the aircraft, the wagon and the container were pictures supplied by the project owner as placeholders, not cleared for public use. They were replaced by the drawings and removed from `public/vehicles/`. Open point that remains: whether the drawn truck cab resembles a real manufacturer's model closely enough to matter.
+They are our own renders of models built in code: nothing to license. Until November 2026 three of these were pictures supplied by the project owner as placeholders, not cleared for public use; they are gone. Open point that remains: whether the drawn truck cab in the race (`TruckArt`) resembles a real manufacturer's model closely enough to matter.

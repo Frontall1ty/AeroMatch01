@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { Materials } from "./materials";
+import { CL, openContainer } from "./container";
 import { box, mesh, rod, span, type Vehicle } from "./parts";
 
 const GAUGE = 1.52; // the 1,520 mm gauge of the region
@@ -85,6 +86,27 @@ function bogie(M: Materials, x: number) {
   return g;
 }
 
+/** A piece of 1,520 mm track on ballast, from x0 to x1. */
+function track(g: THREE.Group, M: Materials, x0: number, x1: number) {
+  const ballast = new THREE.Shape();
+  ballast.moveTo(-2.1, 0);
+  ballast.lineTo(2.1, 0);
+  ballast.lineTo(1.55, 0.3);
+  ballast.lineTo(-1.55, 0.3);
+  ballast.closePath();
+  const bed = mesh(new THREE.ExtrudeGeometry(ballast, { depth: x1 - x0, bevelEnabled: false }), M.ballast);
+  bed.rotation.y = Math.PI / 2;
+  bed.position.set(x0, 0, 0);
+  g.add(bed);
+  for (let x = x0 + 0.3; x < x1; x += 0.55) g.add(box(0.26, 0.17, 2.7, M.concrete, x, 0.3 + 0.085, 0, 0.02));
+  for (const s of [1, -1]) {
+    const z = s * (GAUGE / 2);
+    g.add(span(x0, 0.47, z - 0.075, x1, 0.49, z + 0.075, M.rail));
+    g.add(span(x0, 0.49, z - 0.012, x1, 0.58, z + 0.012, M.rail));
+    g.add(span(x0, 0.58, z - 0.037, x1, RAIL_TOP, z + 0.037, M.railHead));
+  }
+}
+
 /** The automatic coupler at one end. */
 function coupler(M: Materials, x: number, dir: 1 | -1, y: number) {
   const g = new THREE.Group();
@@ -99,7 +121,7 @@ function coupler(M: Materials, x: number, dir: 1 | -1, y: number) {
  * and the cut faces are filled in the accent colour. No railway markings or numbers.
  * The wagon's rear end is at X = 0, its front end at X = L; the near side is +Z.
  */
-export function buildWagon(M: Materials, hold: { L: number; W: number; H: number }): Vehicle {
+export function buildWagon(M: Materials, hold: { L: number; W: number; H: number }, trackExtra = 6): Vehicle {
   const { L, W, H } = hold;
   const g = new THREE.Group();
   const floorY = RAIL_TOP + 1.3;
@@ -108,26 +130,7 @@ export function buildWagon(M: Materials, hold: { L: number; W: number; H: number
   const cutH = 0.035;
   const nearH = 0.55;
 
-  /* ---------- track ---------- */
-  const extra = 6;
-  const ballast = new THREE.Shape();
-  ballast.moveTo(-2.1, 0);
-  ballast.lineTo(2.1, 0);
-  ballast.lineTo(1.55, 0.3);
-  ballast.lineTo(-1.55, 0.3);
-  ballast.closePath();
-  const bed = mesh(new THREE.ExtrudeGeometry(ballast, { depth: L + extra * 2, bevelEnabled: false }), M.ballast);
-  bed.rotation.y = Math.PI / 2;
-  bed.position.set(-extra, 0, 0);
-  bed.scale.set(1, 1, 1);
-  g.add(bed);
-  for (let x = -extra + 0.3; x < L + extra; x += 0.55) g.add(box(0.26, 0.17, 2.7, M.concrete, x, 0.3 + 0.085, 0, 0.02));
-  for (const s of [1, -1]) {
-    const z = s * (GAUGE / 2);
-    g.add(span(-extra, 0.47, z - 0.075, L + extra, 0.49, z + 0.075, M.rail));
-    g.add(span(-extra, 0.49, z - 0.012, L + extra, 0.58, z + 0.012, M.rail));
-    g.add(span(-extra, 0.58, z - 0.037, L + extra, RAIL_TOP, z + 0.037, M.railHead));
-  }
+  track(g, M, -trackExtra, L + trackExtra);
 
   /* ---------- running gear and underframe ---------- */
   g.add(bogie(M, 2.0), bogie(M, L - 2.0));
@@ -181,5 +184,34 @@ export function buildWagon(M: Materials, hold: { L: number; W: number; H: number
     group: g,
     holdOrigin: new THREE.Vector3(0, floorY, -W / 2),
     focus: new THREE.Vector3(L * 0.5, floorY + H * 0.2, 0),
+  };
+}
+
+/**
+ * A 40 ft container on a flat wagon, on track. The container's roof and near side are cut away.
+ * The container's door end is at -X; the near side is +Z. `hold` is the container's inside.
+ */
+export function buildContainerFlat(M: Materials, hold: { L: number; W: number; H: number }, wall: THREE.Material, trackExtra = 6): Vehicle {
+  const g = new THREE.Group();
+  const deckL = CL + 1.4;
+  const deckY = RAIL_TOP + 1.05;
+  const x0 = -0.7;
+  track(g, M, x0 - trackExtra, x0 + deckL + trackExtra);
+  g.add(bogie(M, x0 + 1.9), bogie(M, x0 + deckL - 1.9));
+  g.add(span(x0, deckY - 0.32, -1.3, x0 + deckL, deckY, 1.3, M.wagonFrame)); // deck and side sills
+  g.add(span(x0, deckY - 0.6, -0.22, x0 + deckL, deckY - 0.32, 0.22, M.wagonFrame)); // centre sill
+  const cy = RAIL_TOP + 1.06;
+  g.add(coupler(M, x0, -1, cy), coupler(M, x0 + deckL, 1, cy));
+  const origin = openContainer(g, M, wall, x0 + deckL / 2, deckY, 0, hold, true);
+  g.traverse((o) => {
+    if ((o as THREE.Mesh).isMesh) {
+      o.castShadow = true;
+      o.receiveShadow = true;
+    }
+  });
+  return {
+    group: g,
+    holdOrigin: origin,
+    focus: new THREE.Vector3(x0 + deckL / 2, deckY + hold.H * 0.4, 0),
   };
 }

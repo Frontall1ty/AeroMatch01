@@ -59,7 +59,7 @@ Choices made where the spec was ambiguous, or where domain review changed it. Ea
 
 - **The scroll story was removed** in the November 2026 redesign. Neither its drawn nor its photographic version was approved, and it did not fit the new layout. The race, the board and the load-view demo stayed, because they were asked for.
 - **The site has a shipment board and a race.** The board is a split-flap departures board with invented shipments; each pair of cities really has that mode in the app (a test checks it). The race moves a distance slider and an "ocean" switch over four lanes. It uses invented per-tonne figures, the same road and rail distance limits as the app, and the same Fastest, Cheapest and Safest weights as the comparison, so the winner is decided by the real rule.
-- **The load view is a cutaway drawing** of a truck, aircraft, wagon, container or ship. It shows other bookings (invented references), your cargo and the free space, with "% loaded". It is a picture of how full the vehicle is, not a loading plan.
+- **The load view is a cutaway picture** of a truck, aircraft, wagon, container or ship. It shows other bookings (invented references), your cargo and the free space, with "% loaded". It is a picture of how full the vehicle is, not a loading plan.
 
 ## Design and admin (Nov 2026)
 

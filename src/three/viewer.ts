@@ -19,6 +19,8 @@ export type ViewerOptions = {
   view: View;
   /** No auto-turn and no drop-in, as with reduced motion. */
   still: boolean;
+  /** Turn slowly by itself until touched. Only where the visitor opened the view on purpose, not beside a form. */
+  autoTurn: boolean;
   onHover: (index: number | null) => void;
   onLost: () => void;
 };
@@ -74,7 +76,6 @@ export function createViewer(host: HTMLElement, opts: ViewerOptions): Viewer {
   canvas.style.display = "block";
   canvas.style.width = "100%";
   canvas.style.height = "100%";
-  canvas.style.touchAction = "pan-y";
   host.appendChild(canvas);
 
   const scene = new THREE.Scene();
@@ -113,6 +114,9 @@ export function createViewer(host: HTMLElement, opts: ViewerOptions): Viewer {
   controls.minPolarAngle = 0.02;
   controls.maxPolarAngle = 1.38;
   controls.autoRotateSpeed = 0.55;
+  // the mouse wheel and a vertical swipe scroll the page; only a drag turns the model
+  controls.enableZoom = false;
+  canvas.style.touchAction = "pan-y";
 
   const water = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), M.water);
   water.rotation.x = -Math.PI / 2;
@@ -308,7 +312,7 @@ export function createViewer(host: HTMLElement, opts: ViewerOptions): Viewer {
       });
       busy = busy || drops.length > 0;
     }
-    controls.autoRotate = !still && !touched && !tween;
+    controls.autoRotate = opts.autoTurn && !still && !touched && !tween;
     const moved = controls.update();
     busy = busy || moved || controls.autoRotate;
     renderer.render(scene, camera);
@@ -401,6 +405,8 @@ export function createViewer(host: HTMLElement, opts: ViewerOptions): Viewer {
       pmrem.dispose();
       room.dispose?.();
       renderer.dispose();
+      // give the context back now: browsers keep only a few, and drop the oldest when another is made
+      renderer.forceContextLoss();
       canvas.remove();
     },
   };

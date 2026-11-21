@@ -214,6 +214,7 @@ export function ModeChooser({
                 cargo={cargo ?? sample}
                 dark
                 fit
+                autoTurn
                 note={cargo ? undefined : "Shown with a sample load of 25 crates: enter your cargo in step 2 and it is loaded here."}
                 action={
                   <button ref={closeRef} type="button" className="btn-ghost !min-h-[44px] !border-white/35 !py-1 !text-xs" onClick={() => setInside(false)}>

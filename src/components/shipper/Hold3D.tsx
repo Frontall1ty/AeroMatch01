@@ -25,6 +25,7 @@ export function Hold3D({
   onActive,
   onReady,
   onFail,
+  autoTurn = false,
   className = "",
 }: {
   mode: Mode;
@@ -34,6 +35,7 @@ export function Hold3D({
   onActive: (index: number | null) => void;
   onReady: (viewer: Viewer | null) => void;
   onFail: () => void;
+  autoTurn?: boolean;
   className?: string;
 }) {
   const host = useRef<HTMLDivElement>(null);
@@ -57,6 +59,7 @@ export function Hold3D({
           layout: latest.current.layout,
           view: latest.current.view,
           still: isStill(),
+          autoTurn,
           onHover: (i) => latest.current.onActive(i),
           onLost: () => latest.current.onFail(),
         });
@@ -77,7 +80,7 @@ export function Hold3D({
       viewer.current = null;
       latest.current.onReady(null);
     };
-  }, [mode]);
+  }, [mode, autoTurn]);
 
   useEffect(() => {
     viewer.current?.setLayout(layout);

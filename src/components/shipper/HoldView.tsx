@@ -219,6 +219,7 @@ export function HoldView({
   fit = false,
   action,
   note,
+  autoTurn = false,
   className = "",
 }: {
   mode: Mode;
@@ -230,6 +231,8 @@ export function HoldView({
   action?: React.ReactNode;
   /** A line added to the small print. */
   note?: string;
+  /** Let the 3D model turn slowly by itself (the Look inside card, where it stops with Pause motion). */
+  autoTurn?: boolean;
   className?: string;
 }) {
   const [view, setView] = useState<View>("angled");
@@ -250,7 +253,7 @@ export function HoldView({
       <Scene key={`${mode}-${view}`} mode={mode} layout={layout} view={view} active={active} setActive={setActive} />
     </svg>
   );
-  const turnBtn = `grid min-h-[36px] min-w-[36px] place-items-center rounded border text-sm font-semibold transition-colors disabled:opacity-40 ${dark ? "border-white/20 text-console-text hover:bg-white/10" : "border-rule bg-panel hover:bg-paper"}`;
+  const turnBtn = `grid min-h-[44px] min-w-[44px] place-items-center rounded border text-sm font-semibold transition-colors disabled:opacity-40 ${dark ? "border-white/20 text-console-text hover:bg-white/10" : "border-rule bg-panel hover:bg-paper"}`;
 
   return (
     <div className={`${fit ? "flex min-h-0 flex-1 flex-col" : ""} ${className}`}>
@@ -267,7 +270,7 @@ export function HoldView({
                   type="button"
                   aria-pressed={view === v}
                   onClick={() => setView(v)}
-                  className={`min-h-[36px] px-3 text-xs font-semibold transition-colors ${view === v ? (dark ? "bg-white text-ink" : "bg-ink text-white") : dark ? "text-console-text hover:bg-white/10" : "bg-panel hover:bg-paper"}`}
+                  className={`min-h-[44px] px-3 text-xs font-semibold transition-colors ${view === v ? (dark ? "bg-white text-ink" : "bg-ink text-white") : dark ? "text-console-text hover:bg-white/10" : "bg-panel hover:bg-paper"}`}
                 >
                   {v === "angled" ? "Angled" : "From above"}
                 </button>
@@ -290,7 +293,7 @@ export function HoldView({
       {use3d ? (
         <div className={`relative w-full ${fit ? "min-h-[160px] flex-1" : "aspect-[16/10]"}`} onMouseLeave={() => setActive(null)}>
           {!viewer && svg("hold-svg absolute inset-0 h-full w-full", true)}
-          <Hold3D className="absolute inset-0" mode={mode} layout={layout} view={view} label={text} onActive={setActive} onReady={setViewer} onFail={() => setFailed(true)} />
+          <Hold3D className="absolute inset-0" mode={mode} layout={layout} view={view} label={text} onActive={setActive} onReady={setViewer} onFail={() => setFailed(true)} autoTurn={autoTurn} />
         </div>
       ) : (
         svg(`hold-svg w-full ${fit ? "min-h-[120px] flex-1" : ""}`)

@@ -1,8 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MODE_LABEL, type Mode } from "@/lib/constants";
 import { cargoLayout, HOLDS, SHIP_SLOTS, type CargoInput, type Layout, type PlacedBox } from "@/lib/holds";
+import { MODELS_3D, canUseWebGL } from "@/three/support";
+import type { Viewer } from "@/three/viewer";
+import { Hold3D } from "./Hold3D";
 
 /**
  * The cargo space with its roof cut away, seen from above at an angle (or straight down), with the shipper's cargo
@@ -234,7 +237,20 @@ export function HoldView({
   const layout = useMemo(() => cargoLayout(mode, cargo), [mode, cargo]);
   const vb = useMemo(() => bounds(mode, view), [mode, view]);
   const text = summary(mode, layout);
-  const activeBox = mode === "SEA" ? null : layout.boxes.find((b) => b.index === active);
+  // The 3D model where there is one and WebGL works; the drawing otherwise, and while the model loads.
+  const [gl, setGl] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [viewer, setViewer] = useState<Viewer | null>(null);
+  useEffect(() => setGl(canUseWebGL()), []);
+  const use3d = gl && !failed && MODELS_3D.includes(mode);
+  // In the 3D ship the pieces sit inside the open container, so they can be pointed at too.
+  const activeBox = mode === "SEA" && !use3d ? null : layout.boxes.find((b) => b.index === active);
+  const svg = (cls: string, hidden = false) => (
+    <svg viewBox={vb.map((n) => n.toFixed(1)).join(" ")} className={cls} role={hidden ? undefined : "img"} aria-hidden={hidden || undefined} aria-label={hidden ? undefined : text} onMouseLeave={() => setActive(null)}>
+      <Scene key={`${mode}-${view}`} mode={mode} layout={layout} view={view} active={active} setActive={setActive} />
+    </svg>
+  );
+  const turnBtn = `grid min-h-[36px] min-w-[36px] place-items-center rounded border text-sm font-semibold transition-colors disabled:opacity-40 ${dark ? "border-white/20 text-console-text hover:bg-white/10" : "border-rule bg-panel hover:bg-paper"}`;
 
   return (
     <div className={`${fit ? "flex min-h-0 flex-1 flex-col" : ""} ${className}`}>
@@ -257,18 +273,33 @@ export function HoldView({
                 </button>
               ))}
             </div>
+            {use3d && (
+              <div role="group" aria-label="Turn the model" className="flex gap-1">
+                <button type="button" className={turnBtn} disabled={!viewer} onClick={() => viewer?.turn(-1)} aria-label="Turn left">
+                  <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M7 5H4v3M4.6 8A6 6 0 1 1 5 13" /></svg>
+                </button>
+                <button type="button" className={turnBtn} disabled={!viewer} onClick={() => viewer?.turn(1)} aria-label="Turn right">
+                  <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13 5h3v3M15.4 8A6 6 0 1 0 15 13" /></svg>
+                </button>
+              </div>
+            )}
             {action}
           </div>
         </div>
       )}
-      <svg viewBox={vb.map((n) => n.toFixed(1)).join(" ")} className={`hold-svg w-full ${fit ? "min-h-[120px] flex-1" : ""}`} role="img" aria-label={text} onMouseLeave={() => setActive(null)}>
-        <Scene key={`${mode}-${view}`} mode={mode} layout={layout} view={view} active={active} setActive={setActive} />
-      </svg>
+      {use3d ? (
+        <div className={`relative w-full ${fit ? "min-h-[160px] flex-1" : "aspect-[16/10]"}`} onMouseLeave={() => setActive(null)}>
+          {!viewer && svg("hold-svg absolute inset-0 h-full w-full", true)}
+          <Hold3D className="absolute inset-0" mode={mode} layout={layout} view={view} label={text} onActive={setActive} onReady={setViewer} onFail={() => setFailed(true)} />
+        </div>
+      ) : (
+        svg(`hold-svg w-full ${fit ? "min-h-[120px] flex-1" : ""}`)
+      )}
       <p className={`${fit ? "mt-2" : "mt-3 min-h-[40px]"} text-sm ${dark ? "text-console-muted" : "text-muted"}`} aria-live="polite">
         {activeBox ? `${layout.state === "vehicles" ? "Car" : layout.state === "estimate" ? "Pallet" : "Piece"} ${activeBox.index + 1} of ${layout.count}${activeBox.layer > 0 ? ", on the second layer" : ", on the floor"}. ` : ""}
         {text}
       </p>
-      <p className={`text-xs ${dark ? "text-console-muted" : "text-muted"}`}>A typical size for the picture, not a loading plan. The carrier you choose decides the real one.{note ? ` ${note}` : ""}</p>
+      <p className={`text-xs ${dark ? "text-console-muted" : "text-muted"}`}>A typical size for the picture, not a loading plan. The carrier you choose decides the real one.{use3d ? " Drag to turn it." : ""}{note ? ` ${note}` : ""}</p>
     </div>
   );
 }

@@ -36,6 +36,14 @@ The new-shipment page uses the same two loops on its large card. For sea and rai
 
 Pictures that were supplied or found and not used because of this rule: container-ship side views with real shipping lines' logos, a company name and a stock-site watermark, an airliner with an airline livery and registration, and a wagon drawing with a CAD site's watermark and real railway markings.
 
+## 3D models on the new-shipment page
+
+The freighter, the container ship, the covered wagon and the truck in the cargo-space view are built in code with three.js (`src/three/`: `plane.ts`, `ship.ts`, `rail.ts`, `truck.ts`). No model files and no image files are loaded: the textures (corrugated board, plank floor, tarpaulin, ribbed steel, ballast, ripples) are drawn on a canvas when the view opens, and the studio light is three.js's built-in room environment. So there is nothing to license and nothing comes from another site.
+
+They are generic on purpose: no make, badge, airline or shipping-line colours, registration or railway markings. Container colours are a neutral mix.
+
+They are not photographs. For a photoreal look, licensed model files (GLB) can replace a builder: each vehicle is one function that returns the group and the corner where the cargo starts. Check the licence allows commercial use, that the file shows no brand, and that its textures are embedded (the site's content security policy loads nothing from elsewhere).
+
 ## Vehicle pictures in the load view
 
 All five vehicles in the load view are drawn in code in `src/components/site/Vehicles.tsx`, so they stay sharp at any size and there is nothing to license: `TruckArt`, `ShipArt`, `FreighterArt` (a freighter with its main deck cut open), `WagonArt` (a covered wagon with its side open) and `ContainerFlatArt` (a 40 ft container with its side open, on a flat wagon). The wagon and the container show the inside in perspective (back wall, floor, ends), so the positions read as standing inside.
